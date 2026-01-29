@@ -1,4 +1,5 @@
 package model;
+
 import db.DB_Konexioa;
 
 import java.sql.Date;
@@ -109,7 +110,57 @@ public class Langilea extends Pertsona implements IAutentifikagarria {
         }
     }
 
-    // langile batek bere fitxaketa historiala ikusteko metodoa:
+    public void sarreraFitxaketaEgin() throws java.sql.SQLException {
+        fitxatu("Sarrera");
+    }
+
+    public void irteeraFitxaketaEgin() throws java.sql.SQLException {
+        fitxatu("Irteera");
+    }
+
+    // langile batek bere fitxaketa historiala ikusteko metodoa (datuak itzultzen
+    // ditu)
+    public java.util.List<Fitxaketa> nireFitxaketakIkusi() {
+        java.util.List<Fitxaketa> zerrenda = new java.util.ArrayList<>();
+        String galdera = "SELECT id_fitxaketa, langilea_id, data, ordua, mota, eguneratze_data FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
+        try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                java.sql.PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
+            sententzia.setInt(1, this.getIdLangilea());
+            java.sql.ResultSet rs = sententzia.executeQuery();
+            while (rs.next()) {
+                zerrenda.add(new Fitxaketa(
+                        rs.getInt("id_fitxaketa"),
+                        rs.getInt("langilea_id"),
+                        rs.getDate("data"),
+                        rs.getTime("ordua"),
+                        rs.getString("mota"),
+                        rs.getTimestamp("eguneratze_data")));
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return zerrenda;
+    }
+
+    public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId)
+            throws java.sql.SQLException {
+        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+        try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                java.sql.PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            pst.setString(1, pasahitza);
+            pst.setString(2, hizkuntza);
+            pst.setInt(3, herriaId);
+            pst.setInt(4, this.getIdLangilea());
+            pst.executeUpdate();
+
+            // Eguneratu objektua ere
+            this.setPasahitza(pasahitza);
+            this.setHizkuntza(hizkuntza);
+            this.setHerriaId(herriaId);
+        }
+    }
+
+    // langile batek bere fitxaketa historiala ikusteko metodoa (egoera testua):
     public String getFitxaketaEgoera() {
         String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();

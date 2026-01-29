@@ -1,4 +1,5 @@
 package ui;
+
 import db.DB_Konexioa;
 import model.*;
 
@@ -71,13 +72,6 @@ public class MenuLogistika extends JFrame {
     }
 
     public MenuLogistika() {
-        // Saiorik gabe probatzeko edo Sesioa klasea erabiltzeko
-        // Hemen Sesioa klaseko datuetatik Langilea objektu bat eraiki beharko genuke
-        // Baina errazagoa da IDa bakarrik pasatzean DBtik kargatzea edo zuzenean Sesioa
-        // erabiltzea
-        // Kasu honetan, suponituko dugu Sesioa.lortuLangilea() existitzen dela edo
-        // antzeko zerbait.
-        // Demo moduan datu faltsuekin edo Sesioako datu solteekin eraikiko dugu:
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
                 null, null, true, 2, "", null));
     }
@@ -133,7 +127,7 @@ public class MenuLogistika extends JFrame {
         erabiltzaileInfoPanela.setOpaque(false);
 
         JLabel erabiltzaileEtiketa = new JLabel(
-                langilea.getIzena() + " " + langilea.getAbizena()); // Saila ere jar daiteke
+                langilea.getIzena() + " " + langilea.getAbizena());
         erabiltzaileEtiketa.setFont(new Font("SansSerif", Font.BOLD, 14));
         erabiltzaileEtiketa.setForeground(new Color(0, 102, 102));
 
@@ -143,6 +137,14 @@ public class MenuLogistika extends JFrame {
         gbcUser.gridx = 0;
         gbcUser.gridy = 0;
         erabiltzaileInfoPanela.add(erabiltzaileEtiketa, gbcUser);
+
+        // Fitxaketa Panela (Etiketa)
+        fitxaketaInfoEtiketa = new JLabel("Kargatzen...");
+        fitxaketaInfoEtiketa.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        GridBagConstraints gbcLabel = new GridBagConstraints();
+        gbcLabel.gridx = 0;
+        gbcLabel.gridy = 1;
+        erabiltzaileInfoPanela.add(fitxaketaInfoEtiketa, gbcLabel);
 
         // ... Fitxaketa botoiak ...
         JPanel botoiPanela = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
@@ -157,9 +159,19 @@ public class MenuLogistika extends JFrame {
         JButton historialBotoia = new JButton("Historiala");
         historialBotoia.addActionListener(e -> ikusiFitxaketaHistoriala());
 
+        JButton nireDatuakBotoia = new JButton("Nire Datuak");
+        nireDatuakBotoia.addActionListener(e -> irekiNireDatuakEditatu());
+
         botoiPanela.add(sarreraBotoia);
         botoiPanela.add(irteeraBotoia);
         botoiPanela.add(historialBotoia);
+        botoiPanela.add(nireDatuakBotoia);
+
+        GridBagConstraints gbcBtns = new GridBagConstraints();
+        gbcBtns.gridx = 1;
+        gbcBtns.gridy = 0;
+        gbcBtns.gridheight = 2;
+        erabiltzaileInfoPanela.add(botoiPanela, gbcBtns);
 
         // Logout botoia
         JButton saioaItxiBotoia = new JButton("Saioa Itxi");
@@ -173,15 +185,14 @@ public class MenuLogistika extends JFrame {
         gbcLogout.fill = GridBagConstraints.VERTICAL;
         gbcLogout.gridx = 2;
         gbcLogout.gridy = 0;
+        gbcLogout.gridheight = 2;
         erabiltzaileInfoPanela.add(saioaItxiBotoia, gbcLogout);
-
-        // Zuzendaritza badauka atzera botoia (Suposatuz saila begiratzen dugula, baina
-        // hemen Langilea objektuan ez dago zuzenean saila izena agian, IDa bakarrik.
-        // Logika hau sinplifikatu dezakegu edo sailaID konprobatu).
 
         goikoPanela.add(erabiltzaileInfoPanela, BorderLayout.EAST);
 
-        // ...
+        // PESTAINA PANELA (JTabbedPane)
+        pestainaPanela = new JTabbedPane(JTabbedPane.TOP);
+        edukiPanela.add(pestainaPanela, BorderLayout.CENTER);
 
         // Tab-ak sortu
         sarreraTabSortu();
@@ -212,10 +223,14 @@ public class MenuLogistika extends JFrame {
         }
     }
 
-    // --- FITXAKETA KUDEAKETA (Refactored) ---
+    // --- FITXAKETA LOGIKA ---
     private void fitxatu(String mota) {
         try {
-            langilea.fitxatu(mota);
+            if ("Sarrera".equals(mota)) {
+                langilea.sarreraFitxaketaEgin();
+            } else {
+                langilea.irteeraFitxaketaEgin();
+            }
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -243,16 +258,9 @@ public class MenuLogistika extends JFrame {
         taula.setRowHeight(25);
         elkarrizketa.add(new JScrollPane(taula), BorderLayout.CENTER);
 
-        String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, langilea.getIdLangilea());
-            ResultSet rs = sententzia.executeQuery();
-            while (rs.next()) {
-                eredua.addRow(new Object[] { rs.getString("mota"), rs.getDate("data"), rs.getTime("ordua") });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        java.util.List<Fitxaketa> zerrenda = langilea.nireFitxaketakIkusi();
+        for (Fitxaketa f : zerrenda) {
+            eredua.addRow(new Object[] { f.getMota(), f.getData(), f.getOrdua() });
         }
 
         JButton itxiBotoia = new JButton("Itxi");
@@ -261,6 +269,36 @@ public class MenuLogistika extends JFrame {
         botoiPanela.add(itxiBotoia);
         elkarrizketa.add(botoiPanela, BorderLayout.SOUTH);
         elkarrizketa.setVisible(true);
+    }
+
+    private void irekiNireDatuakEditatu() {
+        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
+
+        Object[] message = {
+                "Pasahitza Berria:", passField,
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
+
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
+                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     // --- TAB SARRERAK ---
@@ -743,8 +781,6 @@ public class MenuLogistika extends JFrame {
                 pstLerroa.executeUpdate();
             }
             con.commit();
-            // JOptionPane.showMessageDialog(this, "Sarrera ondo sortu da! ID: " +
-            // sarreraId);
             lerroBerriEredua.setRowCount(0);
             izenaBerriaTestua.setText("");
             postaBerriaTestua.setText("");
@@ -846,7 +882,7 @@ public class MenuLogistika extends JFrame {
                 pst.setString(1, izenaEremua.getText());
                 pst.setString(2, skuEremua.getText());
                 pst.executeUpdate();
-                biltegiDatuakKargatu(); // JOptionPane.showMessageDialog(this, "Biltegia sortuta.");
+                biltegiDatuakKargatu();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
             }

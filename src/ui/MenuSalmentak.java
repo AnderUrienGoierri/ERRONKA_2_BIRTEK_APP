@@ -1,4 +1,5 @@
 package ui;
+
 import db.DB_Konexioa;
 import model.*;
 
@@ -9,8 +10,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.io.File;
-
-/*import birtek_interfaze_grafikoa.EskaeraDialog;*/
 
 public class MenuSalmentak extends JFrame {
 
@@ -80,9 +79,16 @@ public class MenuSalmentak extends JFrame {
         historialBotoia.setFont(new Font("SansSerif", Font.BOLD, 10));
         historialBotoia.addActionListener(e -> ikusiFitxaketaHistoriala());
 
+        JButton nireDatuakBotoia = new JButton("Nire Datuak");
+        nireDatuakBotoia.setBackground(new Color(100, 149, 237));
+        nireDatuakBotoia.setForeground(Color.BLACK);
+        nireDatuakBotoia.setFont(new Font("SansSerif", Font.BOLD, 10));
+        nireDatuakBotoia.addActionListener(e -> irekiNireDatuakEditatu());
+
         botoiPanela.add(sarreraBotoia);
         botoiPanela.add(irteeraBotoia);
         botoiPanela.add(historialBotoia);
+        botoiPanela.add(nireDatuakBotoia);
 
         fitxaketaInfoEtiketa = new JLabel("Kargatzen...");
         fitxaketaInfoEtiketa.setFont(new Font("SansSerif", Font.PLAIN, 9));
@@ -96,13 +102,6 @@ public class MenuSalmentak extends JFrame {
         saioaItxiBotoia.setForeground(Color.WHITE);
         saioaItxiBotoia.addActionListener(e -> saioaItxi());
 
-        // Atzera botoia (Zuzendaritza) - Suposatu daiteke Langilea objektuak informazio
-        // hori duela edo ID bidez konprobatu daitekeela fitxaketa bidea baino lehen.
-        // Hemen sinplifikaziorako, erabiltzaileId erabiltzen zen. Orain
-        // langilea.getIdLangilea().
-        // Logika hobetu daiteke, baina momentuz Utzi dezagun atzera botoia gabe edo
-        // berriz inplementatu ID-a erabiliz.
-
         eskuinekoPanela.add(erabiltzaileEtiketa);
         eskuinekoPanela.add(fitxaketaPanela);
         eskuinekoPanela.add(saioaItxiBotoia);
@@ -112,7 +111,7 @@ public class MenuSalmentak extends JFrame {
         JTabbedPane pestainaPanela = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(pestainaPanela, BorderLayout.CENTER);
 
-        // ... (Bezero panela etab. berdin jarraitzen du)
+        // BEZEROAK PANELA
         JPanel bezeroPanela = new JPanel(new BorderLayout());
         bezeroTaula = new JTable();
         bezeroPanela.add(new JScrollPane(bezeroTaula));
@@ -138,7 +137,7 @@ public class MenuSalmentak extends JFrame {
         eskaeraPanela.add(splitPane, BorderLayout.CENTER);
         pestainaPanela.addTab("Eskaerak", eskaeraPanela);
 
-        // ... (Eskaera botoiak)
+        // Eskaera botoiak
         JPanel eskaeraBotoiPanela = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton eskaeraGehituBotoia = new JButton("Gehitu");
         JButton eskaeraEditatuBotoia = new JButton("Editatu");
@@ -176,10 +175,14 @@ public class MenuSalmentak extends JFrame {
                 null, null, true, 2, "", null));
     }
 
-    // --- FITXAKETA LOGIKA ---
+    // --- FITXAKETA METODO BERRIAK ---
     private void fitxatu(String mota) {
         try {
-            langilea.fitxatu(mota);
+            if ("Sarrera".equals(mota)) {
+                langilea.sarreraFitxaketaEgin();
+            } else {
+                langilea.irteeraFitxaketaEgin();
+            }
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -205,40 +208,41 @@ public class MenuSalmentak extends JFrame {
         JTable taula = new JTable(eredua);
         elkarrizketa.add(new JScrollPane(taula), BorderLayout.CENTER);
 
-        String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, langilea.getIdLangilea());
-            ResultSet rs = sententzia.executeQuery();
-            while (rs.next()) {
-                eredua.addRow(new Object[] { rs.getString("mota"), rs.getDate("data"), rs.getTime("ordua") });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        java.util.List<Fitxaketa> zerrenda = langilea.nireFitxaketakIkusi();
+        for (Fitxaketa f : zerrenda) {
+            eredua.addRow(new Object[] { f.getMota(), f.getData(), f.getOrdua() });
         }
+
         elkarrizketa.setVisible(true);
     }
 
-    // ... datuakKargatu eta beste metodoak ...
+    private void irekiNireDatuakEditatu() {
+        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
 
-    private void datuakKargatu() {
-        try (Connection konexioa = DB_Konexioa.konektatu()) {
-            DefaultTableModel m1 = TaulaModelatzailea.ereduaEraiki(konexioa
-                    .prepareStatement("SELECT id_bezeroa, izena_edo_soziala, emaila FROM bezeroak").executeQuery());
-            bezeroTaula.setModel(m1);
-            bezeroOrdenatzailea = new TableRowSorter<>(m1);
-            bezeroTaula.setRowSorter(bezeroOrdenatzailea);
+        Object[] message = {
+                "Pasahitza Berria:", passField,
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
+        };
 
-            DefaultTableModel m2 = TaulaModelatzailea
-                    .ereduaEraiki(konexioa.prepareStatement("SELECT * FROM eskaerak").executeQuery());
-            eskaeraTaula.setModel(m2);
-            eskaeraOrdenatzailea = new TableRowSorter<>(m2);
-            eskaeraTaula.setRowSorter(eskaeraOrdenatzailea);
+        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
 
-            if (unekoOrdenatzailea == null)
-                unekoOrdenatzailea = bezeroOrdenatzailea;
-        } catch (Exception e) {
-            e.printStackTrace();
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
+                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -283,6 +287,27 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    private void datuakKargatu() {
+        try (Connection konexioa = DB_Konexioa.konektatu()) {
+            DefaultTableModel m1 = TaulaModelatzailea.ereduaEraiki(konexioa
+                    .prepareStatement("SELECT id_bezeroa, izena_edo_soziala, emaila FROM bezeroak").executeQuery());
+            bezeroTaula.setModel(m1);
+            bezeroOrdenatzailea = new TableRowSorter<>(m1);
+            bezeroTaula.setRowSorter(bezeroOrdenatzailea);
+
+            DefaultTableModel m2 = TaulaModelatzailea
+                    .ereduaEraiki(konexioa.prepareStatement("SELECT * FROM eskaerak").executeQuery());
+            eskaeraTaula.setModel(m2);
+            eskaeraOrdenatzailea = new TableRowSorter<>(m2);
+            eskaeraTaula.setRowSorter(eskaeraOrdenatzailea);
+
+            if (unekoOrdenatzailea == null)
+                unekoOrdenatzailea = bezeroOrdenatzailea;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void eskaeraGehitu() {
         EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
         dialog.setVisible(true);
@@ -303,7 +328,7 @@ public class MenuSalmentak extends JFrame {
                     pst.executeUpdate();
 
                     ResultSet rs = pst.getGeneratedKeys();
-                    // ... kodea jarraitzen du ...
+
                     if (rs.next()) {
                         idEskaera = rs.getInt(1);
 
@@ -345,8 +370,7 @@ public class MenuSalmentak extends JFrame {
             return;
         }
 
-        // Datuak lortu taulatik (Modeloaren indizeak erabili behar dira ordenatzailea
-        // badago)
+        // Datuak lortu taulatik
         aukeratutakoLerroa = eskaeraTaula.convertRowIndexToModel(aukeratutakoLerroa);
         DefaultTableModel model = (DefaultTableModel) eskaeraTaula.getModel();
 
@@ -371,12 +395,6 @@ public class MenuSalmentak extends JFrame {
             pst.setInt(1, idEskaera);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                // OHARRA: Deskontua ez dugu gordetzen DBn, beraz 0 jartzen dugu edo kalkulatzen
-                // saiatu gaitezke.
-                // Sinplifikatzeko, 0 deskontua jartzen dugu eta prezioa mantentzen dugu.
-                // Prezio originala ez dakigunez (zuk unitate prezioa gordetzen duzu
-                // deskontuarekin),
-                // deskontua 0 dela onartuko dugu hemen.
                 dialog.addZuzeneanLerroa(
                         rs.getInt("produktua_id"),
                         rs.getString("izena"),

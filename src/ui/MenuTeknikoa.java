@@ -79,9 +79,16 @@ public class MenuTeknikoa extends JFrame {
         historialBotoia.setFont(new Font("SansSerif", Font.BOLD, 10));
         historialBotoia.addActionListener(e -> ikusiFitxaketaHistoriala());
 
+        JButton nireDatuakBotoia = new JButton("Nire Datuak");
+        nireDatuakBotoia.setBackground(new Color(100, 149, 237));
+        nireDatuakBotoia.setForeground(Color.BLACK);
+        nireDatuakBotoia.setFont(new Font("SansSerif", Font.BOLD, 10));
+        nireDatuakBotoia.addActionListener(e -> irekiNireDatuakEditatu());
+
         botoiPanela.add(sarreraBotoia);
         botoiPanela.add(irteeraBotoia);
         botoiPanela.add(historialBotoia);
+        botoiPanela.add(nireDatuakBotoia);
 
         fitxaketaInfoEtiketa = new JLabel("Kargatzen...");
         fitxaketaInfoEtiketa.setFont(new Font("SansSerif", Font.PLAIN, 9));
@@ -105,9 +112,6 @@ public class MenuTeknikoa extends JFrame {
 
         JTabbedPane pestainaPanela = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(pestainaPanela, BorderLayout.CENTER);
-
-        // ... Tabs creation (kept same, assuming no dependencies on replaced variables
-        // inside creation except usage)
 
         // --- KONPONKETAK TAB ---
         JPanel konponketaPanela = new JPanel(new BorderLayout());
@@ -209,7 +213,11 @@ public class MenuTeknikoa extends JFrame {
     // --- FITXAKETA METODOAK ---
     private void fitxatu(String mota) {
         try {
-            langilea.fitxatu(mota);
+            if ("Sarrera".equals(mota)) {
+                langilea.sarreraFitxaketaEgin();
+            } else {
+                langilea.irteeraFitxaketaEgin();
+            }
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -226,27 +234,59 @@ public class MenuTeknikoa extends JFrame {
     }
 
     private void ikusiFitxaketaHistoriala() {
-        JDialog elkarrizketa = new JDialog(this, "Fitxaketa Historiala", true);
+        JDialog elkarrizketa = new JDialog(this, "Nire Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
         elkarrizketa.setLocationRelativeTo(this);
         elkarrizketa.setLayout(new BorderLayout());
         String[] zutabeak = { "Mota", "Data", "Ordua" };
         DefaultTableModel eredua = new DefaultTableModel(zutabeak, 0);
         JTable taula = new JTable(eredua);
+        taula.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        taula.setRowHeight(25);
         elkarrizketa.add(new JScrollPane(taula), BorderLayout.CENTER);
 
-        String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, langilea.getIdLangilea());
-            ResultSet rs = sententzia.executeQuery();
-            while (rs.next()) {
-                eredua.addRow(new Object[] { rs.getString("mota"), rs.getDate("data"), rs.getTime("ordua") });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        java.util.List<Fitxaketa> zerrenda = langilea.nireFitxaketakIkusi();
+        for (Fitxaketa f : zerrenda) {
+            eredua.addRow(new Object[] { f.getMota(), f.getData(), f.getOrdua() });
         }
+
+        JButton itxiBotoia = new JButton("Itxi");
+        itxiBotoia.addActionListener(e -> elkarrizketa.dispose());
+        JPanel botoiPanela = new JPanel();
+        botoiPanela.add(itxiBotoia);
+        elkarrizketa.add(botoiPanela, BorderLayout.SOUTH);
+
         elkarrizketa.setVisible(true);
+    }
+
+    private void irekiNireDatuakEditatu() {
+        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
+
+        Object[] message = {
+                "Pasahitza Berria:", passField,
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
+
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
+                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private void datuakKargatu() {

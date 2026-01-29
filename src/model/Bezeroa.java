@@ -3,7 +3,7 @@ package model;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-public class Bezeroa extends Pertsona implements IAutentifikagarria {
+public class Bezeroa extends Pertsona  {
     private String sexua;
     private String bezeroOrdainketaTxartela;
 
@@ -57,8 +57,5 @@ public class Bezeroa extends Pertsona implements IAutentifikagarria {
         this.bezeroOrdainketaTxartela = bezeroOrdainketaTxartela;
     }
 
-    @Override
-    public boolean autentifikatu(String pasahitza) {
-        return this.getPasahitza() != null && this.getPasahitza().equals(pasahitza);
-    }
+   
 }
