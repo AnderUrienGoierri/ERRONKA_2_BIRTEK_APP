@@ -1,4 +1,5 @@
 package ui;
+
 import db.DB_Konexioa;
 import model.*;
 
@@ -71,13 +72,6 @@ public class MenuLogistika extends JFrame {
     }
 
     public MenuLogistika() {
-        // Saiorik gabe probatzeko edo Sesioa klasea erabiltzeko
-        // Hemen Sesioa klaseko datuetatik Langilea objektu bat eraiki beharko genuke
-        // Baina errazagoa da IDa bakarrik pasatzean DBtik kargatzea edo zuzenean Sesioa
-        // erabiltzea
-        // Kasu honetan, suponituko dugu Sesioa.lortuLangilea() existitzen dela edo
-        // antzeko zerbait.
-        // Demo moduan datu faltsuekin edo Sesioako datu solteekin eraikiko dugu:
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
                 null, null, true, 2, "", null));
     }
@@ -133,7 +127,7 @@ public class MenuLogistika extends JFrame {
         erabiltzaileInfoPanela.setOpaque(false);
 
         JLabel erabiltzaileEtiketa = new JLabel(
-                langilea.getIzena() + " " + langilea.getAbizena()); // Saila ere jar daiteke
+                langilea.getIzena() + " " + langilea.getAbizena());
         erabiltzaileEtiketa.setFont(new Font("SansSerif", Font.BOLD, 14));
         erabiltzaileEtiketa.setForeground(new Color(0, 102, 102));
 
@@ -143,6 +137,14 @@ public class MenuLogistika extends JFrame {
         gbcUser.gridx = 0;
         gbcUser.gridy = 0;
         erabiltzaileInfoPanela.add(erabiltzaileEtiketa, gbcUser);
+
+        // Fitxaketa Panela (Etiketa)
+        fitxaketaInfoEtiketa = new JLabel("Kargatzen...");
+        fitxaketaInfoEtiketa.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        GridBagConstraints gbcLabel = new GridBagConstraints();
+        gbcLabel.gridx = 0;
+        gbcLabel.gridy = 1;
+        erabiltzaileInfoPanela.add(fitxaketaInfoEtiketa, gbcLabel);
 
         // ... Fitxaketa botoiak ...
         JPanel botoiPanela = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
@@ -157,9 +159,19 @@ public class MenuLogistika extends JFrame {
         JButton historialBotoia = new JButton("Historiala");
         historialBotoia.addActionListener(e -> ikusiFitxaketaHistoriala());
 
+        JButton nireDatuakBotoia = new JButton("Nire Datuak");
+        nireDatuakBotoia.addActionListener(e -> irekiNireDatuakEditatu());
+
         botoiPanela.add(sarreraBotoia);
         botoiPanela.add(irteeraBotoia);
         botoiPanela.add(historialBotoia);
+        botoiPanela.add(nireDatuakBotoia);
+
+        GridBagConstraints gbcBtns = new GridBagConstraints();
+        gbcBtns.gridx = 1;
+        gbcBtns.gridy = 0;
+        gbcBtns.gridheight = 2;
+        erabiltzaileInfoPanela.add(botoiPanela, gbcBtns);
 
         // Logout botoia
         JButton saioaItxiBotoia = new JButton("Saioa Itxi");
@@ -173,15 +185,14 @@ public class MenuLogistika extends JFrame {
         gbcLogout.fill = GridBagConstraints.VERTICAL;
         gbcLogout.gridx = 2;
         gbcLogout.gridy = 0;
+        gbcLogout.gridheight = 2;
         erabiltzaileInfoPanela.add(saioaItxiBotoia, gbcLogout);
-
-        // Zuzendaritza badauka atzera botoia (Suposatuz saila begiratzen dugula, baina
-        // hemen Langilea objektuan ez dago zuzenean saila izena agian, IDa bakarrik.
-        // Logika hau sinplifikatu dezakegu edo sailaID konprobatu).
 
         goikoPanela.add(erabiltzaileInfoPanela, BorderLayout.EAST);
 
-        // ...
+        // PESTAINA PANELA (JTabbedPane)
+        pestainaPanela = new JTabbedPane(JTabbedPane.TOP);
+        edukiPanela.add(pestainaPanela, BorderLayout.CENTER);
 
         // Tab-ak sortu
         sarreraTabSortu();
@@ -212,10 +223,14 @@ public class MenuLogistika extends JFrame {
         }
     }
 
-    // --- FITXAKETA KUDEAKETA (Refactored) ---
+    // --- FITXAKETA LOGIKA ---
     private void fitxatu(String mota) {
         try {
-            langilea.fitxatu(mota);
+            if ("Sarrera".equals(mota)) {
+                langilea.sarreraFitxaketaEgin();
+            } else {
+                langilea.irteeraFitxaketaEgin();
+            }
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -243,16 +258,9 @@ public class MenuLogistika extends JFrame {
         taula.setRowHeight(25);
         elkarrizketa.add(new JScrollPane(taula), BorderLayout.CENTER);
 
-        String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, langilea.getIdLangilea());
-            ResultSet rs = sententzia.executeQuery();
-            while (rs.next()) {
-                eredua.addRow(new Object[] { rs.getString("mota"), rs.getDate("data"), rs.getTime("ordua") });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        java.util.List<Fitxaketa> zerrenda = langilea.nireFitxaketakIkusi();
+        for (Fitxaketa f : zerrenda) {
+            eredua.addRow(new Object[] { f.getMota(), f.getData(), f.getOrdua() });
         }
 
         JButton itxiBotoia = new JButton("Itxi");
@@ -261,6 +269,36 @@ public class MenuLogistika extends JFrame {
         botoiPanela.add(itxiBotoia);
         elkarrizketa.add(botoiPanela, BorderLayout.SOUTH);
         elkarrizketa.setVisible(true);
+    }
+
+    private void irekiNireDatuakEditatu() {
+        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
+
+        Object[] message = {
+                "Pasahitza Berria:", passField,
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
+
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
+                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     // --- TAB SARRERAK ---
@@ -647,69 +685,30 @@ public class MenuLogistika extends JFrame {
             JOptionPane.showMessageDialog(this, "Ez dago produkturik zerrendan.");
             return;
         }
-        int hornitzaileaId = -1;
-        if (hornitzaileBerriaAukera.isSelected()) {
-            String izena = izenaBerriaTestua.getText().trim();
-            String email = postaBerriaTestua.getText().trim();
-            String ifz = ifzBerriaTestua.getText().trim();
-            if (izena.isEmpty() || email.isEmpty() || ifz.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Bete hornitzaile berriaren datuak.");
-                return;
-            }
-            try (Connection konexioa = DB_Konexioa.konektatu()) {
-                PreparedStatement pstCheck = konexioa
-                        .prepareStatement("SELECT COUNT(*) FROM hornitzaileak WHERE emaila = ? OR ifz_nan = ?");
-                pstCheck.setString(1, email);
-                pstCheck.setString(2, ifz);
-                ResultSet rsCheck = pstCheck.executeQuery();
-                if (rsCheck.next() && rsCheck.getInt(1) > 0) {
-                    JOptionPane.showMessageDialog(this, "ERROREA: Hornitzaile hori existitzen da jada.", "Bikoiztua",
-                            JOptionPane.ERROR_MESSAGE);
+
+        try {
+            int hornitzaileaId = -1;
+            if (hornitzaileBerriaAukera.isSelected()) {
+                String izena = izenaBerriaTestua.getText().trim();
+                String email = postaBerriaTestua.getText().trim();
+                String ifz = ifzBerriaTestua.getText().trim();
+                if (izena.isEmpty() || email.isEmpty() || ifz.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Bete hornitzaile berriaren datuak.");
                     return;
                 }
-                String sqlInsertH = "INSERT INTO hornitzaileak (izena_soziala, ifz_nan, emaila, pasahitza, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, '1234', 'Zehaztugabea', 1, '00000')";
-                PreparedStatement pstH = konexioa.prepareStatement(sqlInsertH, Statement.RETURN_GENERATED_KEYS);
-                pstH.setString(1, izena);
-                pstH.setString(2, ifz);
-                pstH.setString(3, email);
-                pstH.executeUpdate();
-                ResultSet rsKey = pstH.getGeneratedKeys();
-                if (rsKey.next())
-                    hornitzaileaId = rsKey.getInt(1);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Errorea hornitzailea sortzean: " + e.getMessage());
-                return;
+                hornitzaileaId = langilea.hornitzaileBerriaSortu(izena, ifz, email);
+            } else {
+                HornitzaileElementua item = (HornitzaileElementua) hornitzaileHautatzailea.getSelectedItem();
+                if (item != null)
+                    hornitzaileaId = item.id;
+                else {
+                    JOptionPane.showMessageDialog(this, "Aukeratu hornitzaile bat.");
+                    return;
+                }
             }
-        } else {
-            HornitzaileElementua item = (HornitzaileElementua) hornitzaileHautatzailea.getSelectedItem();
-            if (item != null)
-                hornitzaileaId = item.id;
-            else {
-                JOptionPane.showMessageDialog(this, "Aukeratu hornitzaile bat.");
-                return;
-            }
-        }
 
-        Connection con = null;
-        try {
-            con = DB_Konexioa.konektatu();
-            con.setAutoCommit(false);
-            String sqlSarrera = "INSERT INTO sarrerak (hornitzailea_id, langilea_id, sarrera_egoera) VALUES (?, ?, 'Bidean')";
-            PreparedStatement pstSarrera = con.prepareStatement(sqlSarrera, Statement.RETURN_GENERATED_KEYS);
-            pstSarrera.setInt(1, hornitzaileaId);
-            pstSarrera.setInt(2, langilea.getIdLangilea());
-            pstSarrera.executeUpdate();
-            ResultSet rsKeys = pstSarrera.getGeneratedKeys();
-            int sarreraId = -1;
-            if (rsKeys.next())
-                sarreraId = rsKeys.getInt(1);
-            else
-                throw new SQLException("Ez da sarrera IDrik sortu.");
-
-            String sqlProd = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, produktu_egoera_oharra, salgai) VALUES (?, ?, ?, ?, ?, ?, ?, 'Zehazteko', ?, ?, ?, 0)";
-            PreparedStatement pstProd = con.prepareStatement(sqlProd, Statement.RETURN_GENERATED_KEYS);
-            String sqlLerroa = "INSERT INTO sarrera_lerroak (sarrera_id, produktua_id, kantitatea, sarrera_lerro_egoera) VALUES (?, ?, ?, 'Bidean')";
-            PreparedStatement pstLerroa = con.prepareStatement(sqlLerroa);
+            java.util.List<Produktua> produktuList = new java.util.ArrayList<>();
+            java.util.List<SarreraLerroa> lerroList = new java.util.ArrayList<>();
 
             for (int i = 0; i < lerroBerriEredua.getRowCount(); i++) {
                 String izena = (String) lerroBerriEredua.getValueAt(i, 0);
@@ -722,29 +721,35 @@ public class MenuLogistika extends JFrame {
                 String imgUrl = (String) lerroBerriEredua.getValueAt(i, 7);
                 String oharra = (String) lerroBerriEredua.getValueAt(i, 8);
 
-                pstProd.setString(1, izena);
-                pstProd.setString(2, marka);
-                pstProd.setInt(3, kat.id);
-                pstProd.setString(4, mota);
-                pstProd.setInt(5, bilt.id);
-                pstProd.setInt(6, hornitzaileaId);
-                pstProd.setInt(7, kanti);
-                pstProd.setString(8, desk);
-                pstProd.setString(9, imgUrl);
-                pstProd.setString(10, oharra);
-                pstProd.executeUpdate();
-                ResultSet rsProdKey = pstProd.getGeneratedKeys();
-                int prodId = -1;
-                if (rsProdKey.next())
-                    prodId = rsProdKey.getInt(1);
-                pstLerroa.setInt(1, sarreraId);
-                pstLerroa.setInt(2, prodId);
-                pstLerroa.setInt(3, kanti);
-                pstLerroa.executeUpdate();
+                // Using a temporary Produktua object holder. Not all fields are filled.
+                // NOTE: Creating Produktua subclass instances would be cleaner if specific
+                // types are used,
+                // but for now we need a concrete class or use anonymous subclass to hold data.
+                // Assuming Produktua is Abstract, so I can't instantiate it directly unless I
+                // use anonymous class
+                // or a concrete subclass. Since `Mota` is a string, I probably should have a
+                // Factory or similar,
+                // but to keep it simple and given the constraints, I'll create a simple
+                // anonymous subclass holder
+                // or just one of the concrete classes like `Eramangarria`.
+                // Let's use `Eramangarria` as a generic container since we just need the fields
+                // for the method.
+                // IMPORTANT: The `mota` field decides the discrimination in DB usually, but
+                // here we just pass data.
+
+                Produktua p = new Eramangarria(0, hornitzaileaId, kat.id, izena, marka, mota, desk, imgUrl, bilt.id,
+                        "Zehazteko", oharra, false, java.math.BigDecimal.ZERO, kanti, java.math.BigDecimal.ZERO,
+                        java.math.BigDecimal.ZERO, null, null, "", 0, 0, java.math.BigDecimal.ZERO, 0, "",
+                        java.math.BigDecimal.ZERO);
+                produktuList.add(p);
+
+                // Temp SarreraLerroa
+                SarreraLerroa l = new SarreraLerroa(0, 0, 0, kanti, "Bidean");
+                lerroList.add(l);
             }
-            con.commit();
-            // JOptionPane.showMessageDialog(this, "Sarrera ondo sortu da! ID: " +
-            // sarreraId);
+
+            langilea.produktuSarreraBerriaSortu(hornitzaileaId, produktuList, lerroList);
+
             lerroBerriEredua.setRowCount(0);
             izenaBerriaTestua.setText("");
             postaBerriaTestua.setText("");
@@ -752,42 +757,30 @@ public class MenuLogistika extends JFrame {
             hornitzaileBerriaAukera.setSelected(false);
             hornitzaileModuaAldatu();
             sarreraHautatzaileakKargatu();
+            JOptionPane.showMessageDialog(this, "Sarrera eta produktuak ondo sortu dira.");
+
         } catch (SQLException e) {
-            try {
-                if (con != null)
-                    con.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
             JOptionPane.showMessageDialog(this, "Errorea prozesuan: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (con != null) {
-                    con.setAutoCommit(true);
-                    con.close();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
         }
     }
 
     private void sarreraDatuakKargatu() {
-        String baseSql = "SELECT s.id_sarrera, h.izena_soziala AS Hornitzailea, s.data, s.sarrera_egoera FROM sarrerak s JOIN hornitzaileak h ON s.hornitzailea_id = h.id_hornitzailea ";
-        String filter = (String) egoeraIragazkia.getSelectedItem();
-        String sql = baseSql;
-        if ("Bidean".equals(filter))
-            sql += " WHERE s.sarrera_egoera = 'Bidean' ";
-        else if ("Jasota".equals(filter))
-            sql += " WHERE s.sarrera_egoera = 'Jasota' ";
-        sql += " ORDER BY s.data DESC";
-        try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
-            DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
+        try {
+            String filter = (String) egoeraIragazkia.getSelectedItem();
+            if ("Denak".equals(filter))
+                filter = ""; // Or handle null inside logic if preferred
+            java.util.List<Object[]> data = langilea.produktuSarrerakIkusi(filter);
+
+            String[] colNames = { "ID", "Hornitzailea", "Data", "Egoera" };
+            DefaultTableModel eredua = new DefaultTableModel(colNames, 0);
+            for (Object[] row : data) {
+                eredua.addRow(row);
+            }
             sarreraTaula.setModel(eredua);
             sarreraOrdenatzailea = new TableRowSorter<>(eredua);
             sarreraTaula.setRowSorter(sarreraOrdenatzailea);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -840,13 +833,9 @@ public class MenuLogistika extends JFrame {
         Object[] mezua = { "Biltegi Izena:", izenaEremua, "SKU Kodea:", skuEremua };
         int aukera = JOptionPane.showConfirmDialog(this, mezua, "Biltegi Berria", JOptionPane.OK_CANCEL_OPTION);
         if (aukera == JOptionPane.OK_OPTION) {
-            try (Connection con = DB_Konexioa.konektatu();
-                    PreparedStatement pst = con
-                            .prepareStatement("INSERT INTO biltegiak (izena, biltegi_sku) VALUES (?, ?)")) {
-                pst.setString(1, izenaEremua.getText());
-                pst.setString(2, skuEremua.getText());
-                pst.executeUpdate();
-                biltegiDatuakKargatu(); // JOptionPane.showMessageDialog(this, "Biltegia sortuta.");
+            try {
+                langilea.biltegiaSortu(izenaEremua.getText(), skuEremua.getText());
+                biltegiDatuakKargatu();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
             }
@@ -860,24 +849,14 @@ public class MenuLogistika extends JFrame {
         int modelRow = biltegiTaula.convertRowIndexToModel(row);
         Object val = biltegiTaula.getModel().getValueAt(modelRow, 0);
         int id = (val instanceof Number) ? ((Number) val).intValue() : Integer.parseInt(val.toString());
-        try (Connection con = DB_Konexioa.konektatu()) {
-            PreparedStatement pstCheck = con.prepareStatement("SELECT COUNT(*) FROM produktuak WHERE biltegi_id = ?");
-            pstCheck.setInt(1, id);
-            ResultSet rs = pstCheck.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(this, "EZIN DA EZABATU: Produktuak ditu barruan.", "Errorea",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        try {
             if (JOptionPane.showConfirmDialog(this, "Ziur ezabatu nahi duzula?", "Ezabatu",
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                PreparedStatement pst = con.prepareStatement("DELETE FROM biltegiak WHERE id_biltegia = ?");
-                pst.setInt(1, id);
-                pst.executeUpdate();
+                langilea.biltegiaEzabatu(id);
                 biltegiDatuakKargatu();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -893,13 +872,8 @@ public class MenuLogistika extends JFrame {
         JTextField skuEremua = new JTextField(skuZaharra);
         if (JOptionPane.showConfirmDialog(this, new Object[] { "Izena:", izenaEremua, "SKU:", skuEremua }, "Aldatu",
                 JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-            try (Connection con = DB_Konexioa.konektatu();
-                    PreparedStatement pst = con.prepareStatement(
-                            "UPDATE biltegiak SET izena = ?, biltegi_sku = ? WHERE id_biltegia = ?")) {
-                pst.setString(1, izenaEremua.getText());
-                pst.setString(2, skuEremua.getText());
-                pst.setInt(3, id);
-                pst.executeUpdate();
+            try {
+                langilea.biltegiaEditatu(id, izenaEremua.getText(), skuEremua.getText());
                 biltegiDatuakKargatu();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -924,35 +898,12 @@ public class MenuLogistika extends JFrame {
         }
         if (JOptionPane.showConfirmDialog(this, hautatzailea, "Aukeratu Biltegi Berria",
                 JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-            try (Connection con = DB_Konexioa.konektatu();
-                    PreparedStatement pst = con
-                            .prepareStatement("UPDATE produktuak SET biltegi_id = ? WHERE id_produktua = ?")) {
-                pst.setInt(1, ((BiltegiElementua) hautatzailea.getSelectedItem()).id);
-                pst.setInt(2, idProd);
-                pst.executeUpdate();
+            try {
+                langilea.produktuarenBiltegiaAldatu(idProd, ((BiltegiElementua) hautatzailea.getSelectedItem()).id);
                 produktuDatuakKargatu();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void egiaztatuSarreraEgoera(int idSarrera) {
-        try (Connection con = DB_Konexioa.konektatu()) {
-            PreparedStatement pst = con.prepareStatement(
-                    "SELECT COUNT(*) FROM sarrera_lerroak WHERE sarrera_id = ? AND sarrera_lerro_egoera != 'Jasota'");
-            pst.setInt(1, idSarrera);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                String egoera = (rs.getInt(1) == 0) ? "Jasota" : "Bidean";
-                PreparedStatement pstUpd = con
-                        .prepareStatement("UPDATE sarrerak SET sarrera_egoera = ? WHERE id_sarrera = ?");
-                pstUpd.setString(1, egoera);
-                pstUpd.setInt(2, idSarrera);
-                pstUpd.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -973,16 +924,10 @@ public class MenuLogistika extends JFrame {
         Object valLerroa = produktuTaula.getModel().getValueAt(modelRow, 6);
         int idSarrera = Integer.parseInt(valSarrera.toString());
         int idLerroa = Integer.parseInt(valLerroa.toString());
-        try (Connection con = DB_Konexioa.konektatu()) {
-            PreparedStatement pst = con.prepareStatement(
-                    "UPDATE sarrera_lerroak SET sarrera_lerro_egoera = ? WHERE id_sarrera_lerroa = ?");
-            pst.setString(1, egoeraBerria);
-            pst.setInt(2, idLerroa);
-            if (pst.executeUpdate() > 0) {
-                egiaztatuSarreraEgoera(idSarrera);
-                produktuDatuakKargatu();
-                sarreraDatuakKargatu();
-            }
+        try {
+            langilea.produktuSarreraEgoeraAldatu(idLerroa, egoeraBerria, idSarrera);
+            produktuDatuakKargatu();
+            sarreraDatuakKargatu();
         } catch (Exception e) {
             e.printStackTrace();
         }
