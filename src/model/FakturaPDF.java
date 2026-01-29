@@ -51,6 +51,7 @@ public class FakturaPDF {
         }
     }
 
+    // fakturak C/: karpetan XamPP barruan
     public static final String FAKTURA_BIDEA = "C:\\Xampp\\htdocs\\fakturak";
 
     public static void sortu(String fitxategiPath, int idEskaera, Timestamp data, BezeroDatuak bezeroa,
@@ -81,7 +82,7 @@ public class FakturaPDF {
 
         // LOGOA (Ezkerrean)
         try {
-            java.net.URL logoURL = FakturaPDF.class.getResource("/irudiak/birtek_logo_zuri_borobila.png");
+            java.net.URL logoURL = FakturaPDF.class.getResource("/birtek_logo_zuri_borobila.png");
             if (logoURL != null) {
                 Image img = Image.getInstance(logoURL);
                 img.scaleToFit(80, 80);
