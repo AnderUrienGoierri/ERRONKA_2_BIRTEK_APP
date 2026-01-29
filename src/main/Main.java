@@ -8,6 +8,8 @@ public class Main {
      * LANGILEEN SaioaHastekoPanela() martxan jarri:
      */
     public static void main(String[] args) {
+    	
+    	
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
