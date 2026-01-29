@@ -73,6 +73,14 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 - **`BiltegiLangilea`**: Logistika lanak.
   - `biltegiaSortu(...)`: Biltegi berriak sortu.
   - `biltegiaEzabatu(...)`: Biltegiak ezabatu.
+  - `biltegiaEditatu(...)`: Biltegiaren datuak eguneratu.
+  - `hornitzaileBerriaSortu(...)`: Hornitzaile berria erregistratu DBan.
+  - `produktuSarreraBerriaSortu(...)`: Sarrera oso bat (hornitzailea, produktuak, lerroak) transakzio bakarrean sortu.
+  - `produktuEgoeraOharraJarri(...)`: Produktu bati egoera-oharra gehitu.
+  - `produktuarenBiltegiaAldatu(...)`: Produktu bat biltegi batetik bestera mugitu.
+  - `produktuSarrerakIkusi(...)`: Sarreren zerrenda lortu egoeraren arabera iragaziz.
+  - `produktuSarreraEgoeraAldatu(...)`: Sarrera lerro baten egoera eguneratu (eta sarrera osoarena egiaztatu).
+  - `produktuEskaeraEgoeraAldatu(...)`: Eskaera baten egoera aldatu ('Prestatzen', 'Osatua', 'Ezabatua').
 
 - **`TeknikariLangilea`**: Konponketa lanak (etorkizuneko hedapenetarako prestatua).
 

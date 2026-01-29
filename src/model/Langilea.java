@@ -160,7 +160,7 @@ public class Langilea extends Pertsona implements IAutentifikagarria {
         }
     }
 
-    // langile batek bere fitxaketa historiala ikusteko metodoa (egoera testua):
+    // langile batek bere fitxaketak historiala ikusteko metodoa:
     public String getFitxaketaEgoera() {
         String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
