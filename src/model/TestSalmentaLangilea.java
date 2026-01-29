@@ -33,6 +33,14 @@ public class TestSalmentaLangilea {
                 // Expected if DB fails
             }
 
+            try {
+                // EskaeraLerroa metodoak probatu
+                EskaeraLerroa.eskaeraLerroaIkusi(1);
+                System.out.println("eskaeraLerroaIkusi OK");
+            } catch (Exception e) {
+                // Expected
+            }
+
             System.out.println("Konpilazioa zuzena da.");
         } catch (Exception e) {
             e.printStackTrace();
