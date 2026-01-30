@@ -132,4 +132,35 @@ public class AdministrariLangilea extends Langilea {
             pst.executeUpdate();
         }
     }
+
+    public void langileSailaEditatu(int idSaila, String izena, String kokapena, String deskribapena)
+            throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "UPDATE langile_sailak SET izena = ?, kokapena = ?, deskribapena = ? WHERE id_saila = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izena);
+            pst.setString(2, kokapena);
+            pst.setString(3, deskribapena);
+            pst.setInt(4, idSaila);
+            pst.executeUpdate();
+        }
+    }
+
+    public LangileSaila langileSailaikusi(int idSaila) throws SQLException {
+        LangileSaila saila = null;
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "SELECT * FROM langile_sailak WHERE id_saila = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idSaila);
+            java.sql.ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                saila = new LangileSaila(
+                        rs.getInt("id_saila"),
+                        rs.getString("izena"),
+                        rs.getString("kokapena"),
+                        rs.getString("deskribapena"));
+            }
+        }
+        return saila;
+    }
 }
