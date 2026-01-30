@@ -231,16 +231,7 @@ public class SalmentaLangilea extends Langilea {
     // FAKTUREN KUDEAKETA
     // -------------------------------------------------------------------------
 
-    /**
-     * Faktura sortu bezeroarentzat.
-     * Existitzen den fakturaSortu metodoa erabiltzen du.
-     * 
-     * @param idEskaera Eskaeraren IDa
-     */
-    public void bezeroFakturaSortu(int idEskaera) throws Exception {
-        fakturaSortu(idEskaera);
-    }
-
+    
     /**
      * Bezeroaren faktura ezabatu.
      * 
@@ -419,7 +410,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera sortu.
-     * 
+     * README.md
      * @param e Eskaera objektua
      */
     public void eskaeraSortu(Eskaera e) throws Exception {

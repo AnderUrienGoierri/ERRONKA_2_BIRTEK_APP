@@ -145,10 +145,9 @@ public class BiltegiLangilea extends Langilea {
     }
 
     public void produktuEgoeraOharraJarri(int idProduktua, String oharra) throws SQLException {
-        // This functionality was part of creation in UI, but maybe needed separately?
-        // UI didn't have explicit "Add Note" button for existing products, but
-        // requested
-        // in prompt.
+        // Funtzionalitate hau UI-ko sorkuntzaren zati zen, baina beharbada bereizita behar da?
+        // UI-ak ez zuen "Gehitu Oharra" botoi espliziturik lehendik zeuden produktuentzat, baina
+        // prompt-ean eskatuta.
         String sql = "UPDATE produktuak SET produktu_egoera_oharra = ? WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
