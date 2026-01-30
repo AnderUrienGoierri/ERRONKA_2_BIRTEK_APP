@@ -142,21 +142,104 @@ public class Langilea extends Pertsona implements IAutentifikagarria {
         return zerrenda;
     }
 
-    public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId)
-            throws java.sql.SQLException {
-        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+    public String getHerriaIzena() {
+        String izena = "";
+        String sql = "SELECT izena FROM herriak WHERE id_herria = ?";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
                 java.sql.PreparedStatement pst = konexioa.prepareStatement(sql)) {
-            pst.setString(1, pasahitza);
-            pst.setString(2, hizkuntza);
-            pst.setInt(3, herriaId);
-            pst.setInt(4, this.getIdLangilea());
+            pst.setInt(1, this.getHerriaId());
+            try (java.sql.ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    izena = rs.getString("izena");
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return izena;
+    }
+
+    public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, String herriaIzena, String lurraldea,
+            String nazioa)
+            throws java.sql.SQLException {
+
+        // Lookup town ID if name is provided
+        Integer herriaIdBerria = null;
+        if (herriaIzena != null && !herriaIzena.trim().isEmpty()) {
+            String sqlHerria = "SELECT id_herria FROM herriak WHERE izena = ?";
+            try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                    java.sql.PreparedStatement pst = konexioa.prepareStatement(sqlHerria)) {
+                pst.setString(1, herriaIzena);
+                try (java.sql.ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        herriaIdBerria = rs.getInt("id_herria");
+                    } else {
+                        // Create new town if not found
+                        if (lurraldea == null || lurraldea.trim().isEmpty() || nazioa == null
+                                || nazioa.trim().isEmpty()) {
+                            throw new java.sql.SQLException(
+                                    "Herria ez da existitzen. Mesedez, bete Lurraldea eta Nazioa.");
+                        }
+
+                        String sqlInsertHerria = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
+                        try (java.sql.PreparedStatement pstInsert = konexioa.prepareStatement(sqlInsertHerria,
+                                java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                            pstInsert.setString(1, herriaIzena);
+                            pstInsert.setString(2, lurraldea);
+                            pstInsert.setString(3, nazioa);
+                            pstInsert.executeUpdate();
+
+                            try (java.sql.ResultSet rsKeys = pstInsert.getGeneratedKeys()) {
+                                if (rsKeys.next()) {
+                                    herriaIdBerria = rsKeys.getInt(1);
+                                } else {
+                                    throw new java.sql.SQLException("Errorea herria sortzean, ID-a ez da lortu.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        StringBuilder sql = new StringBuilder("UPDATE langileak SET eguneratze_data = NOW()");
+        java.util.List<Object> params = new java.util.ArrayList<>();
+
+        if (pasahitza != null && !pasahitza.trim().isEmpty()) {
+            sql.append(", pasahitza = ?");
+            params.add(pasahitza);
+        }
+        if (hizkuntza != null && !hizkuntza.trim().isEmpty()) {
+            sql.append(", hizkuntza = ?");
+            params.add(hizkuntza);
+        }
+        if (herriaIdBerria != null) {
+            sql.append(", herria_id = ?");
+            params.add(herriaIdBerria);
+        }
+
+        sql.append(" WHERE id_langilea = ?");
+        params.add(this.getIdLangilea());
+
+        try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                java.sql.PreparedStatement pst = konexioa.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pst.setObject(i + 1, params.get(i));
+            }
+
             pst.executeUpdate();
 
-            // Eguneratu objektua ere
-            this.setPasahitza(pasahitza);
-            this.setHizkuntza(hizkuntza);
-            this.setHerriaId(herriaId);
+            // Update object state
+            if (pasahitza != null && !pasahitza.trim().isEmpty()) {
+                this.setPasahitza(pasahitza);
+            }
+            if (hizkuntza != null && !hizkuntza.trim().isEmpty()) {
+                this.setHizkuntza(hizkuntza);
+            }
+            if (herriaIdBerria != null) {
+                this.setHerriaId(herriaIdBerria);
+            }
         }
     }
 
