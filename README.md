@@ -66,8 +66,32 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `getSaltoTxartelaUid()` / `setSaltoTxartelaUid()`: Salto txartelaren identifikadorearen kudeaketa.
 
 - **`AdministrariLangilea`**: Administrazio lanetarako logika gehigarria.
-  - `langileaSortu(...)`: Langile berriak sortu DBan.
-  - `langileaEzabatu(...)`: Langileak ezabatu DBtik.
+  - **Langileak**:
+    - `langileaSortu(...)`: Langile berriak sortu DBan.
+    - `langileaEditatu(...)`: Langile baten datuak eguneratu.
+    - `langileaEzabatu(...)`: Langileak ezabatu DBtik.
+    - `langileaIkusi(int id)`: Langile baten datuak lortu.
+  - **Sailak**:
+    - `langileSailaSortu(...)`: Sail berri bat sortu.
+    - `langileSailaEditatu(...)`: Sail baten datuak aldatu.
+    - `langileSailaEzabatu(...)`: Sail bat ezabatu.
+    - `langileSailaikusi(int id)`: Sail baten informazioa lortu.
+  - **Fitxaketak**:
+    - `fitxaketaSortu(...)`: Fitxaketa berri bat eskuz sortu.
+    - `fitxaketaEditatu(...)`: Fitxaketa baten ordua/data aldatu.
+    - `fitxaketaEzabatu(...)`: Fitxaketa bat ezabatu.
+    - `fitxaketaGuztiakIkusi()`: Fitxaketa guztien historia ikusi.
+  - **Hornitzaileak**:
+    - `hornitzaileaEditatu(...)`: Hornitzailearen datuak eguneratu.
+    - `hornitzaileaEzabatu(...)`: Hornitzailea ezabatu.
+    - `hornitzaileaIkusi(int id)`: Hornitzaile baten fitxa ikusi.
+  - **Herriak**:
+    - `herriakIkusi()`: Herrien zerrenda osoa lortu.
+    - `herriBerriaSortu(...)`: Herri berri bat gehitu DBan.
+    - `herriaEditatu(...)`: Herri baten datuak (izena, lurraldea...) aldatu.
+    - `herriaEzabatu(...)`: Herri bat sistematik ezabatu.
+  - **Bestelakoak**:
+    - `bezeroaFakturaIkusi(int id)`: Bezero baten faktura espezifiko bat berreskuratu.
 
 - **`SalmentaLangilea`**: Salmenta eta fakturazio logika.
   - `fakturaSortu(int idEskaera)`: Emandako eskaera IDarekin PDF faktura bat sortzen du eta diskoan gorde.
