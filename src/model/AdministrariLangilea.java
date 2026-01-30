@@ -193,4 +193,30 @@ public class AdministrariLangilea extends Langilea {
             pst.executeUpdate();
         }
     }
+
+    public void fitxaketaEditatu(int idFitxaketa, java.sql.Date data, java.sql.Time ordua, String mota)
+            throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "UPDATE fitxaketak SET data = ?, ordua = ?, mota = ?, eguneratze_data = NOW() WHERE id_fitxaketa = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setDate(1, data);
+            pst.setTime(2, ordua);
+            pst.setString(3, mota);
+            pst.setInt(4, idFitxaketa);
+            pst.executeUpdate();
+        }
+    }
+
+    public void fitxaketaSortu(int langileaId, java.sql.Date data, java.sql.Time ordua, String mota)
+            throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "INSERT INTO fitxaketak (langilea_id, data, ordua, mota) VALUES (?, ?, ?, ?)";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, langileaId);
+            pst.setDate(2, data);
+            pst.setTime(3, ordua);
+            pst.setString(4, mota);
+            pst.executeUpdate();
+        }
+    }
 }
