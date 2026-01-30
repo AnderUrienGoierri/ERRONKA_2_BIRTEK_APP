@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -217,6 +218,42 @@ public class TeknikariLangilea extends Langilea {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement pst = konexioa.prepareStatement(sql)) {
             pst.setInt(1, idKonponketa);
+            pst.executeUpdate();
+        }
+    }
+
+    /**
+     * Produktu berri bat sortu (Bakarrik TeknikariLangilea eta BiltegiLangilea-k
+     * egin dezakete).
+     */
+    public void produktuBatSortu(Produktua p) throws SQLException {
+        // Oharra: Metodo honek produktu bat sortzen du 'produktuak' taulan.
+        // Ez du stock sarrerarik gestionatzen (hori BiltegiLangileak egiten du
+        // Sarrera bidez).
+        String sql = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, produktu_egoera_oharra, salgai, salmenta_prezioa, zergak_ehunekoa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+
+            pst.setString(1, p.getIzena());
+            pst.setString(2, p.getMarka());
+            pst.setInt(3, p.getKategoriaId());
+            pst.setString(4, p.getMota());
+            if (p.getBiltegiId() != null) {
+                pst.setInt(5, p.getBiltegiId());
+            } else {
+                pst.setNull(5, Types.INTEGER);
+            }
+            pst.setInt(6, p.getHornitzaileId());
+            pst.setInt(7, p.getStock());
+            pst.setString(8, p.getProduktuEgoera());
+            pst.setString(9, p.getDeskribapena());
+            pst.setString(10, p.getIrudiaUrl());
+            pst.setString(11, p.getProduktuEgoeraOharra());
+            pst.setBoolean(12, p.isSalgai());
+            pst.setBigDecimal(13, p.getSalmentaPrezioa());
+            pst.setBigDecimal(14, p.getZergakEhunekoa());
+
             pst.executeUpdate();
         }
     }

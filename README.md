@@ -85,13 +85,17 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `eskaeraSortu(Eskaera e)`: Eskaera berria eta bere lerroak sortu.
   - `eskaeraEditatu(Eskaera e)`: Eskaera baten datuak eguneratu.
   - `eskaeraEzabatu(int idEskaera)`: Eskaera bat DBtik kendu.
+  - `eskaeraLerroakIkusi(int idEskaera)`: Eskaera baten produktuak ikusi.
+  - `eskaeraLerroaGehitu(int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera bati produktu bat gehitu.
+  - `eskaeraLerroakEditatu(int idEskaeraLerroa, int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera lerro bat aldatu.
+  - `eskaeraLerroaEzabatu(int idEskaeraLerroa)`: Eskaera lerro bat ezabatu.
 
 - **`BiltegiLangilea`**: Logistika lanak.
   - `biltegiaSortu(String izena, String sku)`: Biltegi berria erregistratu.
   - `biltegiaEzabatu(int idBiltegia)`: Biltegi bat DBtik kendu.
   - `biltegiaEditatu(int idBiltegia, String izena, String sku)`: Biltegi datuak eguneratu.
   - `hornitzaileBerriaSortu(String izena, String ifz, String emaila)`: Hornitzaile berria sortu.
-  - `produktuSarreraBerriaSortu(...)`: Sarrera osoa (hornitzailea, produktuak, lerroak) transakzio bakarrean kudeatu.
+  - `c(...)`: Sarrera osoa (hornitzailea, produktuak, lerroak) transakzio bakarrean kudeatu.
   - `produktuEgoeraOharraJarri(int idProduktua, String oharra)`: Produktuaren egoerari buruzko oharra gehitu.
   - `produktuarenBiltegiaAldatu(int idProduktua, int idBiltegia)`: Produktu bat biltegi batetik bestera mugitu.
   - `produktuSarrerakIkusi(String egoeraIragazkia)`: Sarreren zerrenda lortu iragazki bidez.
@@ -101,6 +105,7 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 
 - **`TeknikariLangilea`**: Konponketa lanak eta produktu teknikoen kudeaketa.
   - `produktuakIkusi()`: Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez daudenak).
+  - `produktuBatSortu(Produktua p)`: Produktu berri bat sisteman sartu.
   - `produktuaEditatu(int id, boolean salgai, String egoera)`: Produktuaren egoera eta salgai-marka aldatu.
   - `produktuariIrudiaGehitu(int id, String irudiaUrl)`: Produktu bati irudia esleitu.
   - `prezioaEzarri(int id, BigDecimal prezioa, BigDecimal eskaintza)`: Produktuaren salmenta prezioa eta eskaintza eguneratu.
@@ -143,5 +148,6 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
   - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).
+
 - **`TaulaModelatzailea`**:
   - `ereduaEraiki(ResultSet rs)`: SQL emaitzak automatikoki JTable bateragarria den `DefaultTableModel` bihurtzen du.
