@@ -163,4 +163,34 @@ public class AdministrariLangilea extends Langilea {
         }
         return saila;
     }
+
+    public java.util.ArrayList<Fitxaketa> fitxaketaGuztiakIkusi() {
+        java.util.ArrayList<Fitxaketa> zerrenda = new java.util.ArrayList<>();
+        String galdera = "SELECT * FROM fitxaketak ORDER BY id_fitxaketa DESC";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(galdera);
+                java.sql.ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                zerrenda.add(new Fitxaketa(
+                        rs.getInt("id_fitxaketa"),
+                        rs.getInt("langilea_id"),
+                        rs.getDate("data"),
+                        rs.getTime("ordua"),
+                        rs.getString("mota"),
+                        rs.getTimestamp("eguneratze_data")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return zerrenda;
+    }
+
+    public void fitxaketaEzabatu(int idFitxaketa) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "DELETE FROM fitxaketak WHERE id_fitxaketa = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idFitxaketa);
+            pst.executeUpdate();
+        }
+    }
 }
