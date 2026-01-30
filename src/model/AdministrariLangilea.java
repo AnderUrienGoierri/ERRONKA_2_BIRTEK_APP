@@ -219,4 +219,60 @@ public class AdministrariLangilea extends Langilea {
             pst.executeUpdate();
         }
     }
+
+    public Hornitzailea hornitzaileaIkusi(int idHornitzailea) throws SQLException {
+        Hornitzailea hornitzailea = null;
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "SELECT * FROM hornitzaileak WHERE id_hornitzailea = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idHornitzailea);
+            java.sql.ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                hornitzailea = new Hornitzailea(
+                        rs.getInt("id_hornitzailea"),
+                        rs.getString("izena_soziala"),
+                        rs.getString("nan_ifz"),
+                        rs.getString("kontaktu_pertsona"),
+                        rs.getString("helbidea"),
+                        rs.getInt("herria_id"),
+                        rs.getString("posta_kodea"),
+                        rs.getString("telefonoa"),
+                        rs.getString("emaila"),
+                        rs.getString("hizkuntza"),
+                        rs.getString("pasahitza"),
+                        rs.getBoolean("aktibo"),
+                        rs.getTimestamp("eguneratze_data"));
+            }
+        }
+        return hornitzailea;
+    }
+
+    public void hornitzaileaEzabatu(int idHornitzailea) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "DELETE FROM hornitzaileak WHERE id_hornitzailea = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idHornitzailea);
+            pst.executeUpdate();
+        }
+    }
+
+    public void hornitzaileaEditatu(int idHornitzailea, String izenaSoziala, String nan, String kontaktuPertsona,
+            String helbidea, int herriaId, String postaKodea, String telefonoa, String emaila, String hizkuntza)
+            throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "UPDATE hornitzaileak SET izena_soziala = ?, nan_ifz = ?, kontaktu_pertsona = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, emaila = ?, hizkuntza = ?, eguneratze_data = NOW() WHERE id_hornitzailea = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izenaSoziala);
+            pst.setString(2, nan);
+            pst.setString(3, kontaktuPertsona);
+            pst.setString(4, helbidea);
+            pst.setInt(5, herriaId);
+            pst.setString(6, postaKodea);
+            pst.setString(7, telefonoa);
+            pst.setString(8, emaila);
+            pst.setString(9, hizkuntza);
+            pst.setInt(10, idHornitzailea);
+            pst.executeUpdate();
+        }
+    }
 }
