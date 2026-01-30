@@ -219,4 +219,60 @@ public class AdministrariLangilea extends Langilea {
             pst.executeUpdate();
         }
     }
+
+    // -------------------------------------------------------------------------
+    // HERRIAK KUDEATZEKO METODOAK
+    // -------------------------------------------------------------------------
+
+    public java.util.ArrayList<Herria> herriakIkusi() {
+        java.util.ArrayList<Herria> zerrenda = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM herriak";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql);
+                java.sql.ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                zerrenda.add(new Herria(
+                        rs.getInt("id_herria"),
+                        rs.getString("izena"),
+                        rs.getString("lurraldea"),
+                        rs.getString("nazioa")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return zerrenda;
+    }
+
+    public void herriBerriaSortu(String izena, String lurraldea, String nazioa) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izena);
+            pst.setString(2, lurraldea);
+            pst.setString(3, nazioa);
+            pst.executeUpdate();
+        }
+    }
+
+    public void herriaEzabatu(int idHerria) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "DELETE FROM herriak WHERE id_herria = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idHerria);
+            pst.executeUpdate();
+        }
+    }
+
+    public void herriaEditatu(int idHerria, String izena, String lurraldea, String nazioa) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "UPDATE herriak SET izena = ?, lurraldea = ?, nazioa = ? WHERE id_herria = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izena);
+            pst.setString(2, lurraldea);
+            pst.setString(3, nazioa);
+            pst.setInt(4, idHerria);
+            pst.executeUpdate();
+        }
+    }
 }
