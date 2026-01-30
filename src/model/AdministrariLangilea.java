@@ -112,4 +112,24 @@ public class AdministrariLangilea extends Langilea {
         }
         return faktura;
     }
+
+    public void langileSailaSortu(String izena, String kokapena, String deskribapena) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "INSERT INTO langile_sailak (izena, kokapena, deskribapena) VALUES (?, ?, ?)";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izena);
+            pst.setString(2, kokapena);
+            pst.setString(3, deskribapena);
+            pst.executeUpdate();
+        }
+    }
+
+    public void langileSailaEzabatu(int idSaila) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "DELETE FROM langile_sailak WHERE id_saila = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idSaila);
+            pst.executeUpdate();
+        }
+    }
 }
