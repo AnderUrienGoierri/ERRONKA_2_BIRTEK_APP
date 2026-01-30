@@ -1,4 +1,5 @@
 package model;
+
 import db.DB_Konexioa;
 
 import java.sql.Connection;
@@ -39,5 +40,76 @@ public class AdministrariLangilea extends Langilea {
             pst.setInt(1, idLangilea);
             pst.executeUpdate();
         }
+    }
+
+    public void langileaEditatu(int idLangilea, String izena, String abizena, String nan, String emaila, int sailaId,
+            String helbidea, int herriaId, String postaKodea) throws SQLException {
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan_ifz = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setString(1, izena);
+            pst.setString(2, abizena);
+            pst.setString(3, nan);
+            pst.setString(4, emaila);
+            pst.setInt(5, sailaId);
+            pst.setString(6, helbidea);
+            pst.setInt(7, herriaId);
+            pst.setString(8, postaKodea);
+            pst.setInt(9, idLangilea);
+            pst.executeUpdate();
+        }
+    }
+
+    public Langilea langileaIkusi(int idLangilea) throws SQLException {
+        Langilea langilea = null;
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "SELECT * FROM langileak WHERE id_langilea = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idLangilea);
+            java.sql.ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                langilea = new Langilea(
+                        rs.getInt("id_langilea"),
+                        rs.getString("izena"),
+                        rs.getString("abizena"),
+                        rs.getString("nan_ifz"),
+                        rs.getDate("jaiotza_data"),
+                        rs.getInt("herria_id"),
+                        rs.getString("helbidea"),
+                        rs.getString("posta_kodea"),
+                        rs.getString("telefonoa"),
+                        rs.getString("emaila"),
+                        rs.getString("hizkuntza"),
+                        rs.getString("pasahitza"),
+                        rs.getString("salto_txartela_uid"),
+                        rs.getTimestamp("alta_data"),
+                        rs.getTimestamp("eguneratze_data"),
+                        rs.getBoolean("aktibo"),
+                        rs.getInt("saila_id"),
+                        rs.getString("iban"),
+                        rs.getBytes("kurrikuluma"));
+            }
+        }
+        return langilea;
+    }
+
+    public BezeroFaktura bezeroaFakturaIkusi(int idFaktura) throws SQLException {
+        BezeroFaktura faktura = null;
+        try (Connection kon = DB_Konexioa.konektatu()) {
+            String sql = "SELECT * FROM bezero_fakturak WHERE id_faktura = ?";
+            PreparedStatement pst = kon.prepareStatement(sql);
+            pst.setInt(1, idFaktura);
+            java.sql.ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                faktura = new BezeroFaktura(
+                        rs.getInt("id_faktura"),
+                        rs.getString("faktura_zenbakia"),
+                        rs.getInt("eskaera_id"),
+                        rs.getDate("data"),
+                        rs.getBigDecimal("zergak_ehunekoa"),
+                        rs.getString("fitxategia_url"));
+            }
+        }
+        return faktura;
     }
 }
