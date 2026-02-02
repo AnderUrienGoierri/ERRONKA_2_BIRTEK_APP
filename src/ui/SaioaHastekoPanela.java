@@ -56,8 +56,9 @@ public class SaioaHastekoPanela extends JFrame {
                 originalaIcon = new ImageIcon(irundiURL);
             } else {
                 // 2. Saiakera: Fitxategi-sisteman zuzenean
-                if (new File("src/birtek1.jpeg").exists()) {
-                    originalaIcon = new ImageIcon("src/birtek1.jpeg");
+                // ALDAKETA: Irudiak 'irudiak' karpetan daude
+                if (new File("irudiak/birtek1.jpeg").exists()) {
+                    originalaIcon = new ImageIcon("irudiak/birtek1.jpeg");
                 }
             }
 
