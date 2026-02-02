@@ -59,7 +59,9 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `sarreraFitxaketaEgin()`: "Sarrera" motako fitxaketa laguntzailea.
   - `irteeraFitxaketaEgin()`: "Irteera" motako fitxaketa laguntzailea.
   - `nireFitxaketakIkusi()`: Langilearen fitxaketa historiala itzultzen du.
-  - `nireLangileDatuakEditatu(...)`: Pasahitza, hizkuntza eta herria eguneratzeko.
+  - `nireLangileDatuakEditatu(...)`: Pasahitza, hizkuntza, herria, telefonoa eta helbidea eguneratzeko.
+  - `herriakLortu()`: Herrien zerrenda osoa itzultzen du.
+  - `herriaSortu(Herria h)`: Herri berri bat sortzen du DBan.
   - `getFitxaketaEgoera()`: Azken fitxaketaren arabera, "BARRUAN" edo "KANPOAN" dagoen itzultzen du.
   - `autentifikatu(String pasahitza)`: Pasahitza zuzena den egiaztatzen du.
   - `getNan()` / `setNan()`: NAN/IFZ kudeatzaileak.
@@ -165,6 +167,7 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 - **`MenuSalmentak`**: Salmenta sailaren interfazea.
   - `eskaeraGehitu()`, `eskaeraEditatu()`, `eskaeraEzabatu()`: Eskaeren CRUD osoa.
   - `fakturaSortu()`: Hautatutako eskaeraren faktura sortu eta ireki.
+  - `garbituEskaeraFiltroa()`: Eskaeren fitxan bilatzailea eta filtroak garbitzen ditu.
   - `fitxatu(...)`: Langilearen sarrera/irteera botoiak.
 
 - **`MenuLogistika`**: Biltegi sailaren interfazea.
@@ -189,6 +192,10 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
   - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).
+
+- **`BezeroaDialog` & `NireDatuakDialog`**:
+  - `BezeroaDialog`: Bezeroen datuak kudeatzeko (gehitu, editatu, ikusi). Herriak gehitzeko aukera barne.
+  - `NireDatuakDialog`: Langilearen profil datuak modu estandarrean editatzeko lehioa.
 
 - **`TaulaModelatzailea`**:
   - `ereduaEraiki(ResultSet rs)`: SQL emaitzak automatikoki JTable bateragarria den `DefaultTableModel` bihurtzen du.
