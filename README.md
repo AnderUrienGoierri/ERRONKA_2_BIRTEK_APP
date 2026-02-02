@@ -138,6 +138,10 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `konponketaEgin(Konponketa k)`: Konponketa berri bat sortu.
   - `konponketaEditatu(Konponketa k)`: Konponketa baten datuak eguneratu.
   - `konponketaEzabatu(int id)`: Konponketa bat ezabatu.
+  - `akatsaIkusi()`: Akatsen zerrenda ikusi.
+  - `akatsaSortu(Akatsa a)`: Akats berri bat sortu.
+  - `akatsaEditatu(Akatsa a)`: Akats bat editatu.
+  - `akatsaEzabatu(int id)`: Akats bat ezabatu.
 
 #### Beste Klaseak
 

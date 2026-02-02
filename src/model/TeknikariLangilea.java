@@ -257,4 +257,76 @@ public class TeknikariLangilea extends Langilea {
             pst.executeUpdate();
         }
     }
+    // -------------------------------------------------------------------------
+    // AKATSAK KUDEAKETA
+    // -------------------------------------------------------------------------
+
+    /**
+     * Akatsen informazioa ikusi.
+     * 
+     * @return Akatsen zerrenda.
+     */
+    public List<Akatsa> akatsaIkusi() throws SQLException {
+        List<Akatsa> akatsak = new ArrayList<>();
+        String sql = "SELECT * FROM akatsak";
+
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql);
+                ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                Akatsa a = new Akatsa(
+                        rs.getInt("id_akatsa"),
+                        rs.getString("izena"),
+                        rs.getString("deskribapena"));
+                akatsak.add(a);
+            }
+        }
+        return akatsak;
+    }
+
+    /**
+     * Akats berri bat sortu.
+     * 
+     * @param a Akatsa objektua.
+     */
+    public void akatsaSortu(Akatsa a) throws SQLException {
+        String sql = "INSERT INTO akatsak (izena, deskribapena) VALUES (?, ?)";
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            pst.setString(1, a.getIzena());
+            pst.setString(2, a.getDeskribapena());
+            pst.executeUpdate();
+        }
+    }
+
+    /**
+     * Akats bat editatu.
+     * 
+     * @param a Akatsa objektua (id-a barne).
+     */
+    public void akatsaEditatu(Akatsa a) throws SQLException {
+        String sql = "UPDATE akatsak SET izena = ?, deskribapena = ? WHERE id_akatsa = ?";
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            pst.setString(1, a.getIzena());
+            pst.setString(2, a.getDeskribapena());
+            pst.setInt(3, a.getIdAkatsa());
+            pst.executeUpdate();
+        }
+    }
+
+    /**
+     * Akats bat ezabatu.
+     * 
+     * @param idAkatsa Akatsaren IDa.
+     */
+    public void akatsaEzabatu(int idAkatsa) throws SQLException {
+        String sql = "DELETE FROM akatsak WHERE id_akatsa = ?";
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            pst.setInt(1, idAkatsa);
+            pst.executeUpdate();
+        }
+    }
 }
