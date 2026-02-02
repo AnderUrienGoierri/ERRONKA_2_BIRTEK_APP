@@ -3,7 +3,13 @@ package model;
 import db.DB_Konexioa;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Langilea extends Pertsona implements IAutentifikagarria {
     private String iban;
@@ -142,21 +148,56 @@ public class Langilea extends Pertsona implements IAutentifikagarria {
         return zerrenda;
     }
 
-    public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId)
-            throws java.sql.SQLException {
-        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+    public List<Herria> herriakLortu() {
+        List<Herria> zerrenda = new ArrayList<>();
+        String sql = "SELECT * FROM herriak ORDER BY izena";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
-                java.sql.PreparedStatement pst = konexioa.prepareStatement(sql)) {
-            pst.setString(1, pasahitza);
-            pst.setString(2, hizkuntza);
-            pst.setInt(3, herriaId);
-            pst.setInt(4, this.getIdLangilea());
-            pst.executeUpdate();
+                Statement st = konexioa.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                zerrenda.add(new Herria(
+                        rs.getInt("id_herria"),
+                        rs.getString("izena"),
+                        rs.getString("lurraldea"),
+                        rs.getString("nazioa")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return zerrenda;
+    }
 
-            // Eguneratu objektua ere
+    public void herriaSortu(Herria h) throws SQLException {
+        String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
+        try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            pst.setString(1, h.getIzena());
+            pst.setString(2, h.getLurraldea());
+            pst.setString(3, h.getNazioa());
+            pst.executeUpdate();
+        }
+    }
+
+    public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId, String telefonoa,
+            String helbidea)
+            throws java.sql.SQLException {
+        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, telefonoa = ?, helbidea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+        try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
+                java.sql.PreparedStatement sententzia = konexioa.prepareStatement(sql)) {
+            sententzia.setString(1, pasahitza);
+            sententzia.setString(2, hizkuntza);
+            sententzia.setInt(3, herriaId);
+            sententzia.setString(4, telefonoa);
+            sententzia.setString(5, helbidea);
+            sententzia.setInt(6, this.getIdLangilea());
+            sententzia.executeUpdate();
+
+            // Objektuaren datuak eguneratu
             this.setPasahitza(pasahitza);
             this.setHizkuntza(hizkuntza);
             this.setHerriaId(herriaId);
+            this.setTelefonoa(telefonoa);
+            this.setHelbidea(helbidea);
         }
     }
 
