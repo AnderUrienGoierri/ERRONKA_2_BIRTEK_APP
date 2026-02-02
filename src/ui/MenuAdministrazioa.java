@@ -23,6 +23,7 @@ public class MenuAdministrazioa extends JFrame {
 
     // Fitxaketa informazioa
     private JLabel fitxaketaInfoEtiketa;
+    private JButton gehituBotoia, editatuBotoia, ezabatuBotoia, ikusiFakturaBotoia;
 
     // Erabiltzailearen datuak
     // Erabiltzailea (OOP)
@@ -172,36 +173,11 @@ public class MenuAdministrazioa extends JFrame {
         herriaTaula = new JTable();
         herriaPanela.add(new JScrollPane(herriaTaula), BorderLayout.CENTER);
 
-        pestainaPanela.addChangeListener(e -> {
-            bilatuTestua.setText("");
-            int index = pestainaPanela.getSelectedIndex();
-            switch (index) {
-                case 0:
-                    unekoOrdenatzailea = langileOrdenatzailea;
-                    break;
-                case 1:
-                    unekoOrdenatzailea = sailaOrdenatzailea;
-                    break;
-                case 2:
-                    unekoOrdenatzailea = fitxaketaOrdenatzailea;
-                    break;
-                case 3:
-                    unekoOrdenatzailea = fakturaOrdenatzailea;
-                    break;
-                case 4:
-                    unekoOrdenatzailea = hornitzaileOrdenatzailea;
-                    break;
-                case 5:
-                    unekoOrdenatzailea = herriaOrdenatzailea;
-                    break;
-            }
-        });
-
         JPanel botoiCrudPanela = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        JButton gehituBotoia = new JButton("Gehitu +");
-        JButton editatuBotoia = new JButton("Editatu");
-        JButton ezabatuBotoia = new JButton("Ezabatu");
-        JButton ikusiFakturaBotoia = new JButton("Ikusi Faktura");
+        gehituBotoia = new JButton("Gehitu +");
+        editatuBotoia = new JButton("Editatu");
+        ezabatuBotoia = new JButton("Ezabatu");
+        ikusiFakturaBotoia = new JButton("Ikusi Faktura");
         ikusiFakturaBotoia.setVisible(false); // Hasieran ezkutatu
 
         gehituBotoia.addActionListener(e -> gehituElementua(pestainaPanela.getSelectedIndex()));
@@ -221,6 +197,13 @@ public class MenuAdministrazioa extends JFrame {
             bilatuTestua.setText("");
             int index = pestainaPanela.getSelectedIndex();
             ikusiFakturaBotoia.setVisible(index == 3); // 3 = Fakturak
+
+            // Fakturak (index 3) denean, ezin da gehitu, editatu edo ezabatu
+            boolean crudGaituta = (index != 3);
+            gehituBotoia.setEnabled(crudGaituta);
+            editatuBotoia.setEnabled(crudGaituta);
+            ezabatuBotoia.setEnabled(crudGaituta);
+
             switch (index) {
                 case 0:
                     unekoOrdenatzailea = langileOrdenatzailea;
@@ -614,30 +597,6 @@ public class MenuAdministrazioa extends JFrame {
                     JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
                 }
             }
-        } else if (index == 3) { // Fakturak
-            JTextField fakturaZnbField = new JTextField();
-            JTextField eskaeraIdField = new JTextField();
-            JTextField dataField = new JTextField();
-            JTextField urlField = new JTextField();
-            Object[] message = { "Faktura Zenbakia:", fakturaZnbField, "Eskaera ID:", eskaeraIdField,
-                    "Data (YYYY-MM-DD):", dataField, "Fitxategia URL:", urlField };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Faktura Berria", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "INSERT INTO bezero_fakturak (faktura_zenbakia, eskaera_id, data, fitxategia_url) VALUES (?, ?, ?, ?)";
-                    PreparedStatement pst = kon.prepareStatement(sql);
-                    pst.setString(1, fakturaZnbField.getText());
-                    pst.setInt(2, Integer.parseInt(eskaeraIdField.getText()));
-                    pst.setString(3, dataField.getText());
-                    pst.setString(4, urlField.getText());
-                    pst.executeUpdate();
-                    datuakKargatuOsoa();
-                    JOptionPane.showMessageDialog(this, "Faktura gordeta.");
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
-                }
-            }
         } else if (index == 4) { // Hornitzaileak
             JTextField izenaField = new JTextField();
             JTextField ifzField = new JTextField();
@@ -814,42 +773,6 @@ public class MenuAdministrazioa extends JFrame {
                         pstUpd.setString(2, (String) motaBox.getSelectedItem());
                         pstUpd.setString(3, dataField.getText());
                         pstUpd.setString(4, orduaField.getText());
-                        pstUpd.setObject(5, id);
-                        pstUpd.executeUpdate();
-                        datuakKargatuOsoa();
-                    }
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
-            }
-        } else if (index == 3) { // Fakturak
-            if (fakturaTaula.getSelectedRow() == -1)
-                return;
-            int r = fakturaTaula.getSelectedRow();
-            int rm = fakturaTaula.convertRowIndexToModel(r);
-            Object id = fakturaTaula.getModel().getValueAt(rm, 0);
-
-            try (Connection kon = DB_Konexioa.konektatu()) {
-                PreparedStatement pstSel = kon.prepareStatement("SELECT * FROM bezero_fakturak WHERE id_faktura = ?");
-                pstSel.setObject(1, id);
-                ResultSet rs = pstSel.executeQuery();
-                if (rs.next()) {
-                    JTextField fakturaZnbField = new JTextField(rs.getString("faktura_zenbakia"));
-                    JTextField eskaeraIdField = new JTextField(String.valueOf(rs.getInt("eskaera_id")));
-                    JTextField dataField = new JTextField(rs.getString("data"));
-                    JTextField urlField = new JTextField(rs.getString("fitxategia_url"));
-
-                    Object[] message = { "Faktura Zenbakia:", fakturaZnbField, "Eskaera ID:", eskaeraIdField, "Data:",
-                            dataField, "URL:", urlField };
-                    int option = JOptionPane.showConfirmDialog(null, message, "Editatu Faktura",
-                            JOptionPane.OK_CANCEL_OPTION);
-                    if (option == JOptionPane.OK_OPTION) {
-                        PreparedStatement pstUpd = kon.prepareStatement(
-                                "UPDATE bezero_fakturak SET faktura_zenbakia = ?, eskaera_id = ?, data = ?, fitxategia_url = ? WHERE id_faktura = ?");
-                        pstUpd.setString(1, fakturaZnbField.getText());
-                        pstUpd.setInt(2, Integer.parseInt(eskaeraIdField.getText()));
-                        pstUpd.setString(3, dataField.getText());
-                        pstUpd.setString(4, urlField.getText());
                         pstUpd.setObject(5, id);
                         pstUpd.executeUpdate();
                         datuakKargatuOsoa();
