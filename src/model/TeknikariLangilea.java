@@ -50,7 +50,7 @@ public class TeknikariLangilea extends Langilea {
                         rs.getString("mota"),
                         rs.getString("deskribapena"),
                         rs.getString("irudia_url"),
-                        (Integer) rs.getObject("biltegi_id"), // Nullable izan daiteke
+                        rs.getInt("biltegi_id"), // Nullable izan daiteke
                         rs.getString("produktu_egoera"),
                         rs.getString("produktu_egoera_oharra"),
                         rs.getBoolean("salgai"),
