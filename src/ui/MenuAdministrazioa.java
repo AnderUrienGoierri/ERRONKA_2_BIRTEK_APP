@@ -199,10 +199,13 @@ public class MenuAdministrazioa extends JFrame {
             ikusiFakturaBotoia.setVisible(index == 3); // 3 = Fakturak
 
             // Fakturak (index 3) denean, ezin da gehitu, editatu edo ezabatu
-            boolean crudGaituta = (index != 3);
-            gehituBotoia.setEnabled(crudGaituta);
-            editatuBotoia.setEnabled(crudGaituta);
-            ezabatuBotoia.setEnabled(crudGaituta);
+            // Hornitzaileak (index 4) denean, ezin da gehitu
+            boolean fakturakDira = (index == 3);
+            boolean hornitzaileakDira = (index == 4);
+
+            gehituBotoia.setEnabled(!fakturakDira && !hornitzaileakDira);
+            editatuBotoia.setEnabled(!fakturakDira);
+            ezabatuBotoia.setEnabled(!fakturakDira);
 
             switch (index) {
                 case 0:
@@ -380,7 +383,8 @@ public class MenuAdministrazioa extends JFrame {
 
             // Hornitzaileak
             PreparedStatement pstH = konexioa
-                    .prepareStatement("SELECT id_hornitzailea, izena_soziala, ifz_nan, emaila FROM hornitzaileak");
+                    .prepareStatement(
+                            "SELECT id_hornitzailea, izena_soziala, ifz_nan, kontaktu_pertsona, helbidea, herria_id, posta_kodea, telefonoa FROM hornitzaileak");
             DefaultTableModel mH = TaulaModelatzailea.ereduaEraiki(pstH.executeQuery());
             hornitzaileTaula.setModel(mH);
             hornitzaileOrdenatzailea = new TableRowSorter<>(mH);
@@ -896,18 +900,83 @@ public class MenuAdministrazioa extends JFrame {
                 if (rs.next()) {
                     JTextField izenaField = new JTextField(rs.getString("izena_soziala"));
                     JTextField ifzField = new JTextField(rs.getString("ifz_nan"));
+                    JTextField kontaktuField = new JTextField(rs.getString("kontaktu_pertsona"));
+                    JTextField helbideaField = new JTextField(rs.getString("helbidea"));
+                    JTextField postaKodeaField = new JTextField(rs.getString("posta_kodea"));
+                    JTextField telefonoaField = new JTextField(rs.getString("telefonoa"));
                     JTextField emailField = new JTextField(rs.getString("emaila"));
 
-                    Object[] message = { "Izena Soziala:", izenaField, "IFZ/NAN:", ifzField, "Emaila:", emailField };
+                    JComboBox<ComboItem> herriaBox = new JComboBox<>();
+                    PreparedStatement pstHerria = kon.prepareStatement("SELECT id_herria, izena FROM herriak");
+                    ResultSet rsH = pstHerria.executeQuery();
+                    ComboItem selectedHerria = null;
+                    int currentHerriaId = rs.getInt("herria_id");
+                    while (rsH.next()) {
+                        ComboItem item = new ComboItem(rsH.getInt("id_herria"), rsH.getString("izena"));
+                        herriaBox.addItem(item);
+                        if (item.getId() == currentHerriaId) {
+                            selectedHerria = item;
+                        }
+                    }
+                    if (selectedHerria != null)
+                        herriaBox.setSelectedItem(selectedHerria);
+
+                    JButton herriBerriaBotoia = new JButton("Herri Berria +");
+                    herriBerriaBotoia.addActionListener(e -> {
+                        JTextField hIzena = new JTextField();
+                        JTextField hLurraldea = new JTextField();
+                        JTextField hNazioa = new JTextField();
+                        Object[] hMsg = { "Herria:", hIzena, "Lurraldea:", hLurraldea, "Nazioa:", hNazioa };
+                        int hOpt = JOptionPane.showConfirmDialog(null, hMsg, "Herri Berria Sortu",
+                                JOptionPane.OK_CANCEL_OPTION);
+                        if (hOpt == JOptionPane.OK_OPTION) {
+                            try (Connection konH = DB_Konexioa.konektatu()) {
+                                String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
+                                PreparedStatement pstH = konH.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                                pstH.setString(1, hIzena.getText());
+                                pstH.setString(2, hLurraldea.getText());
+                                pstH.setString(3, hNazioa.getText());
+                                pstH.executeUpdate();
+                                ResultSet rsKey = pstH.getGeneratedKeys();
+                                if (rsKey.next()) {
+                                    int newId = rsKey.getInt(1);
+                                    ComboItem newItem = new ComboItem(newId, hIzena.getText());
+                                    herriaBox.addItem(newItem);
+                                    herriaBox.setSelectedItem(newItem);
+                                }
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(null, "Errorea herria sortzean: " + ex.getMessage());
+                            }
+                        }
+                    });
+
+                    Object[] message = {
+                            "Izena Soziala:", izenaField,
+                            "IFZ/NAN:", ifzField,
+                            "Kontaktu Pertsona:", kontaktuField,
+                            "Helbidea:", helbideaField,
+                            "Herria:", herriaBox,
+                            "", herriBerriaBotoia,
+                            "Posta Kodea:", postaKodeaField,
+                            "Telefonoa:", telefonoaField,
+                            "Emaila:", emailField
+                    };
+
                     int option = JOptionPane.showConfirmDialog(null, message, "Editatu Hornitzailea",
                             JOptionPane.OK_CANCEL_OPTION);
                     if (option == JOptionPane.OK_OPTION) {
+                        ComboItem selHerria = (ComboItem) herriaBox.getSelectedItem();
                         PreparedStatement pst = kon.prepareStatement(
-                                "UPDATE hornitzaileak SET izena_soziala = ?, ifz_nan = ?, emaila = ? WHERE id_hornitzailea = ?");
+                                "UPDATE hornitzaileak SET izena_soziala = ?, ifz_nan = ?, kontaktu_pertsona = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, emaila = ? WHERE id_hornitzailea = ?");
                         pst.setString(1, izenaField.getText());
                         pst.setString(2, ifzField.getText());
-                        pst.setString(3, emailField.getText());
-                        pst.setObject(4, id);
+                        pst.setString(3, kontaktuField.getText());
+                        pst.setString(4, helbideaField.getText());
+                        pst.setInt(5, selHerria != null ? selHerria.getId() : 0);
+                        pst.setString(6, postaKodeaField.getText());
+                        pst.setString(7, telefonoaField.getText());
+                        pst.setString(8, emailField.getText());
+                        pst.setObject(9, id);
                         pst.executeUpdate();
                         datuakKargatuOsoa();
                     }
