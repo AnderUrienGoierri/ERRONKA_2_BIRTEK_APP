@@ -13,10 +13,10 @@ import java.sql.*;
 public class MenuTeknikoa extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JTable konponketaTaula, produktuTaula, akatsTaula;
+    private JTable konponketaTaula, produktuTaula, akatsTaula, nireFitxaketaTaula;
     private JTextField bilatuTestua;
     private TableRowSorter<DefaultTableModel> konponketaOrdenatzailea, produktuOrdenatzailea, akatsOrdenatzailea,
-            unekoOrdenatzailea;
+            nireFitxaketaOrdenatzailea, unekoOrdenatzailea;
 
     // Fitxaketa
     private JLabel fitxaketaInfoEtiketa;
@@ -154,6 +154,12 @@ public class MenuTeknikoa extends JFrame {
         akatsPanela.add(new JScrollPane(akatsTaula), BorderLayout.CENTER);
         pestainaPanela.addTab("Akatsak", akatsPanela);
 
+        // --- NIRE FITXAKETAK TAB ---
+        JPanel nireFitxaketakPanela = new JPanel(new BorderLayout());
+        nireFitxaketaTaula = new JTable();
+        nireFitxaketakPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
+        pestainaPanela.addTab("Nire Fitxaketak", nireFitxaketakPanela);
+
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
             int index = pestainaPanela.getSelectedIndex();
@@ -163,6 +169,8 @@ public class MenuTeknikoa extends JFrame {
                 unekoOrdenatzailea = produktuOrdenatzailea;
             else if (index == 2)
                 unekoOrdenatzailea = akatsOrdenatzailea;
+            else if (index == 3)
+                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         // CRUD Botoiak
@@ -201,6 +209,8 @@ public class MenuTeknikoa extends JFrame {
                 unekoOrdenatzailea = produktuOrdenatzailea;
             else if (index == 2)
                 unekoOrdenatzailea = akatsOrdenatzailea;
+            else if (index == 3)
+                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         if (!java.beans.Beans.isDesignTime()) {
@@ -223,6 +233,7 @@ public class MenuTeknikoa extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
+            datuakKargatu(); // Refrescar tableros
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
@@ -289,6 +300,15 @@ public class MenuTeknikoa extends JFrame {
             akatsTaula.setModel(m3);
             akatsOrdenatzailea = new TableRowSorter<>(m3);
             akatsTaula.setRowSorter(akatsOrdenatzailea);
+
+            // Nire Fitxaketak
+            PreparedStatement pstNF = konexioa.prepareStatement(
+                    "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC");
+            pstNF.setInt(1, langilea.getIdLangilea());
+            DefaultTableModel mNF = TaulaModelatzailea.ereduaEraiki(pstNF.executeQuery());
+            nireFitxaketaTaula.setModel(mNF);
+            nireFitxaketaOrdenatzailea = new TableRowSorter<>(mNF);
+            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
 
             if (unekoOrdenatzailea == null)
                 unekoOrdenatzailea = konponketaOrdenatzailea;

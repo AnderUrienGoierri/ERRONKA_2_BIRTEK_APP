@@ -31,6 +31,7 @@ public class MenuLogistika extends JFrame {
     private JTable sarreraTaula;
     private JTable biltegiTaula;
     private JTable produktuTaula;
+    private JTable nireFitxaketaTaula;
 
     // Sarrera Berria elementuak
     private JComboBox<HornitzaileElementua> hornitzaileHautatzailea;
@@ -62,6 +63,7 @@ public class MenuLogistika extends JFrame {
     private TableRowSorter<DefaultTableModel> sarreraOrdenatzailea;
     private TableRowSorter<DefaultTableModel> biltegiOrdenatzailea;
     private TableRowSorter<DefaultTableModel> produktuOrdenatzailea;
+    private TableRowSorter<DefaultTableModel> nireFitxaketaOrdenatzailea;
 
     // Eskaerak
     private JTable eskaeraTaula;
@@ -205,6 +207,7 @@ public class MenuLogistika extends JFrame {
         produktuTabSortu();
         eskaeraTabSortu(); // NEW
         sarreraBerriaTabSortu();
+        nireFitxaketaTabSortu();
 
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
@@ -219,6 +222,8 @@ public class MenuLogistika extends JFrame {
                 eskaeraDatuakKargatu();
             else if (index == 4)
                 sarreraHautatzaileakKargatu();
+            else if (index == 5)
+                nireFitxaketaDatuakKargatu();
         });
 
         // Hasierako karga
@@ -240,6 +245,7 @@ public class MenuLogistika extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
+            nireFitxaketaDatuakKargatu(); // Refresh personal attendance
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
@@ -857,6 +863,10 @@ public class MenuLogistika extends JFrame {
             unekoOrdenatzailea = biltegiOrdenatzailea;
         else if (index == 2)
             unekoOrdenatzailea = produktuOrdenatzailea;
+        else if (index == 3)
+            unekoOrdenatzailea = eskaeraOrdenatzailea;
+        else if (index == 5)
+            unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         if (unekoOrdenatzailea != null) {
             if (testua.trim().length() == 0)
                 unekoOrdenatzailea.setRowFilter(null);
@@ -1224,6 +1234,27 @@ public class MenuLogistika extends JFrame {
 
         public String toString() {
             return izena;
+        }
+    }
+
+    private void nireFitxaketaTabSortu() {
+        JPanel nireFitxaketaPanela = new JPanel(new BorderLayout());
+        nireFitxaketaPanela.setOpaque(false);
+        nireFitxaketaTaula = new JTable();
+        nireFitxaketaPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
+        pestainaPanela.addTab("Nire Fitxaketak", null, nireFitxaketaPanela, null);
+    }
+
+    private void nireFitxaketaDatuakKargatu() {
+        String sql = "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
+        try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, langilea.getIdLangilea());
+            DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
+            nireFitxaketaTaula.setModel(eredua);
+            nireFitxaketaOrdenatzailea = new TableRowSorter<>(eredua);
+            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -14,11 +14,11 @@ import java.io.File;
 public class MenuSalmentak extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JTable bezeroTaula, eskaeraTaula, eskaeraLerroTaula, produktuTaula;
+    private JTable bezeroTaula, eskaeraTaula, eskaeraLerroTaula, produktuTaula, nireFitxaketaTaula;
     private JTextField bilatuTestua;
     private JComboBox<String> kategoriaFiltroa, motaFiltroa;
     private TableRowSorter<DefaultTableModel> bezeroOrdenatzailea, eskaeraOrdenatzailea, produktuOrdenatzailea,
-            unekoOrdenatzailea;
+            nireFitxaketaOrdenatzailea, unekoOrdenatzailea;
 
     // Fitxaketa
     private JLabel fitxaketaInfoEtiketa;
@@ -235,6 +235,12 @@ public class MenuSalmentak extends JFrame {
         produktuPanela.add(produktuKontrolPanela, BorderLayout.SOUTH);
         pestainaPanela.addTab("Produktuak", produktuPanela);
 
+        // NIRE FITXAKETAK TAB
+        JPanel nireFitxaketaPanela = new JPanel(new BorderLayout());
+        nireFitxaketaTaula = new JTable();
+        nireFitxaketaPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
+        pestainaPanela.addTab("Nire Fitxaketak", nireFitxaketaPanela);
+
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
             int idx = pestainaPanela.getSelectedIndex();
@@ -242,8 +248,10 @@ public class MenuSalmentak extends JFrame {
                 unekoOrdenatzailea = bezeroOrdenatzailea;
             else if (idx == 1)
                 unekoOrdenatzailea = eskaeraOrdenatzailea;
-            else
+            else if (idx == 2)
                 unekoOrdenatzailea = produktuOrdenatzailea;
+            else
+                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         if (!java.beans.Beans.isDesignTime()) {
@@ -267,6 +275,7 @@ public class MenuSalmentak extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
+            nireFitxaketaDatuakKargatu(); // Refrescar tablero personal
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
@@ -388,6 +397,7 @@ public class MenuSalmentak extends JFrame {
             eskaeraTaula.setRowSorter(eskaeraOrdenatzailea);
 
             produktuDatuakKargatu();
+            nireFitxaketaDatuakKargatu();
 
             if (unekoOrdenatzailea == null)
                 unekoOrdenatzailea = bezeroOrdenatzailea;
@@ -901,6 +911,19 @@ public class MenuSalmentak extends JFrame {
         bilatuTestua.setText("");
         if (eskaeraOrdenatzailea != null) {
             eskaeraOrdenatzailea.setRowFilter(null);
+        }
+    }
+
+    private void nireFitxaketaDatuakKargatu() {
+        String sql = "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
+        try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, langilea.getIdLangilea());
+            DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
+            nireFitxaketaTaula.setModel(eredua);
+            nireFitxaketaOrdenatzailea = new TableRowSorter<>(eredua);
+            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
