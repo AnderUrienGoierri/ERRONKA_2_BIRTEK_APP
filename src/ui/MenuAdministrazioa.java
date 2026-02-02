@@ -288,49 +288,27 @@ public class MenuAdministrazioa extends JFrame {
 
     private void irekiNireDatuakEditatu() {
         JPasswordField passField = new JPasswordField(langilea.getPasahitza());
-
-        // Hizkuntza ComboBox
-        String[] hizkuntzak = { "Euskara", "Gaztelania", "Ingelesa", "Frantsesa" };
-        JComboBox<String> hizkuntzaBox = new JComboBox<>(hizkuntzak);
-
-        // Aurrez hautatu uneko hizkuntza
-        String unekoKodea = langilea.getHizkuntza();
-        if ("EU".equalsIgnoreCase(unekoKodea) || "Euskara".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Euskara");
-        else if ("ES".equalsIgnoreCase(unekoKodea) || "Gaztelania".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Gaztelania");
-        else if ("EN".equalsIgnoreCase(unekoKodea) || "Ingelesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Ingelesa");
-        else if ("FR".equalsIgnoreCase(unekoKodea) || "Frantsesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Frantsesa");
-        else
-            hizkuntzaBox.setSelectedItem("Gaztelania"); // Lehenetsia
-
-        JTextField herriaIzenaField = new JTextField(langilea.getHerriaIzena());
-        JTextField lurraldeaField = new JTextField();
-        JTextField nazioaField = new JTextField();
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
 
         Object[] message = {
                 "Pasahitza Berria:", passField,
-                "Hizkuntza:", hizkuntzaBox,
-                "Herria (Izena):", herriaIzenaField,
-                "Lurraldea (Berria bada):", lurraldeaField,
-                "Nazioa (Berria bada):", nazioaField
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
         };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
                 String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
 
-                // Orain izen osoa bidaltzen dugu DB-ra
-                String hizkuntzaAukeratua = (String) hizkuntzaBox.getSelectedItem();
-                String herria = herriaIzenaField.getText();
-                String lurraldea = lurraldeaField.getText();
-                String nazioa = nazioaField.getText();
-
-                langilea.nireLangileDatuakEditatu(pass, hizkuntzaAukeratua, herria, lurraldea, nazioa);
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
                 JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
                         JOptionPane.ERROR_MESSAGE);
