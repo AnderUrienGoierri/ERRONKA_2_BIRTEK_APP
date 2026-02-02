@@ -63,6 +63,11 @@ public class MenuLogistika extends JFrame {
     private TableRowSorter<DefaultTableModel> biltegiOrdenatzailea;
     private TableRowSorter<DefaultTableModel> produktuOrdenatzailea;
 
+    // Eskaerak
+    private JTable eskaeraTaula;
+    private TableRowSorter<DefaultTableModel> eskaeraOrdenatzailea;
+    private JComboBox<String> eskaeraEgoeraIragazkia;
+
     /**
      * Eraikitzaileak eguneratua.
      */
@@ -198,6 +203,7 @@ public class MenuLogistika extends JFrame {
         sarreraTabSortu();
         biltegiTabSortu();
         produktuTabSortu();
+        eskaeraTabSortu(); // NEW
         sarreraBerriaTabSortu();
 
         pestainaPanela.addChangeListener(e -> {
@@ -210,6 +216,8 @@ public class MenuLogistika extends JFrame {
             else if (index == 2)
                 produktuDatuakKargatu();
             else if (index == 3)
+                eskaeraDatuakKargatu();
+            else if (index == 4)
                 sarreraHautatzaileakKargatu();
         });
 
@@ -324,6 +332,7 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- TAB SARRERAK ---
+    // --- TAB SARRERAK ---
     private void sarreraTabSortu() {
         JPanel sarreraPanela = new JPanel(new BorderLayout());
         sarreraPanela.setOpaque(false);
@@ -342,6 +351,20 @@ public class MenuLogistika extends JFrame {
         JButton eguneratuBotoia = new JButton("Eguneratu Zerrenda");
         eguneratuBotoia.addActionListener(e -> sarreraDatuakKargatu());
         goikoAukeraPanela.add(eguneratuBotoia);
+
+        // NEW BUTTONS
+        JButton ikusiLerroakBotoia = new JButton("Ikusi Lerroak");
+        ikusiLerroakBotoia.addActionListener(e -> ikusiSarreraLerroak());
+        goikoAukeraPanela.add(ikusiLerroakBotoia);
+
+        JButton editatuBotoia = new JButton("Editatu Egoera");
+        editatuBotoia.addActionListener(e -> editatuSarrera());
+        goikoAukeraPanela.add(editatuBotoia);
+
+        JButton ezabatuBotoia = new JButton("Ezabatu");
+        ezabatuBotoia.setBackground(new Color(255, 100, 100));
+        ezabatuBotoia.addActionListener(e -> ezabatuSarrera());
+        goikoAukeraPanela.add(ezabatuBotoia);
 
         sarreraPanela.add(goikoAukeraPanela, BorderLayout.NORTH);
 
@@ -396,12 +419,52 @@ public class MenuLogistika extends JFrame {
         botoiPanela.add(aldatuKokapenaBotoia);
         botoiPanela.add(jasoBotoia);
         botoiPanela.add(bideanBotoia);
+
+        JButton oharraBotoia = new JButton("Editatu Oharra");
+        oharraBotoia.addActionListener(e -> editatuProduktuOharra());
+        botoiPanela.add(oharraBotoia);
+
         produktuPanela.add(botoiPanela, BorderLayout.NORTH);
 
         produktuTaula = new JTable();
         produktuPanela.add(new JScrollPane(produktuTaula), BorderLayout.CENTER);
 
         pestainaPanela.addTab("Produktuak eta Kokapena", null, produktuPanela, null);
+    }
+
+    // --- TAB ESKAERAK (NEW) ---
+    private void eskaeraTabSortu() {
+        JPanel eskaeraPanela = new JPanel(new BorderLayout());
+        eskaeraPanela.setOpaque(false);
+
+        JPanel goikoAukeraPanela = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        goikoAukeraPanela.setOpaque(false);
+        goikoAukeraPanela.add(new JLabel("Egoera Iragazi:"));
+
+        eskaeraEgoeraIragazkia = new JComboBox<>();
+        eskaeraEgoeraIragazkia.addItem("Denak");
+        eskaeraEgoeraIragazkia.addItem("Prestatzen");
+        eskaeraEgoeraIragazkia.addItem("Osatua/Bidalita");
+        eskaeraEgoeraIragazkia.addActionListener(e -> eskaeraDatuakKargatu());
+        goikoAukeraPanela.add(eskaeraEgoeraIragazkia);
+
+        JButton eguneratuBotoia = new JButton("Eguneratu");
+        eguneratuBotoia.addActionListener(e -> eskaeraDatuakKargatu());
+        goikoAukeraPanela.add(eguneratuBotoia);
+
+        JButton lerroakBotoia = new JButton("Ikusi Lerroak / Kudeatu");
+        lerroakBotoia.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lerroakBotoia.setBackground(new Color(200, 230, 255));
+        lerroakBotoia.addActionListener(e -> ikusiEskaeraLerroak());
+        goikoAukeraPanela.add(lerroakBotoia);
+
+        eskaeraPanela.add(goikoAukeraPanela, BorderLayout.NORTH);
+
+        eskaeraTaula = new JTable();
+        JScrollPane ruli = new JScrollPane(eskaeraTaula);
+        eskaeraPanela.add(ruli, BorderLayout.CENTER);
+
+        pestainaPanela.addTab("Eskaerak", null, eskaeraPanela, null);
     }
 
     // --- TAB SARRERA BERRIA ---
@@ -820,7 +883,7 @@ public class MenuLogistika extends JFrame {
     }
 
     private void produktuDatuakKargatu() {
-        String sql = "SELECT p.id_produktua, p.izena AS Produktua, b.izena AS Biltegia, s.id_sarrera AS 'Sarrera ID', sl.sarrera_lerro_egoera AS Egoera, s.data AS 'Sarrera Data', sl.id_sarrera_lerroa FROM sarrera_lerroak sl JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera JOIN produktuak p ON sl.produktua_id = p.id_produktua JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
+        String sql = "SELECT p.id_produktua, p.izena AS Produktua, b.izena AS Biltegia, s.id_sarrera AS 'Sarrera ID', sl.sarrera_lerro_egoera AS Egoera, s.data AS 'Sarrera Data', sl.id_sarrera_lerroa, p.produktu_egoera_oharra AS Oharra FROM sarrera_lerroak sl JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera JOIN produktuak p ON sl.produktua_id = p.id_produktua JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
         try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
             DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
             produktuTaula.setModel(eredua);
@@ -846,6 +909,239 @@ public class MenuLogistika extends JFrame {
                 unekoOrdenatzailea.setRowFilter(null);
             else
                 unekoOrdenatzailea.setRowFilter(RowFilter.regexFilter("(?i)" + testua));
+        }
+    }
+
+    // --- SARRERA LOGIKA DESARROILUA ---
+
+    private void ikusiSarreraLerroak() {
+        int row = sarreraTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu sarrera bat lehenbizi.");
+            return;
+        }
+        int idSarrera = ((Number) sarreraTaula.getValueAt(row, 0)).intValue();
+
+        JDialog dialog = new JDialog(this, "Sarrera Kodea: " + idSarrera + " - Lerroak", true);
+        dialog.setSize(600, 400);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout());
+
+        String[] columns = { "ID", "Produktua", "Marka", "Kantitatea", "Egoera" };
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        JTable table = new JTable(model);
+        dialog.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Logic extracted to method for refreshing
+        kargatuSarreraLerroak(idSarrera, model);
+
+        JPanel btnPanel = new JPanel();
+        JButton aldatuBtn = new JButton("Aldatu Lerroaren Egoera");
+        aldatuBtn.addActionListener(e -> {
+            int lRow = table.getSelectedRow();
+            if (lRow == -1) {
+                JOptionPane.showMessageDialog(dialog, "Aukeratu lerro bat.");
+                return;
+            }
+            int idLerroa = ((Number) table.getValueAt(lRow, 0)).intValue();
+            String unekoSt = (String) table.getValueAt(lRow, 4);
+
+            String[] opts = { "Bidean", "Jasota", "Ezabatua" };
+            String berria = (String) JOptionPane.showInputDialog(dialog,
+                    "Aukeratu egoera:", "Egoera Aldatu",
+                    JOptionPane.QUESTION_MESSAGE, null, opts, unekoSt);
+
+            if (berria != null) {
+                try {
+                    langilea.produktuSarreraLerroEgoeraAldatu(idLerroa, berria);
+                    kargatuSarreraLerroak(idSarrera, model);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(dialog, "Errorea: " + ex.getMessage());
+                }
+            }
+        });
+
+        JButton itxiBtn = new JButton("Itxi");
+        itxiBtn.addActionListener(e -> dialog.dispose());
+
+        btnPanel.add(aldatuBtn);
+        btnPanel.add(itxiBtn);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
+    private void kargatuSarreraLerroak(int idSarrera, DefaultTableModel model) {
+        model.setRowCount(0);
+        try {
+            java.util.List<Object[]> lerroak = langilea.produktuSarreraLerroakIkusi(idSarrera);
+            for (Object[] o : lerroak) {
+                model.addRow(o);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errorea datuak kargatzean: " + e.getMessage());
+        }
+    }
+
+    private void editatuSarrera() {
+        int row = sarreraTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu sarrera bat lehenbizi.");
+            return;
+        }
+        int idSarrera = ((Number) sarreraTaula.getValueAt(row, 0)).intValue();
+        String unekoEgoera = (String) sarreraTaula.getValueAt(row, 3);
+
+        String[] options = { "Bidean", "Jasota", "Ezabatua" };
+        String berria = (String) JOptionPane.showInputDialog(this,
+                "Aukeratu Egoera Berria:", "Egoera Aldatu",
+                JOptionPane.QUESTION_MESSAGE, null, options, unekoEgoera);
+
+        if (berria != null && !berria.equals(unekoEgoera)) {
+            try {
+                langilea.produktuSarreraEditatu(idSarrera, berria);
+                sarreraDatuakKargatu();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea eguneratzean: " + e.getMessage());
+            }
+        }
+    }
+
+    private void ezabatuSarrera() {
+        int row = sarreraTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu sarrera bat lehenbizi.");
+            return;
+        }
+        int idSarrera = ((Number) sarreraTaula.getValueAt(row, 0)).intValue();
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Ziur zaude sarrera hau eta bere lerro guztiak ezabatu nahi dituzula?",
+                "Ezabatu", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                langilea.produktuSarreraEzabatu(idSarrera);
+                sarreraDatuakKargatu();
+                JOptionPane.showMessageDialog(this, "Sarrera ezabatua.");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea ezabatzean: " + e.getMessage());
+            }
+        }
+    }
+
+    // --- ESKAERA LOGIKA DESARROILUA ---
+
+    private void eskaeraDatuakKargatu() {
+        try {
+            String filter = (String) eskaeraEgoeraIragazkia.getSelectedItem();
+            java.util.List<Object[]> data = langilea.produktuEskaerakIkusi(filter);
+
+            String[] colNames = { "ID", "Bezeroa", "Data", "Guztira (€)", "Egoera" };
+            DefaultTableModel eredua = new DefaultTableModel(colNames, 0);
+            for (Object[] row : data) {
+                eredua.addRow(row);
+            }
+            eskaeraTaula.setModel(eredua);
+            eskaeraOrdenatzailea = new TableRowSorter<>(eredua);
+            eskaeraTaula.setRowSorter(eskaeraOrdenatzailea);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void ikusiEskaeraLerroak() {
+        int row = eskaeraTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu eskaera bat lehenbizi.");
+            return;
+        }
+        int idEskaera = ((Number) eskaeraTaula.getValueAt(row, 0)).intValue();
+
+        JDialog dialog = new JDialog(this, "Eskaera Kodea: " + idEskaera + " - Kudeaketa", true);
+        dialog.setSize(700, 500);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout());
+
+        String[] columns = { "ID", "Produktua", "Kantitatea", "P.Unit.(€)", "Egoera" };
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        JTable table = new JTable(model);
+        dialog.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Karga Hasieran
+        kargatuEskaeraLerroak(idEskaera, model);
+
+        JPanel btnPanel = new JPanel();
+        JButton aldatuBtn = new JButton("Aldatu Lerroaren Egoera");
+        aldatuBtn.addActionListener(e -> {
+            int lRow = table.getSelectedRow();
+            if (lRow == -1)
+                return;
+            int idLerroa = ((Number) table.getValueAt(lRow, 0)).intValue();
+            String unekoSt = (String) table.getValueAt(lRow, 4);
+
+            String[] opts = { "Prestatzen", "Osatua/Bidalita", "Ezabatua" };
+            String berria = (String) JOptionPane.showInputDialog(dialog,
+                    "Aukeratu egoera:", "Egoera Aldatu",
+                    JOptionPane.QUESTION_MESSAGE, null, opts, unekoSt);
+
+            if (berria != null) {
+                try {
+                    langilea.produktuEskaeraLerroEgoeraAldatu(idLerroa, berria, idEskaera);
+                    kargatuEskaeraLerroak(idEskaera, model); // Freskatu
+                    eskaeraDatuakKargatu(); // Freskatu atzeko taula nagusia ere
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        JButton itxiBtn = new JButton("Itxi");
+        itxiBtn.addActionListener(e -> dialog.dispose());
+
+        btnPanel.add(aldatuBtn);
+        btnPanel.add(itxiBtn);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
+    private void kargatuEskaeraLerroak(int idEskaera, DefaultTableModel model) {
+        model.setRowCount(0);
+        try {
+            java.util.List<Object[]> lerroak = langilea.produktuEskaeraLerroakIkusi(idEskaera);
+            for (Object[] o : lerroak) {
+                model.addRow(o);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void editatuProduktuOharra() {
+        int row = produktuTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu produktu bat lehenbizi.");
+            return;
+        }
+
+        int idProduktua = ((Number) produktuTaula.getValueAt(row, 0)).intValue();
+        // Assuming 'Oharra' is the last column (index 7 based on new SQL)
+        String unekoOharra = "";
+        Object val = produktuTaula.getValueAt(row, 7);
+        if (val != null)
+            unekoOharra = val.toString();
+
+        String oharBerria = JOptionPane.showInputDialog(this, "Idatzi oharra:", unekoOharra);
+        if (oharBerria != null) {
+            try {
+                langilea.produktuEgoeraOharraJarri(idProduktua, oharBerria);
+                produktuDatuakKargatu();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Errorea oharra gordetzean: " + e.getMessage());
+            }
         }
     }
 

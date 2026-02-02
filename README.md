@@ -123,9 +123,14 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `produktuEgoeraOharraJarri(int idProduktua, String oharra)`: Produktuaren egoerari buruzko oharra gehitu.
   - `produktuarenBiltegiaAldatu(int idProduktua, int idBiltegia)`: Produktu bat biltegi batetik bestera mugitu.
   - `produktuSarrerakIkusi(String egoeraIragazkia)`: Sarreren zerrenda lortu iragazki bidez.
-  - `produktuSarreraEditatu(int idSarrera, String egoera)`: Sarrera baten egoera orokorra aldatu.
-  - `produktuSarreraEgoeraAldatu(int idSarreraLerroa, String egoera, int idSarrera)`: Sarrera lerro baten egoera espezifikoa eguneratu.
-  - `produktuEskaeraEgoeraAldatu(int idEskaera, String egoera)`: Eskaera baten egoera eguneratu ('Prestatzen', 'Osatua', 'Ezabatua').
+  - `produktuSarreraLerroakIkusi(int idSarrera)`: Sarrera baten lerro guztiak lortu.
+  - `produktuSarreraEditatu(int idSarrera, String egoera)`: Sarrera baten egoera orokorra aldatu. Aldaketak lerro guztietara hedatzen dira (Cascading).
+  - `produktuSarreraLerroEgoeraAldatu(int idSarreraLerroa, String egoera)`: Sarrera lerro baten egoera eguneratu. Lerro guztiak "Jasota" badaude, sarrera nagusia ere eguneratzen du.
+  - `produktuSarreraEzabatu(int idSarrera)`: Sarrera bat eta bere lerro guztiak ezabatu DBtik.
+  - `produktuEskaerakIkusi(String egoeraIragazkia)`: Eskaerak zerrendatu egoeraren arabera iragaziz.
+  - `produktuEskaeraLerroakIkusi(int idEskaera)`: Eskaera baten lerro guztiak ikusi.
+  - `produktuEskaeraEgoeraAldatu(int idEskaera, String egoera)`: Eskaera baten egoera eguneratu. Aldaketak lerro guztietara hedatzen dira.
+  - `produktuEskaeraLerroEgoeraAldatu(int idEskaeraLerroa, String egoera, int idEskaera)`: Eskaera lerro bat eguneratu. Lerro bat "Prestatzen" badago, eskaera osoa "Prestatzen" jartzen da.
 
 - **`TeknikariLangilea`**: Konponketa lanak eta produktu teknikoen kudeaketa.
   - `produktuakIkusi()`: Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez daudenak).
@@ -163,9 +168,17 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
   - `fitxatu(...)`: Langilearen sarrera/irteera botoiak.
 
 - **`MenuLogistika`**: Biltegi sailaren interfazea.
-  - `sarreraBerriaTabSortu()`: Sarrera berriak kudeatzeko fitxa dinamikoa.
-  - `igoIrudia()`: Produktuei irudiak esleitzeko.
-  - `biltegiaKudeatu...`: Stock eta kokapenak kudeatzeko.
+  - `sarreraTabSortu()`: Sarrerak ikusteko eta kudeatzeko (editatu/ezabatu) fitxa.
+  - `biltegiTabSortu()`: Biltegiak kudeatzeko fitxa.
+  - `produktuTabSortu()`: Produktuen inbentarioa, kokapenak eta oharrak kudeatzeko fitxa.
+  - `eskaeraTabSortu()`: Bezeroen eskaerak eta beraien lerroak kudeatzeko fitxa.
+  - `sarreraBerriaTabSortu()`: Sarrera berriak (hornitzailea + produktuak) sortzeko inprimakia.
+  - `ikusiSarreraLerroak()`: Sarrera baten xehetasunak erakusten dituen lehioa ireki.
+  - `editatuSarrera()`: Sarreraren egoera aldatzeko lehioa ireki.
+  - `ezabatuSarrera()`: Sarrera bat ezabatu.
+  - `ikusiEskaeraLerroak()`: Eskaera baten lerroak ikusi eta kudeatzeko lehioa.
+  - `editatuProduktuOharra()`: Produktu bati oharra gehitu/aldatu.
+  - `igoIrudia()`: Produktuei irudiak esleitzeko fitxategi-hautatzailea.
 
 - **`MenuTeknikoa`**: SAT / Konponketa sailaren interfazea.
   - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
