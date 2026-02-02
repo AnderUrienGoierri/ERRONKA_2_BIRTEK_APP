@@ -262,7 +262,6 @@ public class MenuTeknikoa extends JFrame {
     private void irekiNireDatuakEditatu() {
         JPasswordField passField = new JPasswordField(langilea.getPasahitza());
 
-        // Hizkuntza ComboBox
         String[] hizkuntzak = { "Euskara", "Gaztelania", "Ingelesa", "Frantsesa" };
         JComboBox<String> hizkuntzaBox = new JComboBox<>(hizkuntzak);
 
@@ -340,37 +339,138 @@ public class MenuTeknikoa extends JFrame {
 
     private void ezabatuElementua(int index) {
         JTable t = (index == 0) ? konponketaTaula : (index == 1) ? produktuTaula : akatsTaula;
-        String taula = (index == 0) ? "konponketak" : (index == 1) ? "produktuak" : "akatsak";
-        String idCol = (index == 0) ? "id_konponketa" : (index == 1) ? "id_produktua" : "id_akatsa";
 
-        if (t.getSelectedRow() == -1)
+        if (t.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu elementu bat ezabatzeko.");
             return;
-        Object id = t.getModel().getValueAt(t.convertRowIndexToModel(t.getSelectedRow()), 0);
+        }
+
+        int rm = t.convertRowIndexToModel(t.getSelectedRow());
+        Object idObj = t.getModel().getValueAt(rm, 0);
+        int id = Integer.parseInt(idObj.toString());
 
         if (JOptionPane.showConfirmDialog(this, "Ziur ID " + id + " ezabatu nahi duzula?", "Ezabatu",
                 JOptionPane.YES_NO_OPTION) == 0) {
-            try (Connection kon = DB_Konexioa.konektatu()) {
-                PreparedStatement pst = kon.prepareStatement("DELETE FROM " + taula + " WHERE " + idCol + " = ?");
-                pst.setObject(1, id);
-                pst.executeUpdate();
+            try {
+                if (index == 2) { // Akatsak
+                    langilea.akatsaEzabatu(id);
+                } else {
+                    // Besteetarako oraindik SQL zuzena mantentzen dugu momentuz, edo dagokion
+                    // metodoa sortu beharko litzateke
+                    String taula = (index == 0) ? "konponketak" : "produktuak";
+                    String idCol = (index == 0) ? "id_konponketa" : "id_produktua";
+                    try (Connection kon = DB_Konexioa.konektatu()) {
+                        PreparedStatement pst = kon
+                                .prepareStatement("DELETE FROM " + taula + " WHERE " + idCol + " = ?");
+                        pst.setInt(1, id);
+                        pst.executeUpdate();
+                    }
+                }
                 datuakKargatu();
-            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Elementua ezabatu da.");
+            } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
             }
         }
     }
 
     private void gehituElementua(int index) {
-        if (index == 2) { // Akatsak
-            String desc = JOptionPane.showInputDialog(this, "Sartu akatsaren deskribapena:");
-            if (desc != null && !desc.trim().isEmpty()) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    PreparedStatement pst = kon.prepareStatement("INSERT INTO akatsak (deskribapena) VALUES (?)");
-                    pst.setString(1, desc);
-                    pst.executeUpdate();
+        if (index == 0) { // Konponketak
+            try {
+                // 1. Datuak lortu
+                java.util.List<Produktua> produktuak = langilea.produktuakIkusi();
+                java.util.List<Akatsa> akatsak = langilea.akatsaIkusi();
+
+                if (produktuak.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Ez dago produkturik sisteman.");
+                    return;
+                }
+                if (akatsak.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Ez dago akats motarik sisteman. Sortu bat lehenik.");
+                    return;
+                }
+
+                // 2. UI Konponenteak
+                JComboBox<ComboItem> produktuBox = new JComboBox<>();
+                for (Produktua p : produktuak) {
+                    produktuBox.addItem(new ComboItem(p.getIdProduktua(), p.getIzena() + " (" + p.getMarka() + ")"));
+                }
+
+                JComboBox<ComboItem> akatsBox = new JComboBox<>();
+                for (Akatsa a : akatsak) {
+                    akatsBox.addItem(new ComboItem(a.getIdAkatsa(), a.getIzena()));
+                }
+
+                JTextArea oharrakArea = new JTextArea(5, 20);
+
+                Object[] message = {
+                        "Produktua:", produktuBox,
+                        "Akatsa:", akatsBox,
+                        "Oharrak:", new JScrollPane(oharrakArea)
+                };
+
+                int option = JOptionPane.showConfirmDialog(this, message, "Sortu Konponketa Berria",
+                        JOptionPane.OK_CANCEL_OPTION);
+
+                if (option == JOptionPane.OK_OPTION) {
+                    ComboItem selectedProd = (ComboItem) produktuBox.getSelectedItem();
+                    ComboItem selectedAkats = (ComboItem) akatsBox.getSelectedItem();
+                    String oharrak = oharrakArea.getText();
+
+                    if (selectedProd == null || selectedAkats == null)
+                        return;
+
+                    // 3. Konponketa sortu
+                    Konponketa k = new Konponketa(
+                            0, // ID
+                            selectedProd.getId(),
+                            langilea.getIdLangilea(),
+                            new Timestamp(System.currentTimeMillis()), // Hasiera data
+                            null, // Amaiera data
+                            "Prozesuan",
+                            selectedAkats.getId(),
+                            oharrak,
+                            null);
+
+                    langilea.konponketaEgin(k);
                     datuakKargatu();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+                    JOptionPane.showMessageDialog(this, "Konponketa ondo sortu da!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.toString() + "\n" + e.getMessage(), "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } else if (index == 2) { // Akatsak
+            JTextField izenaField = new JTextField();
+            JTextArea deskribapenaArea = new JTextArea(5, 20);
+
+            Object[] message = {
+                    "Izena (Derrigorrezkoa):", izenaField,
+                    "Deskribapena:", new JScrollPane(deskribapenaArea)
+            };
+
+            int option = JOptionPane.showConfirmDialog(this, message, "Gehitu Akatsa", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == JOptionPane.OK_OPTION) {
+                String izena = izenaField.getText().trim();
+                String deskribapena = deskribapenaArea.getText().trim();
+
+                if (izena.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Izena derrigorrezkoa da.", "Errorea",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try {
+                    Akatsa a = new Akatsa(0, izena, deskribapena);
+                    langilea.akatsaSortu(a);
+                    datuakKargatu();
+                    JOptionPane.showMessageDialog(this, "Akatsa ondo sortu da.");
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Errorea sortzean: " + e.getMessage(), "Errorea",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
@@ -413,22 +513,53 @@ public class MenuTeknikoa extends JFrame {
             }
         } else if (index == 2) { // Akatsak
             int r = akatsTaula.getSelectedRow();
-            if (r == -1)
+            if (r == -1) {
+                JOptionPane.showMessageDialog(this, "Aukeratu akats bat editatzeko.");
                 return;
+            }
+
+            // Ereduko balioak lortu (View -> Model konbertsioa)
             int rm = akatsTaula.convertRowIndexToModel(r);
-            Object id = akatsTaula.getModel().getValueAt(rm, 0);
-            String descZ = (String) akatsTaula.getModel().getValueAt(rm, 1);
-            String descB = JOptionPane.showInputDialog(this, "Eguneratu deskribapena:", descZ);
-            if (descB != null) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    PreparedStatement pst = kon
-                            .prepareStatement("UPDATE akatsak SET deskribapena = ? WHERE id_akatsa = ?");
-                    pst.setString(1, descB);
-                    pst.setObject(2, id);
-                    pst.executeUpdate();
+            // Suposatzen dugu zutabeen ordena: [0]=ID, [1]=Izena, [2]=Deskribapena
+            // Egiaztatu behar da datuakKargatu() metodoan zutabeen ordena
+            Object idObj = akatsTaula.getModel().getValueAt(rm, 0);
+            Object izenaObj = akatsTaula.getModel().getValueAt(rm, 1);
+            Object deskribapenaObj = akatsTaula.getModel().getValueAt(rm, 2);
+
+            int idAkatsa = Integer.parseInt(idObj.toString());
+            String unekoIzena = izenaObj != null ? izenaObj.toString() : "";
+            String unekoDeskr = deskribapenaObj != null ? deskribapenaObj.toString() : "";
+
+            JTextField izenaField = new JTextField(unekoIzena);
+            JTextArea deskribapenaArea = new JTextArea(unekoDeskr);
+            deskribapenaArea.setRows(5);
+            deskribapenaArea.setColumns(20);
+
+            Object[] message = {
+                    "Izena:", izenaField,
+                    "Deskribapena:", new JScrollPane(deskribapenaArea)
+            };
+
+            int option = JOptionPane.showConfirmDialog(this, message, "Editatu Akatsa", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == JOptionPane.OK_OPTION) {
+                String izenaBerria = izenaField.getText().trim();
+                String deskribapenaBerria = deskribapenaArea.getText().trim();
+
+                if (izenaBerria.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Izena ezin da hutsik egon.", "Errorea",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try {
+                    Akatsa a = new Akatsa(idAkatsa, izenaBerria, deskribapenaBerria);
+                    langilea.akatsaEditatu(a);
                     datuakKargatu();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+                    JOptionPane.showMessageDialog(this, "Akatsa eguneratu da.");
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Errorea editatzean: " + e.getMessage(), "Errorea",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
@@ -437,16 +568,29 @@ public class MenuTeknikoa extends JFrame {
     }
 
     private void irekiKonponketaXehetasuna(int idKonponketa) {
-        // Balioak lortu taulatik (suposatuz ordena: id, egoera, oharrak...)
-        int errenkada = konponketaTaula.getSelectedRow();
-        String egoera = konponketaTaula.getValueAt(errenkada, 5).toString(); // suposatuz egoera 5. zutabea dela
-        String oharrak = konponketaTaula.getValueAt(errenkada, 6).toString(); // suposatuz oharrak 6. zutabea dela
+        try {
+            // Balioak lortu taulatik
+            int errenkada = konponketaTaula.getSelectedRow();
+            String egoera = konponketaTaula.getValueAt(errenkada, 5).toString();
+            // 6. zutabea akatsa_id da, 7.a oharrak
+            int akatsaId = Integer.parseInt(konponketaTaula.getValueAt(errenkada, 6).toString());
+            Object oharrakObj = konponketaTaula.getValueAt(errenkada, 7);
+            String oharrak = (oharrakObj != null) ? oharrakObj.toString() : "";
 
-        KonponketaXehetasunaElkarrizketa elkarrizketa = new KonponketaXehetasunaElkarrizketa(idKonponketa, egoera,
-                oharrak);
-        elkarrizketa.setModal(true);
-        elkarrizketa.setVisible(true);
-        datuakKargatu();
+            java.util.List<Akatsa> zerrenda = langilea.akatsaIkusi();
+
+            KonponketaXehetasunaElkarrizketa elkarrizketa = new KonponketaXehetasunaElkarrizketa(
+                    idKonponketa, egoera, oharrak, akatsaId, zerrenda);
+            elkarrizketa.setModal(true);
+            elkarrizketa.setVisible(true);
+            datuakKargatu();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Errorea datuak kargatzean: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+        }
     }
 
     private void filtratu() {
@@ -463,6 +607,26 @@ public class MenuTeknikoa extends JFrame {
         if (JOptionPane.showConfirmDialog(this, "Irten?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();
             new SaioaHastekoPanela().setVisible(true);
+        }
+    }
+
+    // Helper class for ComboBox items
+    private static class ComboItem {
+        private int id;
+        private String label;
+
+        public ComboItem(int id, String label) {
+            this.id = id;
+            this.label = label;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return label;
         }
     }
 }
