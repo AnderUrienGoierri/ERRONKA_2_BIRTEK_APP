@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,6 +108,42 @@ public class SalmentaLangilea extends Langilea {
         return null;
     }
 
+    /**
+     * Faktura ezabatu eskaera IDa erabiliz.
+     * 
+     * @param idEskaera Eskaeraren IDa
+     */
+    public void fakturaEzabatu(int idEskaera) throws Exception {
+        String sqlSelect = "SELECT fitxategia_url FROM bezero_fakturak WHERE eskaera_id = ?";
+        String sqlDelete = "DELETE FROM bezero_fakturak WHERE eskaera_id = ?";
+
+        try (Connection konexioa = DB_Konexioa.konektatu()) {
+            // 1. Fitxategia lortu eta ezabatu
+            try (PreparedStatement pstSelect = konexioa.prepareStatement(sqlSelect)) {
+                pstSelect.setInt(1, idEskaera);
+                try (ResultSet rs = pstSelect.executeQuery()) {
+                    if (rs.next()) {
+                        String bidea = rs.getString("fitxategia_url");
+                        if (bidea != null) {
+                            File fitxategia = new File(bidea);
+                            if (fitxategia.exists()) {
+                                fitxategia.delete();
+                            }
+                        }
+                    } else {
+                        throw new Exception("Eskaera honek ez du fakturarik.");
+                    }
+                }
+            }
+
+            // 2. DBtik ezabatu
+            try (PreparedStatement pstDelete = konexioa.prepareStatement(sqlDelete)) {
+                pstDelete.setInt(1, idEskaera);
+                pstDelete.executeUpdate();
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // BEZEROEN KUDEAKETA
     // -------------------------------------------------------------------------
@@ -178,16 +215,27 @@ public class SalmentaLangilea extends Langilea {
     }
 
     /**
-     * Bezeroa kendu (ezabatu).
+     * Bezero bat ezabatu (Order check included)
      * 
      * @param idBezeroa Bezeroaren IDa
      */
     public void bezeroaKendu(int idBezeroa) throws Exception {
-        String sql = "DELETE FROM bezeroak WHERE id_bezeroa=?";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement pst = konexioa.prepareStatement(sql)) {
-            pst.setInt(1, idBezeroa);
-            pst.executeUpdate();
+        try (Connection konexioa = DB_Konexioa.konektatu()) {
+            // Check for existing orders
+            try (PreparedStatement pstCheck = konexioa
+                    .prepareStatement("SELECT COUNT(*) FROM eskaerak WHERE bezeroa_id = ?")) {
+                pstCheck.setInt(1, idBezeroa);
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    throw new Exception("Ezin da bezeroa ezabatu: Eskaerak ditu.");
+                }
+            }
+
+            String sql = "DELETE FROM bezeroak WHERE id_bezeroa=?";
+            try (PreparedStatement pst = konexioa.prepareStatement(sql)) {
+                pst.setInt(1, idBezeroa);
+                pst.executeUpdate();
+            }
         }
     }
 

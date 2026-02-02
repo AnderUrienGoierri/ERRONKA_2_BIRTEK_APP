@@ -95,7 +95,7 @@ public class BiltegiLangilea extends Langilea {
             if (rsKeys.next())
                 sarreraId = rsKeys.getInt(1);
             else
-                throw new SQLException("Ez da sarrera IDrik sortu.");
+                throw new SQLException("Ez da sarrera produktu IDrik sortu.");
 
             // 2. Sortu produktuak eta lerroak
             String sqlProd = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, produktu_egoera_oharra, salgai) VALUES (?, ?, ?, ?, ?, ?, ?, 'Zehazteko', ?, ?, ?, 0)";
@@ -345,10 +345,10 @@ public class BiltegiLangilea extends Langilea {
             }
 
             if (idSarrera != -1) {
-                // 3. Check peers
+                // 3. Check peers - IGNORE 'Ezabatua' lines
                 boolean allJasota = true;
                 try (PreparedStatement pstCheck = kon.prepareStatement(
-                        "SELECT COUNT(*) FROM sarrera_lerroak WHERE sarrera_id = ? AND sarrera_lerro_egoera != 'Jasota'")) {
+                        "SELECT COUNT(*) FROM sarrera_lerroak WHERE sarrera_id = ? AND sarrera_lerro_egoera != 'Jasota' AND sarrera_lerro_egoera != 'Ezabatua'")) {
                     pstCheck.setInt(1, idSarrera);
                     ResultSet rs = pstCheck.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
@@ -484,7 +484,7 @@ public class BiltegiLangilea extends Langilea {
             }
 
             if (dagoPrestatzen) {
-                
+
                 try (PreparedStatement pstUpd = kon
                         .prepareStatement("UPDATE eskaerak SET eskaera_egoera = ? WHERE id_eskaera = ?")) {
                     pstUpd.setString(1, "Prestatzen");
@@ -492,7 +492,7 @@ public class BiltegiLangilea extends Langilea {
                     pstUpd.executeUpdate();
                 }
             } else {
-              
+
                 try (PreparedStatement pstUpd = kon
                         .prepareStatement("UPDATE eskaerak SET eskaera_egoera = ? WHERE id_eskaera = ?")) {
                     pstUpd.setString(1, "Osatua/Bidalita");
