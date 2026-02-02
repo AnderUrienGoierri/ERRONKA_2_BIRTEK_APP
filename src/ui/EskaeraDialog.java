@@ -45,16 +45,18 @@ public class EskaeraDialog extends JDialog {
         int id;
         String izena;
         BigDecimal prezioa;
+        int stock;
 
-        public ProduktuaItem(int id, String izena, BigDecimal prezioa) {
+        public ProduktuaItem(int id, String izena, BigDecimal prezioa, int stock) {
             this.id = id;
             this.izena = izena;
             this.prezioa = prezioa;
+            this.stock = stock;
         }
 
         @Override
         public String toString() {
-            return izena + " (" + prezioa + " €)";
+            return izena + " (" + prezioa + " \u20AC) - Stock: " + stock;
         }
     }
 
@@ -171,10 +173,10 @@ public class EskaeraDialog extends JDialog {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 Statement stmt = konexioa.createStatement();
                 ResultSet rs = stmt.executeQuery(
-                        "SELECT id_produktua, izena, salmenta_prezioa FROM produktuak WHERE salgai = 1")) {
+                        "SELECT id_produktua, izena, salmenta_prezioa, stock FROM produktuak WHERE salgai = 1")) {
             while (rs.next()) {
                 produktuKomboa.addItem(new ProduktuaItem(rs.getInt("id_produktua"), rs.getString("izena"),
-                        rs.getBigDecimal("salmenta_prezioa")));
+                        rs.getBigDecimal("salmenta_prezioa"), rs.getInt("stock")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -187,6 +189,23 @@ public class EskaeraDialog extends JDialog {
             return;
 
         int kantitatea = (int) kantitateSpinner.getValue();
+
+        // Stock balidazioa: Zenbat dago jada taulan?
+        int dagoenKantitatea = 0;
+        for (int i = 0; i < lerroakModel.getRowCount(); i++) {
+            if ((int) lerroakModel.getValueAt(i, 0) == p.id) {
+                dagoenKantitatea += (int) lerroakModel.getValueAt(i, 3);
+            }
+        }
+
+        if (dagoenKantitatea + kantitatea > p.stock) {
+            JOptionPane.showMessageDialog(this,
+                    "Ezin da stock-a baino gehiago gehitu.\nStock erabilgarria: " + p.stock
+                            + "\nZure hautaketa (lehendik dagoena barne): " + (dagoenKantitatea + kantitatea),
+                    "Stock mugatua", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         double deskontua = 0;
         try {
             deskontua = Double.parseDouble(deskontuaField.getText());
@@ -216,7 +235,7 @@ public class EskaeraDialog extends JDialog {
         for (int i = 0; i < lerroakModel.getRowCount(); i++) {
             totala = totala.add((BigDecimal) lerroakModel.getValueAt(i, 5)); // 5 = Guztira zutabea
         }
-        prezioTotalaLabel.setText(String.format("%.2f €", totala));
+        prezioTotalaLabel.setText(String.format("%.2f \u20AC", totala));
     }
 
     private void hautatuBezeroa(int id) {
@@ -262,7 +281,7 @@ public class EskaeraDialog extends JDialog {
     }
 
     public BigDecimal getPrezioTotala() {
-        String t = prezioTotalaLabel.getText().replace(" €", "").replace(",", ".");
+        String t = prezioTotalaLabel.getText().replace(" \u20AC", "").replace(",", ".");
         return new BigDecimal(t);
     }
 

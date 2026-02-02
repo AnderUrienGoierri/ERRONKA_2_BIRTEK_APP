@@ -14,9 +14,11 @@ import java.io.File;
 public class MenuSalmentak extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JTable bezeroTaula, eskaeraTaula, eskaeraLerroTaula;
+    private JTable bezeroTaula, eskaeraTaula, eskaeraLerroTaula, produktuTaula, nireFitxaketaTaula;
     private JTextField bilatuTestua;
-    private TableRowSorter<DefaultTableModel> bezeroOrdenatzailea, eskaeraOrdenatzailea, unekoOrdenatzailea;
+    private JComboBox<String> kategoriaFiltroa, motaFiltroa;
+    private TableRowSorter<DefaultTableModel> bezeroOrdenatzailea, eskaeraOrdenatzailea, produktuOrdenatzailea,
+            nireFitxaketaOrdenatzailea, unekoOrdenatzailea;
 
     // Fitxaketa
     private JLabel fitxaketaInfoEtiketa;
@@ -108,13 +110,37 @@ public class MenuSalmentak extends JFrame {
 
         goikoPanela.add(eskuinekoPanela, BorderLayout.EAST);
 
-        JTabbedPane pestainaPanela = new JTabbedPane(JTabbedPane.TOP);
-        getContentPane().add(pestainaPanela, BorderLayout.CENTER);
+        pestainaPanelaRef = new JTabbedPane(JTabbedPane.TOP);
+        getContentPane().add(pestainaPanelaRef, BorderLayout.CENTER);
+
+        JTabbedPane pestainaPanela = pestainaPanelaRef;
 
         // BEZEROAK PANELA
         JPanel bezeroPanela = new JPanel(new BorderLayout());
         bezeroTaula = new JTable();
-        bezeroPanela.add(new JScrollPane(bezeroTaula));
+        bezeroPanela.add(new JScrollPane(bezeroTaula), BorderLayout.CENTER);
+
+        JPanel bezeroBotoiPanela = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton bezeroGehituBtn = new JButton("Gehitu");
+        JButton bezeroEditatuBtn = new JButton("Editatu");
+        JButton bezeroEzabatuBtn = new JButton("Ezabatu");
+        JButton bezeroIkusiBtn = new JButton("Ikusi");
+        JButton bezeroHistorialaBtn = new JButton("Eskaera Historiala Ikusi");
+
+        bezeroGehituBtn.addActionListener(e -> bezeroaGehitu());
+        bezeroEditatuBtn.addActionListener(e -> bezeroaEditatu());
+        bezeroEzabatuBtn.addActionListener(e -> bezeroaEzabatu());
+        bezeroIkusiBtn.addActionListener(e -> bezeroaIkusi());
+        bezeroHistorialaBtn.addActionListener(e -> bezeroHistorialaIkusi());
+
+        bezeroBotoiPanela.add(bezeroGehituBtn);
+        bezeroBotoiPanela.add(bezeroEditatuBtn);
+        bezeroBotoiPanela.add(bezeroEzabatuBtn);
+        bezeroBotoiPanela.add(bezeroIkusiBtn);
+        bezeroBotoiPanela.add(bezeroHistorialaBtn);
+
+        bezeroPanela.add(bezeroBotoiPanela, BorderLayout.SOUTH);
+
         pestainaPanela.addTab("Bezeroak", bezeroPanela);
 
         // ESKAERAK PANELA (SplitPane)
@@ -143,29 +169,94 @@ public class MenuSalmentak extends JFrame {
         JButton eskaeraEditatuBotoia = new JButton("Editatu");
         JButton eskaeraEzabatuBotoia = new JButton("Ezabatu");
         JButton eskaeraFakturaBotoia = new JButton("Faktura");
+        JButton eskaeraFakturaEzabatuBotoia = new JButton("Faktura Ezabatu");
         JButton eskaeraFakturaGuztiakBotoia = new JButton("Faktura Guztiak sortu");
 
         eskaeraGehituBotoia.addActionListener(e -> eskaeraGehitu());
         eskaeraEditatuBotoia.addActionListener(e -> eskaeraEditatu());
         eskaeraEzabatuBotoia.addActionListener(e -> eskaeraEzabatu());
         eskaeraFakturaBotoia.addActionListener(e -> fakturaSortu());
+        eskaeraFakturaEzabatuBotoia.addActionListener(e -> fakturaEzabatu());
         eskaeraFakturaGuztiakBotoia.addActionListener(e -> fakturaGuztiakSortu());
+
+        JButton eskaeraGarbituBotoia = new JButton("Filtroa Garbitu");
+        eskaeraGarbituBotoia.addActionListener(e -> garbituEskaeraFiltroa());
 
         eskaeraBotoiPanela.add(eskaeraGehituBotoia);
         eskaeraBotoiPanela.add(eskaeraEditatuBotoia);
         eskaeraBotoiPanela.add(eskaeraEzabatuBotoia);
         eskaeraBotoiPanela.add(eskaeraFakturaBotoia);
+        eskaeraBotoiPanela.add(eskaeraFakturaEzabatuBotoia);
         eskaeraBotoiPanela.add(eskaeraFakturaGuztiakBotoia);
+        eskaeraBotoiPanela.add(eskaeraGarbituBotoia);
 
         eskaeraPanela.add(eskaeraBotoiPanela, BorderLayout.SOUTH);
 
+        // PRODUKTUAK PANELA
+        JPanel produktuPanela = new JPanel(new BorderLayout());
+        produktuTaula = new JTable();
+        produktuPanela.add(new JScrollPane(produktuTaula), BorderLayout.CENTER);
+
+        JPanel produktuKontrolPanela = new JPanel(new BorderLayout());
+        JPanel produktuFiltroPanela = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        kategoriaFiltroa = new JComboBox<>();
+        kategoriaFiltroa.addItem("Kategoria Denak");
+        motaFiltroa = new JComboBox<>();
+        motaFiltroa.addItem("Mota Denak");
+        // Motak gehitu (Enum-etik datoz DBan)
+        String[] motak = { "Eramangarria", "Mahai-gainekoa", "Mugikorra", "Tableta", "Zerbitzaria", "Pantaila",
+                "Softwarea" };
+        for (String m : motak)
+            motaFiltroa.addItem(m);
+
+        kategoriaFiltroa.addActionListener(e -> filtratu());
+        motaFiltroa.addActionListener(e -> filtratu());
+
+        produktuFiltroPanela.add(new JLabel("Kategoria:"));
+        produktuFiltroPanela.add(kategoriaFiltroa);
+        produktuFiltroPanela.add(new JLabel("Mota:"));
+        produktuFiltroPanela.add(motaFiltroa);
+        produktuKontrolPanela.add(produktuFiltroPanela, BorderLayout.NORTH);
+
+        JPanel produktuBotoiPanela = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton prezioaBtn = new JButton("Prezioa Eguneratu");
+        JButton salgaiBtn = new JButton("Salgai/Ez");
+        JButton eskaintzaBtn = new JButton("Eskaintza Gehitu");
+
+        prezioaBtn.addActionListener(e -> produktuPrezioaAldatu());
+        salgaiBtn.addActionListener(e -> produktuSalgaiToggle());
+        eskaintzaBtn.addActionListener(e -> produktuEskaintzaJarri());
+
+        produktuBotoiPanela.add(prezioaBtn);
+        produktuBotoiPanela.add(salgaiBtn);
+        produktuBotoiPanela.add(eskaintzaBtn);
+        produktuKontrolPanela.add(produktuBotoiPanela, BorderLayout.SOUTH);
+
+        produktuPanela.add(produktuKontrolPanela, BorderLayout.SOUTH);
+        pestainaPanela.addTab("Produktuak", produktuPanela);
+
+        // NIRE FITXAKETAK TAB
+        JPanel nireFitxaketaPanela = new JPanel(new BorderLayout());
+        nireFitxaketaTaula = new JTable();
+        nireFitxaketaPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
+        pestainaPanela.addTab("Nire Fitxaketak", nireFitxaketaPanela);
+
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
-            unekoOrdenatzailea = (pestainaPanela.getSelectedIndex() == 0) ? bezeroOrdenatzailea : eskaeraOrdenatzailea;
+            int idx = pestainaPanela.getSelectedIndex();
+            if (idx == 0)
+                unekoOrdenatzailea = bezeroOrdenatzailea;
+            else if (idx == 1)
+                unekoOrdenatzailea = eskaeraOrdenatzailea;
+            else if (idx == 2)
+                unekoOrdenatzailea = produktuOrdenatzailea;
+            else
+                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         if (!java.beans.Beans.isDesignTime()) {
             datuakKargatu();
+            kargatuKategoriak();
             eguneratuFitxaketaEgoera();
         }
     }
@@ -184,6 +275,7 @@ public class MenuSalmentak extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
+            nireFitxaketaDatuakKargatu(); // Refrescar tablero personal
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
@@ -217,55 +309,8 @@ public class MenuSalmentak extends JFrame {
     }
 
     private void irekiNireDatuakEditatu() {
-        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
-
-        // Hizkuntza ComboBox
-        String[] hizkuntzak = { "Euskara", "Gaztelania", "Ingelesa", "Frantsesa" };
-        JComboBox<String> hizkuntzaBox = new JComboBox<>(hizkuntzak);
-
-        // Aurrez hautatu uneko hizkuntza
-        String unekoKodea = langilea.getHizkuntza();
-        if ("EU".equalsIgnoreCase(unekoKodea) || "Euskara".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Euskara");
-        else if ("ES".equalsIgnoreCase(unekoKodea) || "Gaztelania".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Gaztelania");
-        else if ("EN".equalsIgnoreCase(unekoKodea) || "Ingelesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Ingelesa");
-        else if ("FR".equalsIgnoreCase(unekoKodea) || "Frantsesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Frantsesa");
-        else
-            hizkuntzaBox.setSelectedItem("Gaztelania"); // Lehenetsia
-
-        JTextField herriaIzenaField = new JTextField(langilea.getHerriaIzena());
-        JTextField lurraldeaField = new JTextField();
-        JTextField nazioaField = new JTextField();
-
-        Object[] message = {
-                "Pasahitza Berria:", passField,
-                "Hizkuntza:", hizkuntzaBox,
-                "Herria (Izena):", herriaIzenaField,
-                "Lurraldea (Berria bada):", lurraldeaField,
-                "Nazioa (Berria bada):", nazioaField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                String pass = new String(passField.getPassword());
-
-                // Orain izen osoa bidaltzen dugu DB-ra
-                String hizkuntzaAukeratua = (String) hizkuntzaBox.getSelectedItem();
-                String herria = herriaIzenaField.getText();
-                String lurraldea = lurraldeaField.getText();
-                String nazioa = nazioaField.getText();
-
-                langilea.nireLangileDatuakEditatu(pass, hizkuntzaAukeratua, herria, lurraldea, nazioa);
-                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
+        dialog.setVisible(true);
     }
 
     private void fokatutakoEskaeraKargatu() {
@@ -277,7 +322,7 @@ public class MenuSalmentak extends JFrame {
                     : Integer.parseInt(idObj.toString());
 
             try (Connection konexioa = DB_Konexioa.konektatu()) {
-                String sql = "SELECT p.izena, el.kantitatea, el.unitate_prezioa, (el.kantitatea * el.unitate_prezioa) as guztira "
+                String sql = "SELECT p.izena, el.kantitatea, el.unitate_prezioa, (el.kantitatea * el.unitate_prezioa) as guztira, el.eskaera_lerro_egoera "
                         +
                         "FROM eskaera_lerroak el JOIN produktuak p ON el.produktua_id = p.id_produktua " +
                         "WHERE el.eskaera_id = ?";
@@ -293,12 +338,40 @@ public class MenuSalmentak extends JFrame {
     }
 
     private void filtratu() {
-        String t = bilatuTestua.getText();
-        if (unekoOrdenatzailea != null) {
-            if (t.isEmpty())
-                unekoOrdenatzailea.setRowFilter(null);
-            else
-                unekoOrdenatzailea.setRowFilter(RowFilter.regexFilter("(?i)" + t));
+        int pestainaIdx = pestainaPanelaRef.getSelectedIndex();
+
+        if (pestainaIdx == 2) { // Produktuak
+            if (produktuOrdenatzailea != null) {
+                java.util.List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
+
+                // Testu filtroa
+                String t = bilatuTestua.getText();
+                if (!t.isEmpty()) {
+                    filters.add(RowFilter.regexFilter("(?i)" + t));
+                }
+
+                // Kategoria filtroa
+                String kat = (String) kategoriaFiltroa.getSelectedItem();
+                if (kat != null && !"Kategoria Denak".equals(kat)) {
+                    filters.add(RowFilter.regexFilter("^" + kat + "$", 1)); // 1 = Kategoria zutabea
+                }
+
+                // Mota filtroa
+                String mota = (String) motaFiltroa.getSelectedItem();
+                if (mota != null && !"Mota Denak".equals(mota)) {
+                    filters.add(RowFilter.regexFilter("^" + mota + "$", 4)); // 4 = Mota zutabea
+                }
+
+                produktuOrdenatzailea.setRowFilter(RowFilter.andFilter(filters));
+            }
+        } else { // Bezeroak edo Eskaerak
+            String t = bilatuTestua.getText();
+            if (unekoOrdenatzailea != null) {
+                if (t.isEmpty())
+                    unekoOrdenatzailea.setRowFilter(null);
+                else
+                    unekoOrdenatzailea.setRowFilter(RowFilter.regexFilter("(?i)" + t));
+            }
         }
     }
 
@@ -323,6 +396,9 @@ public class MenuSalmentak extends JFrame {
             eskaeraOrdenatzailea = new TableRowSorter<>(m2);
             eskaeraTaula.setRowSorter(eskaeraOrdenatzailea);
 
+            produktuDatuakKargatu();
+            nireFitxaketaDatuakKargatu();
+
             if (unekoOrdenatzailea == null)
                 unekoOrdenatzailea = bezeroOrdenatzailea;
         } catch (Exception e) {
@@ -335,7 +411,6 @@ public class MenuSalmentak extends JFrame {
         dialog.setVisible(true);
         if (dialog.isOnartua()) {
             String sqlEskaera = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, eguneratze_data, guztira_prezioa, eskaera_egoera) VALUES (?, ?, NOW(), NOW(), ?, ?)";
-            String sqlLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa) VALUES (?, ?, ?, ?)";
 
             try (Connection konexioa = DB_Konexioa.konektatu()) {
                 konexioa.setAutoCommit(false); // Transakzioa hasi
@@ -353,13 +428,16 @@ public class MenuSalmentak extends JFrame {
 
                     if (rs.next()) {
                         idEskaera = rs.getInt(1);
+                        String egoera = dialog.getEgoera();
 
+                        String sqlLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
                         try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlLerroa)) {
                             for (Object[] lerroa : dialog.getLerroak()) {
                                 pstLerroa.setInt(1, idEskaera);
                                 pstLerroa.setInt(2, (int) lerroa[0]); // Produktua ID
                                 pstLerroa.setInt(3, (int) lerroa[1]); // Kantitatea
                                 pstLerroa.setBigDecimal(4, (java.math.BigDecimal) lerroa[2]); // Unitate Prezioa
+                                pstLerroa.setString(5, egoera);
                                 pstLerroa.addBatch();
                             }
                             pstLerroa.executeBatch();
@@ -433,7 +511,6 @@ public class MenuSalmentak extends JFrame {
         if (dialog.isOnartua()) {
             String sqlUpdate = "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() WHERE id_eskaera = ?";
             String sqlDeleteLerroak = "DELETE FROM eskaera_lerroak WHERE eskaera_id = ?";
-            String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa) VALUES (?, ?, ?, ?)";
 
             try (Connection konexioa = DB_Konexioa.konektatu()) {
                 konexioa.setAutoCommit(false);
@@ -454,12 +531,15 @@ public class MenuSalmentak extends JFrame {
                 }
 
                 // Lerro berriak sartu
+                String egoeraBerria = dialog.getEgoera();
+                String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
                 try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlInsertLerroa)) {
                     for (Object[] lerroa : dialog.getLerroak()) {
                         pstLerroa.setInt(1, idEskaera);
                         pstLerroa.setInt(2, (int) lerroa[0]);
                         pstLerroa.setInt(3, (int) lerroa[1]);
                         pstLerroa.setBigDecimal(4, (java.math.BigDecimal) lerroa[2]);
+                        pstLerroa.setString(5, egoeraBerria);
                         pstLerroa.addBatch();
                     }
                     pstLerroa.executeBatch();
@@ -544,28 +624,306 @@ public class MenuSalmentak extends JFrame {
 
     private void fakturaGuztiakSortu() {
         String sql = "SELECT id_eskaera FROM eskaerak WHERE eskaera_egoera = 'Osatua/Bidalita'";
+        java.util.List<Integer> idZerrenda = new java.util.ArrayList<>();
         int kontagailua = 0;
 
+        // 1. Fasea: ID-ak lortu (Konexioa ireki eta itxi egiten da bloke honetan)
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement pst = konexioa.prepareStatement(sql);
                 ResultSet rs = pst.executeQuery()) {
 
             while (rs.next()) {
-                int idEskaera = rs.getInt("id_eskaera");
-                try {
-                    if (langilea.fakturaSortu(idEskaera) != null) {
-                        kontagailua++;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                idZerrenda.add(rs.getInt("id_eskaera"));
             }
-
-            JOptionPane.showMessageDialog(this, kontagailua + " faktura sortu dira zuzen.");
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errorea faktura guztiak sortzean: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Errorea eskaerak bilatzean: " + e.getMessage());
+            return;
+        }
+
+        // 2. Fasea: Fakturak sortu (Bakoitzak bere konexio kudeaketa dauka barruan)
+        for (int idEskaera : idZerrenda) {
+            try {
+                if (langilea.fakturaSortu(idEskaera) != null) {
+                    kontagailua++;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        JOptionPane.showMessageDialog(this, kontagailua + " faktura sortu dira zuzen.");
+    }
+
+    private void fakturaEzabatu() {
+        int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
+        if (aukeratutakoLerroa == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu eskaera bat faktura ezabatzeko.");
+            return;
+        }
+
+        aukeratutakoLerroa = eskaeraTaula.convertRowIndexToModel(aukeratutakoLerroa);
+        DefaultTableModel model = (DefaultTableModel) eskaeraTaula.getModel();
+
+        Object idObj = model.getValueAt(aukeratutakoLerroa, 0);
+        int idEskaera = (idObj instanceof Number) ? ((Number) idObj).intValue()
+                : Integer.parseInt(idObj.toString());
+
+        if (JOptionPane.showConfirmDialog(this, "Ziur zaude eskaera honen faktura ezabatu nahi duzula?",
+                "Faktura Ezabatu", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            try {
+                langilea.fakturaEzabatu(idEskaera);
+                JOptionPane.showMessageDialog(this, "Faktura ondo ezabatu da.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea faktura ezabatzean: " + e.getMessage());
+            }
         }
     }
 
+    private void bezeroaIkusi() {
+        int r = bezeroTaula.getSelectedRow();
+        if (r == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu bezero bat ikusteko.");
+            return;
+        }
+        int rm = bezeroTaula.convertRowIndexToModel(r);
+        Object idObj = bezeroTaula.getModel().getValueAt(rm, 0);
+        int idBezeroa = Integer.parseInt(idObj.toString());
+
+        try {
+            Bezeroa b = langilea.bezeroaIkusi(idBezeroa);
+            if (b != null) {
+                BezeroaDialog dialog = new BezeroaDialog(this, "Bezeroa Ikusi", b, langilea);
+                dialog.setViewMode(true);
+                dialog.setVisible(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+        }
+    }
+
+    private void bezeroaGehitu() {
+        BezeroaDialog dialog = new BezeroaDialog(this, "Bezero Berria", null, langilea);
+        dialog.setVisible(true);
+        if (dialog.isOnartua()) {
+            try {
+                langilea.bezeroBerriaSortu(dialog.getBezeroa());
+                datuakKargatu();
+                JOptionPane.showMessageDialog(this, "Bezeroa ondo sortu da.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea bezeroa sortzean: " + e.getMessage());
+            }
+        }
+    }
+
+    private void bezeroaEditatu() {
+        int r = bezeroTaula.getSelectedRow();
+        if (r == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu bezero bat editatzeko.");
+            return;
+        }
+        int rm = bezeroTaula.convertRowIndexToModel(r);
+        Object idObj = bezeroTaula.getModel().getValueAt(rm, 0);
+        int idBezeroa = Integer.parseInt(idObj.toString());
+
+        try {
+            Bezeroa b = langilea.bezeroaIkusi(idBezeroa);
+            if (b != null) {
+                BezeroaDialog dialog = new BezeroaDialog(this, "Bezeroa Editatu", b, langilea);
+                dialog.setVisible(true);
+                if (dialog.isOnartua()) {
+                    Bezeroa bBerria = dialog.getBezeroa();
+                    // IDa mantendu
+                    bBerria.setIdBezeroa(idBezeroa);
+                    langilea.bezeroaEditatu(bBerria);
+                    datuakKargatu();
+                    JOptionPane.showMessageDialog(this, "Bezeroa eguneratu da.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+        }
+    }
+
+    private void bezeroaEzabatu() {
+        int r = bezeroTaula.getSelectedRow();
+        if (r == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu bezero bat ezabatzeko.");
+            return;
+        }
+        int rm = bezeroTaula.convertRowIndexToModel(r);
+        Object idObj = bezeroTaula.getModel().getValueAt(rm, 0);
+        int idBezeroa = Integer.parseInt(idObj.toString());
+
+        if (JOptionPane.showConfirmDialog(this, "Ziur zaude bezero hau ezabatu nahi duzula?", "Ezabatu",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            try {
+                langilea.bezeroaKendu(idBezeroa);
+                datuakKargatu();
+                JOptionPane.showMessageDialog(this, "Bezeroa ezabatu da.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage(), "Ezin da ezabatu",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Klaseko aldagaia JTabbedPane gordetzeko
+    private JTabbedPane pestainaPanelaRef;
+
+    private void bezeroHistorialaIkusi() {
+        int r = bezeroTaula.getSelectedRow();
+        if (r == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu bezero bat historiala ikusteko.");
+            return;
+        }
+        int rm = bezeroTaula.convertRowIndexToModel(r);
+        Object idObj = bezeroTaula.getModel().getValueAt(rm, 0);
+        // Bezeroaren izena ere lortu dezakegu filtroan erakusteko, baina IDa nahikoa da
+        String idStr = idObj.toString();
+
+        if (pestainaPanelaRef != null) {
+            pestainaPanelaRef.setSelectedIndex(1); // Eskaerak tab
+
+            if (eskaeraOrdenatzailea != null) {
+                // Zehatz mehatz ID hori dutenak (regex hasiera eta amaiera ^ $)
+                // eskaerak taulako 2. zutabea (index 1) da bezeroa_id
+                eskaeraOrdenatzailea.setRowFilter(RowFilter.regexFilter("^" + idStr + "$", 1));
+                bilatuTestua.setText("Bezero ID: " + idStr); // Erabiltzaileari abisatu
+            }
+        }
+    }
+
+    private void kargatuKategoriak() {
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                Statement stmt = konexioa.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT izena FROM produktu_kategoriak")) {
+            while (rs.next()) {
+                kategoriaFiltroa.addItem(rs.getString("izena"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void produktuDatuakKargatu() {
+        String sql = "SELECT p.id_produktua, pk.izena as kategoria, p.izena, p.marka, p.mota, p.salmenta_prezioa, p.stock, p.salgai, p.eskaintza "
+                + "FROM produktuak p JOIN produktu_kategoriak pk ON p.kategoria_id = pk.id_kategoria";
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            DefaultTableModel model = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
+            produktuTaula.setModel(model);
+            produktuOrdenatzailea = new TableRowSorter<>(model);
+            produktuTaula.setRowSorter(produktuOrdenatzailea);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void produktuPrezioaAldatu() {
+        int row = produktuTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu produktu bat.");
+            return;
+        }
+        row = produktuTaula.convertRowIndexToModel(row);
+        Object idObj = produktuTaula.getModel().getValueAt(row, 0);
+        int idProd = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
+        String izena = (String) produktuTaula.getModel().getValueAt(row, 2);
+
+        String berria = JOptionPane.showInputDialog(this, izena + " - Sartu prezio berria:",
+                produktuTaula.getModel().getValueAt(row, 5));
+        if (berria != null && !berria.isEmpty()) {
+            try {
+                langilea.produktuariPrezioaAldatu(idProd, new java.math.BigDecimal(berria));
+                produktuDatuakKargatu();
+                JOptionPane.showMessageDialog(this, "Prezioa eguneratuta.");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+            }
+        }
+    }
+
+    private void produktuSalgaiToggle() {
+        int row = produktuTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu produktu bat.");
+            return;
+        }
+        row = produktuTaula.convertRowIndexToModel(row);
+        Object idObj = produktuTaula.getModel().getValueAt(row, 0);
+        int idProd = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
+
+        Object salgaiObj = produktuTaula.getModel().getValueAt(row, 7);
+        boolean salgai = false;
+        if (salgaiObj instanceof Boolean) {
+            salgai = (Boolean) salgaiObj;
+        } else if (salgaiObj instanceof Number) {
+            salgai = ((Number) salgaiObj).intValue() != 0;
+        } else if (salgaiObj != null) {
+            salgai = "true".equalsIgnoreCase(salgaiObj.toString()) || "1".equals(salgaiObj.toString());
+        }
+
+        try {
+            // Salgai jarri/kendu logic
+            String sql = "UPDATE produktuak SET salgai = ? WHERE id_produktua = ?";
+            try (Connection kon = DB_Konexioa.konektatu();
+                    PreparedStatement pst = kon.prepareStatement(sql)) {
+                pst.setBoolean(1, !salgai);
+                pst.setInt(2, idProd);
+                pst.executeUpdate();
+            }
+            produktuDatuakKargatu();
+            JOptionPane.showMessageDialog(this, "Egoera aldatuta.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+        }
+    }
+
+    private void produktuEskaintzaJarri() {
+        int row = produktuTaula.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu produktu bat.");
+            return;
+        }
+        row = produktuTaula.convertRowIndexToModel(row);
+        Object idObj = produktuTaula.getModel().getValueAt(row, 0);
+        int idProd = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
+
+        String eskaintza = JOptionPane.showInputDialog(this, "Sartu eskaintza (ehunekoa, adib. 10):", "0");
+        if (eskaintza != null && !eskaintza.isEmpty()) {
+            try {
+                langilea.produktuariEskaintzaAldatzeko(idProd, new java.math.BigDecimal(eskaintza));
+                produktuDatuakKargatu();
+                JOptionPane.showMessageDialog(this, "Eskaintza eguneratuta.");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+            }
+        }
+    }
+
+    private void garbituEskaeraFiltroa() {
+        bilatuTestua.setText("");
+        if (eskaeraOrdenatzailea != null) {
+            eskaeraOrdenatzailea.setRowFilter(null);
+        }
+    }
+
+    private void nireFitxaketaDatuakKargatu() {
+        String sql = "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
+        try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setInt(1, langilea.getIdLangilea());
+            DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
+            nireFitxaketaTaula.setModel(eredua);
+            nireFitxaketaOrdenatzailea = new TableRowSorter<>(eredua);
+            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

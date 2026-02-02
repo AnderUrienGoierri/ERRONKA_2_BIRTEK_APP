@@ -105,7 +105,7 @@ public class FitxaketakKudeatu extends JFrame {
 	}
 
 	private void datuakKargatu() {
-		String galdera = "SELECT * FROM fitxaketak ORDER BY id_fitxaketa DESC";
+		String galdera = "SELECT id_fitxaketa, langilea_id, data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak ORDER BY id_fitxaketa DESC";
 		try (Connection konexioa = DB_Konexioa.konektatu();
 				PreparedStatement sententziaPrestatua = konexioa.prepareStatement(galdera);
 				ResultSet emaitza = sententziaPrestatua.executeQuery()) {

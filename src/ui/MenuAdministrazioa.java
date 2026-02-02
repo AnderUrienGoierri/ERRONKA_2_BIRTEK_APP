@@ -16,10 +16,12 @@ public class MenuAdministrazioa extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel edukiPanela;
-    private JTable langileTaula, sailaTaula, fitxaketaTaula, fakturaTaula, hornitzaileTaula, herriaTaula;
+    private JTable langileTaula, sailaTaula, fitxaketaTaula, fakturaTaula, hornitzaileTaula, herriaTaula,
+            nireFitxaketaTaula;
     private JTextField bilatuTestua;
     private TableRowSorter<DefaultTableModel> langileOrdenatzailea, sailaOrdenatzailea, fitxaketaOrdenatzailea,
-            fakturaOrdenatzailea, hornitzaileOrdenatzailea, herriaOrdenatzailea, unekoOrdenatzailea;
+            fakturaOrdenatzailea, hornitzaileOrdenatzailea, herriaOrdenatzailea, nireFitxaketaOrdenatzailea,
+            unekoOrdenatzailea;
 
     // Fitxaketa informazioa
     private JLabel fitxaketaInfoEtiketa;
@@ -173,6 +175,12 @@ public class MenuAdministrazioa extends JFrame {
         herriaTaula = new JTable();
         herriaPanela.add(new JScrollPane(herriaTaula), BorderLayout.CENTER);
 
+        // --- NIRE FITXAKETAK TAB ---
+        JPanel nireFitxaketakTabPanela = new JPanel(new BorderLayout());
+        pestainaPanela.addTab("Nire Fitxaketak", null, nireFitxaketakTabPanela, null);
+        nireFitxaketaTaula = new JTable();
+        nireFitxaketakTabPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
+
         JPanel botoiCrudPanela = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         gehituBotoia = new JButton("Gehitu +");
         editatuBotoia = new JButton("Editatu");
@@ -226,6 +234,9 @@ public class MenuAdministrazioa extends JFrame {
                 case 5:
                     unekoOrdenatzailea = herriaOrdenatzailea;
                     break;
+                case 6:
+                    unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
+                    break;
             }
         });
 
@@ -250,6 +261,7 @@ public class MenuAdministrazioa extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
+            datuakKargatuOsoa(); // Taulak freskatu
             JOptionPane.showMessageDialog(this, mota + " ondo erregistratu da.");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -291,49 +303,27 @@ public class MenuAdministrazioa extends JFrame {
 
     private void irekiNireDatuakEditatu() {
         JPasswordField passField = new JPasswordField(langilea.getPasahitza());
-
-        // Hizkuntza ComboBox
-        String[] hizkuntzak = { "Euskara", "Gaztelania", "Ingelesa", "Frantsesa" };
-        JComboBox<String> hizkuntzaBox = new JComboBox<>(hizkuntzak);
-
-        // Aurrez hautatu uneko hizkuntza
-        String unekoKodea = langilea.getHizkuntza();
-        if ("EU".equalsIgnoreCase(unekoKodea) || "Euskara".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Euskara");
-        else if ("ES".equalsIgnoreCase(unekoKodea) || "Gaztelania".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Gaztelania");
-        else if ("EN".equalsIgnoreCase(unekoKodea) || "Ingelesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Ingelesa");
-        else if ("FR".equalsIgnoreCase(unekoKodea) || "Frantsesa".equalsIgnoreCase(unekoKodea))
-            hizkuntzaBox.setSelectedItem("Frantsesa");
-        else
-            hizkuntzaBox.setSelectedItem("Gaztelania"); // Lehenetsia
-
-        JTextField herriaIzenaField = new JTextField(langilea.getHerriaIzena());
-        JTextField lurraldeaField = new JTextField();
-        JTextField nazioaField = new JTextField();
+        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
+        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
 
         Object[] message = {
                 "Pasahitza Berria:", passField,
-                "Hizkuntza:", hizkuntzaBox,
-                "Herria (Izena):", herriaIzenaField,
-                "Lurraldea (Berria bada):", lurraldeaField,
-                "Nazioa (Berria bada):", nazioaField
+                "Hizkuntza (ES/EU):", hizkuntzaField,
+                "Herria ID:", herriaIdField
         };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try {
                 String pass = new String(passField.getPassword());
+                String hiz = hizkuntzaField.getText();
+                int herria = Integer.parseInt(herriaIdField.getText());
 
-                // Orain izen osoa bidaltzen dugu DB-ra
-                String hizkuntzaAukeratua = (String) hizkuntzaBox.getSelectedItem();
-                String herria = herriaIzenaField.getText();
-                String lurraldea = lurraldeaField.getText();
-                String nazioa = nazioaField.getText();
-
-                langilea.nireLangileDatuakEditatu(pass, hizkuntzaAukeratua, herria, lurraldea, nazioa);
+                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
                 JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
                         JOptionPane.ERROR_MESSAGE);
@@ -359,12 +349,24 @@ public class MenuAdministrazioa extends JFrame {
             sailaOrdenatzailea = new TableRowSorter<>(mS);
             sailaTaula.setRowSorter(sailaOrdenatzailea);
 
-            // Fitxaketak
-            PreparedStatement pstF = konexioa.prepareStatement("SELECT * FROM fitxaketak ORDER BY id_fitxaketa DESC");
+            // Fitxaketak (Globala)
+            PreparedStatement pstF = konexioa.prepareStatement(
+                    "SELECT f.id_fitxaketa, CONCAT(l.izena, ' ', l.abizena) AS langilea, f.data, CAST(f.ordua AS CHAR) AS ordua, f.mota "
+                            +
+                            "FROM fitxaketak f JOIN langileak l ON f.langilea_id = l.id_langilea ORDER BY f.id_fitxaketa DESC");
             DefaultTableModel mF = TaulaModelatzailea.ereduaEraiki(pstF.executeQuery());
             fitxaketaTaula.setModel(mF);
             fitxaketaOrdenatzailea = new TableRowSorter<>(mF);
             fitxaketaTaula.setRowSorter(fitxaketaOrdenatzailea);
+
+            // Nire Fitxaketak (Pertsonala)
+            PreparedStatement pstNF = konexioa.prepareStatement(
+                    "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC");
+            pstNF.setInt(1, langilea.getIdLangilea());
+            DefaultTableModel mNF = TaulaModelatzailea.ereduaEraiki(pstNF.executeQuery());
+            nireFitxaketaTaula.setModel(mNF);
+            nireFitxaketaOrdenatzailea = new TableRowSorter<>(mNF);
+            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
 
             // Fakturak
             // Hobekuntza: Bezeroaren izena erakutsi eskaera ID hutsaren ordez

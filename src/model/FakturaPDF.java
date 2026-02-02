@@ -81,17 +81,30 @@ public class FakturaPDF {
         headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
         // LOGOA (Ezkerrean)
+        // LOGOA (Ezkerrean)
         try {
-            java.net.URL logoURL = FakturaPDF.class.getResource("/birtek_logo_zuri_borobila.png");
-            if (logoURL != null) {
-                Image img = Image.getInstance(logoURL);
+            String logoPath = "irudiak/birtek_logo_zuri_borobila.png";
+            File logoFile = new File(logoPath);
+            if (logoFile.exists()) {
+                Image img = Image.getInstance(logoPath);
                 img.scaleToFit(80, 80);
                 PdfPCell logoCell = new PdfPCell(img);
                 logoCell.setBorder(Rectangle.NO_BORDER);
                 logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 headerTable.addCell(logoCell);
             } else {
-                headerTable.addCell(""); // Hutsik bidea ez bada aurkitzen
+                // beste bide batetik saiatzen gara
+                logoPath = "C:\\Ander\\Workspace\\Java\\eclipse-workspace\\ERRONKA_2_BIRTEK_APP\\irudiak\\birtek_logo_zuri_borobila.png";
+                if (new File(logoPath).exists()) {
+                    Image img = Image.getInstance(logoPath);
+                    img.scaleToFit(80, 80);
+                    PdfPCell logoCell = new PdfPCell(img);
+                    logoCell.setBorder(Rectangle.NO_BORDER);
+                    logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    headerTable.addCell(logoCell);
+                } else {
+                    headerTable.addCell(""); // Hutsik
+                }
             }
         } catch (Exception e) {
             headerTable.addCell(""); // Errorea egonez gero, hutsik
@@ -145,8 +158,8 @@ public class FakturaPDF {
         for (LerroDatuak lerroa : lerroak) {
             table.addCell(new Phrase(lerroa.produktua, arruntaFont));
             table.addCell(new Phrase(String.valueOf(lerroa.kantitatea), arruntaFont));
-            table.addCell(new Phrase(lerroa.prezioa + " €", arruntaFont));
-            table.addCell(new Phrase(lerroa.guztira + " €", arruntaFont));
+            table.addCell(new Phrase(lerroa.prezioa + " \u20AC", arruntaFont));
+            table.addCell(new Phrase(lerroa.guztira + " \u20AC", arruntaFont));
         }
 
         document.add(table);
@@ -158,7 +171,7 @@ public class FakturaPDF {
         totalTable.setWidthPercentage(40);
         totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
-        addTotalRow(totalTable, "GUZTIRA (BEZ %21 barne):", guztira + " €",
+        addTotalRow(totalTable, "GUZTIRA (BEZ %21 barne):", guztira + " \u20AC",
                 FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14));
 
         document.add(totalTable);
