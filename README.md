@@ -62,27 +62,86 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `nireLangileDatuakEditatu(...)`: Pasahitza, hizkuntza eta herria eguneratzeko.
   - `getFitxaketaEgoera()`: Azken fitxaketaren arabera, "BARRUAN" edo "KANPOAN" dagoen itzultzen du.
   - `autentifikatu(String pasahitza)`: Pasahitza zuzena den egiaztatzen du.
+  - `getNan()` / `setNan()`: NAN/IFZ kudeatzaileak.
+  - `getSaltoTxartelaUid()` / `setSaltoTxartelaUid()`: Salto txartelaren identifikadorearen kudeaketa.
 
 - **`AdministrariLangilea`**: Administrazio lanetarako logika gehigarria.
-  - `langileaSortu(...)`: Langile berriak sortu DBan.
-  - `langileaEzabatu(...)`: Langileak ezabatu DBtik.
+  - **Langileak**:
+    - `langileaSortu(...)`: Langile berriak sortu DBan.
+    - `langileaEditatu(...)`: Langile baten datuak eguneratu.
+    - `langileaEzabatu(...)`: Langileak ezabatu DBtik.
+    - `langileaIkusi(int id)`: Langile baten datuak lortu.
+  - **Sailak**:
+    - `langileSailaSortu(...)`: Sail berri bat sortu.
+    - `langileSailaEditatu(...)`: Sail baten datuak aldatu.
+    - `langileSailaEzabatu(...)`: Sail bat ezabatu.
+    - `langileSailaikusi(int id)`: Sail baten informazioa lortu.
+  - **Fitxaketak**:
+    - `fitxaketaSortu(...)`: Fitxaketa berri bat eskuz sortu.
+    - `fitxaketaEditatu(...)`: Fitxaketa baten ordua/data aldatu.
+    - `fitxaketaEzabatu(...)`: Fitxaketa bat ezabatu.
+    - `fitxaketaGuztiakIkusi()`: Fitxaketa guztien historia ikusi.
+  - **Hornitzaileak**:
+    - `hornitzaileaEditatu(...)`: Hornitzailearen datuak eguneratu.
+    - `hornitzaileaEzabatu(...)`: Hornitzailea ezabatu.
+    - `hornitzaileaIkusi(int id)`: Hornitzaile baten fitxa ikusi.
+  - **Herriak**:
+    - `herriakIkusi()`: Herrien zerrenda osoa lortu.
+    - `herriBerriaSortu(...)`: Herri berri bat gehitu DBan.
+    - `herriaEditatu(...)`: Herri baten datuak (izena, lurraldea...) aldatu.
+    - `herriaEzabatu(...)`: Herri bat sistematik ezabatu.
+  - **Bestelakoak**:
+    - `bezeroaFakturaIkusi(int id)`: Bezero baten faktura espezifiko bat berreskuratu.
 
 - **`SalmentaLangilea`**: Salmenta eta fakturazio logika.
   - `fakturaSortu(int idEskaera)`: Emandako eskaera IDarekin PDF faktura bat sortzen du eta diskoan gorde.
+  - `bezeroBerriaSortu(Bezeroa b)`: Bezero berri bat DBan erregistratu.
+  - `bezeroaEditatu(Bezeroa b)`: Bezero baten datuak eguneratu.
+  - `bezeroaKendu(int idBezeroa)`: Bezero bat DBtik ezabatu.
+  - `bezeroaIkusi(int idBezeroa)`: Bezero baten informazio zehatza lortu.
+  - `bezeroFakturaEzabatu(int idFaktura)`: Sortutako faktura bat ezabatu.
+  - `produktuaIkusi(int idProduktua)`: Produktu baten xehetasunak lortu.
+  - `produktuariEskaintzaAldatzeko(int idProduktua, BigDecimal eskaintza)`: Produktu baten eskaintza prezioa aldatu.
+  - `produktuaSalgaijarri(int idProduktua)`: Produktu bat salgai moduan markatu.
+  - `produktuariPrezioaJarri(int idProduktua, BigDecimal prezioa)`: Produktuari oinarrizko prezioa ezarri.
+  - `produktuariPrezioaAldatu(int idProduktua, BigDecimal prezioa)`: Lehendik dagoen prezioa eguneratu.
+  - `eskaerakIkusi(int idBezeroa)`: Bezero baten eskaera guztien zerrenda lortu.
+  - `eskaeraSortu(Eskaera e)`: Eskaera berria eta bere lerroak sortu.
+  - `eskaeraEditatu(Eskaera e)`: Eskaera baten datuak eguneratu.
+  - `eskaeraEzabatu(int idEskaera)`: Eskaera bat DBtik kendu.
+  - `eskaeraLerroakIkusi(int idEskaera)`: Eskaera baten produktuak ikusi.
+  - `eskaeraLerroaGehitu(int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera bati produktu bat gehitu.
+  - `eskaeraLerroakEditatu(int idEskaeraLerroa, int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera lerro bat aldatu.
+  - `eskaeraLerroaEzabatu(int idEskaeraLerroa)`: Eskaera lerro bat ezabatu.
 
 - **`BiltegiLangilea`**: Logistika lanak.
-  - `biltegiaSortu(...)`: Biltegi berriak sortu.
-  - `biltegiaEzabatu(...)`: Biltegiak ezabatu.
-  - `biltegiaEditatu(...)`: Biltegiaren datuak eguneratu.
-  - `hornitzaileBerriaSortu(...)`: Hornitzaile berria erregistratu DBan.
-  - `produktuSarreraBerriaSortu(...)`: Sarrera oso bat (hornitzailea, produktuak, lerroak) transakzio bakarrean sortu.
-  - `produktuEgoeraOharraJarri(...)`: Produktu bati egoera-oharra gehitu.
-  - `produktuarenBiltegiaAldatu(...)`: Produktu bat biltegi batetik bestera mugitu.
-  - `produktuSarrerakIkusi(...)`: Sarreren zerrenda lortu egoeraren arabera iragaziz.
-  - `produktuSarreraEgoeraAldatu(...)`: Sarrera lerro baten egoera eguneratu (eta sarrera osoarena egiaztatu).
-  - `produktuEskaeraEgoeraAldatu(...)`: Eskaera baten egoera aldatu ('Prestatzen', 'Osatua', 'Ezabatua').
+  - `biltegiaSortu(String izena, String sku)`: Biltegi berria erregistratu.
+  - `biltegiaEzabatu(int idBiltegia)`: Biltegi bat DBtik kendu.
+  - `biltegiaEditatu(int idBiltegia, String izena, String sku)`: Biltegi datuak eguneratu.
+  - `hornitzaileBerriaSortu(String izena, String ifz, String emaila)`: Hornitzaile berria sortu.
+  - `c(...)`: Sarrera osoa (hornitzailea, produktuak, lerroak) transakzio bakarrean kudeatu.
+  - `produktuEgoeraOharraJarri(int idProduktua, String oharra)`: Produktuaren egoerari buruzko oharra gehitu.
+  - `produktuarenBiltegiaAldatu(int idProduktua, int idBiltegia)`: Produktu bat biltegi batetik bestera mugitu.
+  - `produktuSarrerakIkusi(String egoeraIragazkia)`: Sarreren zerrenda lortu iragazki bidez.
+  - `produktuSarreraEditatu(int idSarrera, String egoera)`: Sarrera baten egoera orokorra aldatu.
+  - `produktuSarreraEgoeraAldatu(int idSarreraLerroa, String egoera, int idSarrera)`: Sarrera lerro baten egoera espezifikoa eguneratu.
+  - `produktuEskaeraEgoeraAldatu(int idEskaera, String egoera)`: Eskaera baten egoera eguneratu ('Prestatzen', 'Osatua', 'Ezabatua').
 
-- **`TeknikariLangilea`**: Konponketa lanak (etorkizuneko hedapenetarako prestatua).
+- **`TeknikariLangilea`**: Konponketa lanak eta produktu teknikoen kudeaketa.
+  - `produktuakIkusi()`: Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez daudenak).
+  - `produktuBatSortu(Produktua p)`: Produktu berri bat sisteman sartu.
+  - `produktuaEditatu(int id, boolean salgai, String egoera)`: Produktuaren egoera eta salgai-marka aldatu.
+  - `produktuariIrudiaGehitu(int id, String irudiaUrl)`: Produktu bati irudia esleitu.
+  - `prezioaEzarri(int id, BigDecimal prezioa, BigDecimal eskaintza)`: Produktuaren salmenta prezioa eta eskaintza eguneratu.
+  - `produktuaBorratu(int id)`: Produktu bat sistematik ezabatu.
+  - `konponketakIkusi()`: Konponketa guztiak zerrendatu.
+  - `konponketaEgin(Konponketa k)`: Konponketa berri bat sortu.
+  - `konponketaEditatu(Konponketa k)`: Konponketa baten datuak eguneratu.
+  - `konponketaEzabatu(int id)`: Konponketa bat ezabatu.
+  - `akatsaIkusi()`: Akatsen zerrenda ikusi.
+  - `akatsaSortu(Akatsa a)`: Akats berri bat sortu.
+  - `akatsaEditatu(Akatsa a)`: Akats bat editatu.
+  - `akatsaEzabatu(int id)`: Akats bat ezabatu.
 
 #### Beste Klaseak
 
@@ -117,5 +176,6 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
   - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).
+
 - **`TaulaModelatzailea`**:
   - `ereduaEraiki(ResultSet rs)`: SQL emaitzak automatikoki JTable bateragarria den `DefaultTableModel` bihurtzen du.

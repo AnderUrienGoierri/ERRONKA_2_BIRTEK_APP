@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -232,16 +233,6 @@ public class SalmentaLangilea extends Langilea {
     // -------------------------------------------------------------------------
 
     /**
-     * Faktura sortu bezeroarentzat.
-     * Existitzen den fakturaSortu metodoa erabiltzen du.
-     * 
-     * @param idEskaera Eskaeraren IDa
-     */
-    public void bezeroFakturaSortu(int idEskaera) throws Exception {
-        fakturaSortu(idEskaera);
-    }
-
-    /**
      * Bezeroaren faktura ezabatu.
      * 
      * @param idFaktura Fakturaren IDa
@@ -259,51 +250,138 @@ public class SalmentaLangilea extends Langilea {
     // PRODUKTUEN KUDEAKETA
     // -------------------------------------------------------------------------
 
+    // -------------------------------------------------------------------------
+    // PRODUKTUEN KUDEAKETA
+    // -------------------------------------------------------------------------
+
+    /**
+     * Produktuak ikusi motaren arabera iragaziz.
+     * 
+     * @param mota Produktu mota (adib. 'Eramangarria', 'Mugikorra'...). Null edo
+     *             hutsik bada, denak itzuli.
+     * @return Produktu zerrenda
+     */
+    public List<Produktua> produktuakIkusi(String mota) throws Exception {
+        List<Produktua> produktuak = new ArrayList<>();
+        String sql = "SELECT * FROM produktuak";
+
+        // Iragazkia aplikatu
+        if (mota != null && !mota.trim().isEmpty() && !mota.equalsIgnoreCase("Guztiak")) {
+            sql += " WHERE mota = ?";
+        }
+
+        try (Connection konexioa = DB_Konexioa.konektatu();
+                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+
+            if (mota != null && !mota.trim().isEmpty() && !mota.equalsIgnoreCase("Guztiak")) {
+                pst.setString(1, mota);
+            }
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    produktuak.add(instanziatuProduktua(rs));
+                }
+            }
+        }
+        return produktuak;
+    }
+
     /**
      * Produktua ikusi.
      * 
      * @param idProduktua Produktuaren IDa
-     * @return Produktua objektua (Mota zehatza ezin denez jakin erraz, null itzul
-     *         liteke implementazio osoa gabe edo oinarrizko datuak)
-     *         Oharra: Proiektu honetan 'Produktua' klase abstraktua da. Hemen
-     *         adibide gisa
-     *         Eramangarria, Mugikorra eta abar bereizi beharko lirateke motaren
-     *         arabera,
-     *         baina sinpletasunerako, datuak irakurtzea bakarrik egingo dugu,
-     *         instantziazioa zaila izan daiteke.
-     *         Hemen logika sinple bat egingo dut: soilik datuak irakurri eta null
-     *         itzuli 'abstract' delako,
-     *         edo hobeto: motaren arabera instantziatu.
+     * @return Produktua objektua
      */
     public Produktua produktuaIkusi(int idProduktua) throws Exception {
-        // Oharra: Produktua abstract da. Mota eremua begiratu beharko genuke zein
-        // azpiklase den jakiteko.
         String sql = "SELECT * FROM produktuak WHERE id_produktua=?";
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement pst = konexioa.prepareStatement(sql)) {
             pst.setInt(1, idProduktua);
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    String mota = rs.getString("mota");
-                    // Hemen factory pattern edo antzeko bat beharko litzateke.
-                    // Momentuz null itzuliko dut arazoak saihesteko, edo saiatuko naiz
-                    // kasu batzuk kudeatzen.
-
-                    // Adibidea (suposatuz azpiklaseak daudela):
-                    // if ("Eramangarria".equals(mota)) return new Eramangarria(...);
-                    // if ("Mugikorra".equals(mota)) return new Mugikorra(...);
-
-                    // Suposizioa: Erabiltzaileak informazioa ikusi nahi du, ez objektua bera
-                    // erabili kodean.
-                    // Hala ere, metodoaren sinadurak Produktua itzultzen du.
-                    // Erraza izateko, null itzultzen dut, baina kontsulta ondo doala ziurtatuz.
-                    // Edo, Produktua klase anonimo bat sor dezaket datuekin.
-
-                    return null; // TODO: Implementatu azpiklase zuzena sortzea 'mota' eremuaren arabera.
+                    return instanziatuProduktua(rs);
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * ResultSet-etik 'Produktua' azpiklase egokia sortzen duen metodo pribatua.
+     * Oharra: Soilik 'produktuak' taulako datuak erabiltzen dira.
+     * Azpiklaseen eremu espezifikoak null/0 balioekin hasieratzen dira.
+     * 
+     * @param rs ResultSet kurtsorea (dagoeneko .next() eginda egon behar du)
+     * @return Produktuaren azpiklasearen instantzia (Eramangarria, Mugikorra...)
+     * @throws Exception
+     */
+    private Produktua instanziatuProduktua(ResultSet rs) throws Exception {
+        String mota = rs.getString("mota");
+
+        // Komunak diren datuak (Base Constructor arguments)
+        int id = rs.getInt("id_produktua");
+        int hornitzaileId = rs.getInt("hornitzaile_id");
+        int kategoriaId = rs.getInt("kategoria_id");
+        String izena = rs.getString("izena");
+        String marka = rs.getString("marka");
+        // mota already retrieved
+        String deskribapena = rs.getString("deskribapena");
+        String irudiaUrl = rs.getString("irudia_url");
+        Integer biltegiId = (Integer) rs.getObject("biltegi_id");
+        String egoera = rs.getString("produktu_egoera");
+        String egoeraOharra = rs.getString("produktu_egoera_oharra");
+        boolean salgai = rs.getBoolean("salgai");
+        BigDecimal prezioa = rs.getBigDecimal("salmenta_prezioa");
+        int stock = rs.getInt("stock");
+        BigDecimal eskaintza = rs.getBigDecimal("eskaintza");
+        BigDecimal zergak = rs.getBigDecimal("zergak_ehunekoa");
+        Timestamp sortzeData = rs.getTimestamp("sortze_data");
+        Timestamp eguneratzeData = rs.getTimestamp("eguneratze_data");
+
+        switch (mota) {
+            case "Eramangarria":
+                return new Eramangarria(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, 0, 0, null, 0, null, null);
+            case "Mugikorra":
+                return new Mugikorra(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, null, 0, 0, 0, 0, null, null);
+            case "Mahai-gainekoa":
+                return new MahaiGainekoa(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, null, 0, 0, null, 0, null);
+            case "Tableta":
+                return new Tableta(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, 0, null, null, 0, false);
+            case "Pantaila":
+                return new Pantaila(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, null, null, 0, null, null);
+            case "Softwarea":
+                return new Softwarea(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        null, null, null, null);
+            case "Zerbitzaria":
+                return new Zerbitzaria(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData,
+                        0, null, 0, 0, false, null);
+            default:
+                // Fallback: aurkitu ez den mota bada, edozein kasuan Produktua abstraktua denez
+                // klase anonimo batekin itzuliko dugu, behintzat oinarrizko datuak edukitzeko.
+                return new Produktua(id, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl,
+                        biltegiId, egoera, egoeraOharra, salgai, prezioa, stock, eskaintza, zergak, sortzeData,
+                        eguneratzeData) {
+                };
+        }
     }
 
     /**
@@ -374,6 +452,60 @@ public class SalmentaLangilea extends Langilea {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // ESKAERA LERROEN KUDEAKETA
+    // -------------------------------------------------------------------------
+
+    /**
+     * Eskaera baten lerroak (produktuak) ikusi.
+     * 
+     * @param idEskaera Eskaeraren IDa
+     * @return Eskaera lerroen zerrenda
+     */
+    public List<EskaeraLerroa> eskaeraLerroakIkusi(int idEskaera) throws SQLException {
+        return EskaeraLerroa.eskaeraLerroaIkusi(idEskaera);
+    }
+
+    /**
+     * Eskaera bati lerro (produktu) berri bat gehitu.
+     * 
+     * @param idEskaera   Eskaeraren IDa
+     * @param idProduktua Produktuaren IDa
+     * @param kantitatea  Kantitatea
+     * @param prezioa     Unitateko prezioa
+     */
+    public void eskaeraLerroaGehitu(int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)
+            throws SQLException {
+        // IDa 0 jartzen dugu, DBak autoincrement bidez sortuko baitu
+        EskaeraLerroa el = new EskaeraLerroa(0, idEskaera, idProduktua, kantitatea, prezioa, "Prestatzen");
+        EskaeraLerroa.eskaeraLerroaSortu(el);
+    }
+
+    /**
+     * Eskaera lerro bat editatu.
+     * 
+     * @param idEskaeraLerroa Lerroaren IDa
+     * @param idEskaera       Eskaeraren IDa
+     * @param idProduktua     Produktuaren IDa
+     * @param kantitatea      Kantitatea
+     * @param prezioa         Unitateko prezioa
+     */
+    public void eskaeraLerroakEditatu(int idEskaeraLerroa, int idEskaera, int idProduktua, int kantitatea,
+            BigDecimal prezioa) throws SQLException {
+        EskaeraLerroa el = new EskaeraLerroa(idEskaeraLerroa, idEskaera, idProduktua, kantitatea, prezioa,
+                "Prestatzen");
+        EskaeraLerroa.eskaeralerroaEditatu(el);
+    }
+
+    /**
+     * Eskaera lerro bat ezabatu.
+     * 
+     * @param idEskaeraLerroa Lerroaren IDa
+     */
+    public void eskaeraLerroaEzabatu(int idEskaeraLerroa) throws SQLException {
+        EskaeraLerroa.eskaeraLerroaEzabatu(idEskaeraLerroa);
+    }
+
     /**
      * Produktuari prezioa aldatu (produktuariPrezioaJarri-ren berdina).
      * 
@@ -419,6 +551,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera sortu.
+     * README.md
      * 
      * @param e Eskaera objektua
      */
