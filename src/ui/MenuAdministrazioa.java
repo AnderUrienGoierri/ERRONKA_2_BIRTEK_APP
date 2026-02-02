@@ -302,33 +302,8 @@ public class MenuAdministrazioa extends JFrame {
     }
 
     private void irekiNireDatuakEditatu() {
-        JPasswordField passField = new JPasswordField(langilea.getPasahitza());
-        JTextField hizkuntzaField = new JTextField(langilea.getHizkuntza());
-        JTextField herriaIdField = new JTextField(String.valueOf(langilea.getHerriaId()));
-
-        Object[] message = {
-                "Pasahitza Berria:", passField,
-                "Hizkuntza (ES/EU):", hizkuntzaField,
-                "Herria ID:", herriaIdField
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Nire Datuak Editatu", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                String pass = new String(passField.getPassword());
-                String hiz = hizkuntzaField.getText();
-                int herria = Integer.parseInt(herriaIdField.getText());
-
-                langilea.nireLangileDatuakEditatu(pass, hiz, herria);
-                JOptionPane.showMessageDialog(this, "Datuak eguneratuta!");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Herria ID zenbakia izan behar da.", "Errorea",
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Errorea DBan: " + e.getMessage(), "Errorea",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
+        dialog.setVisible(true);
     }
 
     private void datuakKargatuOsoa() {
