@@ -497,30 +497,48 @@ public class MenuAdministrazioa extends JFrame {
             JTextField nanField = new JTextField();
             JTextField emailField = new JTextField();
             JPasswordField passField = new JPasswordField();
-            JTextField sailaIdField = new JTextField();
+
+            // Sailak ComboBox
+            JComboBox<ComboItem> sailaBox = new JComboBox<>();
+            for (LangileSaila s : langilea.sailakGuztiakIkusi()) {
+                sailaBox.addItem(new ComboItem(s.getIdSaila(), s.getIzena()));
+            }
+
             JTextField helbideaField = new JTextField();
-            JTextField herriaIdField = new JTextField();
+
+            // Herriak ComboBox
+            JComboBox<ComboItem> herriaBox = new JComboBox<>();
+            for (Herria h : langilea.herriakIkusi()) {
+                herriaBox.addItem(new ComboItem(h.getIdHerria(), h.getIzena()));
+            }
+
             JTextField postaKodeaField = new JTextField();
 
             Object[] message = {
                     "Izena:", izenaField, "Abizena:", abizenaField, "NAN/IFZ:", nanField,
-                    "Email:", emailField, "Pasahitza:", passField, "Saila ID:", sailaIdField,
-                    "Helbidea:", helbideaField, "Herria ID:", herriaIdField, "Posta Kodea:", postaKodeaField
+                    "Email:", emailField, "Pasahitza:", passField, "Saila:", sailaBox,
+                    "Helbidea:", helbideaField, "Herria:", herriaBox, "Posta Kodea:", postaKodeaField
             };
 
             int option = JOptionPane.showConfirmDialog(null, message, "Langile Berria", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
                 try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "INSERT INTO langileak (izena, abizena, nan_ifz, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     PreparedStatement pst = kon.prepareStatement(sql);
                     pst.setString(1, izenaField.getText());
                     pst.setString(2, abizenaField.getText());
                     pst.setString(3, nanField.getText());
                     pst.setString(4, emailField.getText());
                     pst.setString(5, new String(passField.getPassword()));
-                    pst.setInt(6, Integer.parseInt(sailaIdField.getText()));
+
+                    ComboItem selectedSaila = (ComboItem) sailaBox.getSelectedItem();
+                    pst.setInt(6, selectedSaila != null ? selectedSaila.getId() : 0);
+
                     pst.setString(7, helbideaField.getText());
-                    pst.setInt(8, Integer.parseInt(herriaIdField.getText()));
+
+                    ComboItem selectedHerria = (ComboItem) herriaBox.getSelectedItem();
+                    pst.setInt(8, selectedHerria != null ? selectedHerria.getId() : 0);
+
                     pst.setString(9, postaKodeaField.getText());
                     pst.executeUpdate();
                     datuakKargatuOsoa();
@@ -530,14 +548,27 @@ public class MenuAdministrazioa extends JFrame {
                 }
             }
         } else if (index == 1) { // Sailak
-            String sailaIzena = JOptionPane.showInputDialog(this, "Sartu sailaren izena:");
-            if (sailaIzena != null && !sailaIzena.trim().isEmpty()) {
+            JTextField izenaField = new JTextField();
+            JTextField kokapenaField = new JTextField();
+            JTextField deskribapenaField = new JTextField();
+
+            Object[] message = {
+                    "Izena:", izenaField,
+                    "Kokapena:", kokapenaField,
+                    "Deskribapena:", deskribapenaField
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Saila Berria", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
                 try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "INSERT INTO langile_sailak (izena) VALUES (?)";
+                    String sql = "INSERT INTO langile_sailak (izena, kokapena, deskribapena) VALUES (?, ?, ?)";
                     PreparedStatement pst = kon.prepareStatement(sql);
-                    pst.setString(1, sailaIzena);
+                    pst.setString(1, izenaField.getText());
+                    pst.setString(2, kokapenaField.getText());
+                    pst.setString(3, deskribapenaField.getText());
                     pst.executeUpdate();
                     datuakKargatuOsoa();
+                    JOptionPane.showMessageDialog(this, "Saila gordeta.");
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
                 }
@@ -611,26 +642,22 @@ public class MenuAdministrazioa extends JFrame {
             JTextField izenaField = new JTextField();
             JTextField ifzField = new JTextField();
             JTextField emailField = new JTextField();
-            JTextField helbideaField = new JTextField();
-            JTextField herriaIdField = new JTextField();
-            JTextField postaKodeaField = new JTextField();
 
             Object[] message = {
-                    "Izena:", izenaField, "IFZ:", ifzField, "Email:", emailField,
-                    "Helbidea:", helbideaField, "Herria ID:", herriaIdField, "Posta Kodea:", postaKodeaField
+                    "Izena Soziala:", izenaField, "IFZ/NAN:", ifzField, "Emaila:", emailField
             };
             int option = JOptionPane.showConfirmDialog(null, message, "Hornitzaile Berria",
                     JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
                 try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "INSERT INTO hornitzaileak (izena_soziala, ifz_nan, emaila, pasahitza, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, '1234', ?, ?, ?)";
+                    // Helbidea, herria eta posta kodea derrigorrezkoak dira DBan.
+                    // Defektuzko balioak jarriko ditugu hemen erabiltzaileak ez duelako horiek
+                    // kudeatu nahi momentuz.
+                    String sql = "INSERT INTO hornitzaileak (izena_soziala, ifz_nan, emaila, pasahitza, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, '1234', '-', 1, '-')";
                     PreparedStatement pst = kon.prepareStatement(sql);
                     pst.setString(1, izenaField.getText());
                     pst.setString(2, ifzField.getText());
                     pst.setString(3, emailField.getText());
-                    pst.setString(4, helbideaField.getText());
-                    pst.setInt(5, Integer.parseInt(herriaIdField.getText()));
-                    pst.setString(6, postaKodeaField.getText());
                     pst.executeUpdate();
                     datuakKargatuOsoa();
                 } catch (Exception e) {
@@ -679,23 +706,38 @@ public class MenuAdministrazioa extends JFrame {
                 if (rs.next()) {
                     JTextField izenaField = new JTextField(rs.getString("izena"));
                     JTextField abizenaField = new JTextField(rs.getString("abizena"));
-                    JTextField nanField = new JTextField(rs.getString("nan_ifz"));
+                    JTextField nanField = new JTextField(rs.getString("nan"));
                     JTextField emailField = new JTextField(rs.getString("emaila"));
-                    JTextField sailaIdField = new JTextField(String.valueOf(rs.getInt("saila_id")));
+
+                    int currentSailaId = rs.getInt("saila_id");
+                    JComboBox<ComboItem> sailaBox = new JComboBox<>();
+                    ComboItem selectedSaila = null;
+                    for (LangileSaila s : langilea.sailakGuztiakIkusi()) {
+                        ComboItem item = new ComboItem(s.getIdSaila(), s.getIzena());
+                        sailaBox.addItem(item);
+                        if (s.getIdSaila() == currentSailaId) {
+                            selectedSaila = item;
+                        }
+                    }
+                    if (selectedSaila != null)
+                        sailaBox.setSelectedItem(selectedSaila);
 
                     Object[] message = { "Izena:", izenaField, "Abizena:", abizenaField, "NAN/IFZ:", nanField, "Email:",
-                            emailField, "Saila ID:", sailaIdField };
+                            emailField, "Saila:", sailaBox };
 
                     int option = JOptionPane.showConfirmDialog(null, message, "Editatu Langilea",
                             JOptionPane.OK_CANCEL_OPTION);
                     if (option == JOptionPane.OK_OPTION) {
                         PreparedStatement pstUpd = kon.prepareStatement(
-                                "UPDATE langileak SET izena = ?, abizena = ?, nan_ifz = ?, emaila = ?, saila_id = ? WHERE id_langilea = ?");
+                                "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ? WHERE id_langilea = ?");
                         pstUpd.setString(1, izenaField.getText());
                         pstUpd.setString(2, abizenaField.getText());
                         pstUpd.setString(3, nanField.getText());
                         pstUpd.setString(4, emailField.getText());
-                        pstUpd.setInt(5, Integer.parseInt(sailaIdField.getText()));
+
+                        ComboItem sel = (ComboItem) sailaBox.getSelectedItem();
+                        pstUpd.setInt(5, sel != null ? sel.getId() : 0);
+
                         pstUpd.setObject(6, id);
                         pstUpd.executeUpdate();
                         datuakKargatuOsoa();
@@ -710,19 +752,37 @@ public class MenuAdministrazioa extends JFrame {
             int r = sailaTaula.getSelectedRow();
             int rm = sailaTaula.convertRowIndexToModel(r);
             Object id = sailaTaula.getModel().getValueAt(rm, 0);
-            String izenZaharra = (String) sailaTaula.getModel().getValueAt(rm, 1);
-            String izenBerria = JOptionPane.showInputDialog(this, "Eguneratu sailaren izena:", izenZaharra);
-            if (izenBerria != null && !izenBerria.trim().isEmpty()) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    PreparedStatement pst = kon
-                            .prepareStatement("UPDATE langile_sailak SET izena = ? WHERE id_saila = ?");
-                    pst.setString(1, izenBerria);
-                    pst.setObject(2, id);
-                    pst.executeUpdate();
-                    datuakKargatuOsoa();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+
+            try (Connection kon = DB_Konexioa.konektatu()) {
+                PreparedStatement pstSel = kon.prepareStatement("SELECT * FROM langile_sailak WHERE id_saila = ?");
+                pstSel.setObject(1, id);
+                ResultSet rs = pstSel.executeQuery();
+                if (rs.next()) {
+                    JTextField izenaField = new JTextField(rs.getString("izena"));
+                    JTextField kokapenaField = new JTextField(rs.getString("kokapena"));
+                    JTextField deskribapenaField = new JTextField(rs.getString("deskribapena"));
+
+                    Object[] message = {
+                            "Izena:", izenaField,
+                            "Kokapena:", kokapenaField,
+                            "Deskribapena:", deskribapenaField
+                    };
+
+                    int option = JOptionPane.showConfirmDialog(null, message, "Editatu Saila",
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (option == JOptionPane.OK_OPTION) {
+                        PreparedStatement pstUpd = kon.prepareStatement(
+                                "UPDATE langile_sailak SET izena = ?, kokapena = ?, deskribapena = ? WHERE id_saila = ?");
+                        pstUpd.setString(1, izenaField.getText());
+                        pstUpd.setString(2, kokapenaField.getText());
+                        pstUpd.setString(3, deskribapenaField.getText());
+                        pstUpd.setObject(4, id);
+                        pstUpd.executeUpdate();
+                        datuakKargatuOsoa();
+                    }
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
             }
         } else if (index == 2) { // Fitxaketak
             if (fitxaketaTaula.getSelectedRow() == -1)
@@ -814,24 +874,17 @@ public class MenuAdministrazioa extends JFrame {
                     JTextField izenaField = new JTextField(rs.getString("izena_soziala"));
                     JTextField ifzField = new JTextField(rs.getString("ifz_nan"));
                     JTextField emailField = new JTextField(rs.getString("emaila"));
-                    JTextField helbideaField = new JTextField(rs.getString("helbidea"));
-                    JTextField herriaIdField = new JTextField(String.valueOf(rs.getInt("herria_id")));
-                    JTextField postaKodeaField = new JTextField(rs.getString("posta_kodea"));
 
-                    Object[] message = { "Izena:", izenaField, "IFZ:", ifzField, "Email:", emailField, "Helbidea:",
-                            helbideaField, "Herria ID:", herriaIdField, "Posta Kodea:", postaKodeaField };
+                    Object[] message = { "Izena Soziala:", izenaField, "IFZ/NAN:", ifzField, "Emaila:", emailField };
                     int option = JOptionPane.showConfirmDialog(null, message, "Editatu Hornitzailea",
                             JOptionPane.OK_CANCEL_OPTION);
                     if (option == JOptionPane.OK_OPTION) {
                         PreparedStatement pst = kon.prepareStatement(
-                                "UPDATE hornitzaileak SET izena_soziala = ?, ifz_nan = ?, emaila = ?, helbidea = ?, herria_id = ?, posta_kodea = ? WHERE id_hornitzailea = ?");
+                                "UPDATE hornitzaileak SET izena_soziala = ?, ifz_nan = ?, emaila = ? WHERE id_hornitzailea = ?");
                         pst.setString(1, izenaField.getText());
                         pst.setString(2, ifzField.getText());
                         pst.setString(3, emailField.getText());
-                        pst.setString(4, helbideaField.getText());
-                        pst.setInt(5, Integer.parseInt(herriaIdField.getText()));
-                        pst.setString(6, postaKodeaField.getText());
-                        pst.setObject(7, id);
+                        pst.setObject(4, id);
                         pst.executeUpdate();
                         datuakKargatuOsoa();
                     }
@@ -847,21 +900,33 @@ public class MenuAdministrazioa extends JFrame {
             int r = herriaTaula.getSelectedRow();
             int rm = herriaTaula.convertRowIndexToModel(r);
             Object id = herriaTaula.getModel().getValueAt(rm, 0);
-            String izenZaharra = (String) herriaTaula.getModel().getValueAt(rm, 1);
 
-            String izenBerria = JOptionPane.showInputDialog(this, "Eguneratu herriaren izena:", izenZaharra);
-            if (izenBerria != null && !izenBerria.trim().isEmpty()) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "UPDATE herriak SET izena = ? WHERE id_herria = ?";
-                    PreparedStatement pst = kon.prepareStatement(sql);
-                    pst.setString(1, izenBerria);
-                    pst.setObject(2, id);
-                    pst.executeUpdate();
-                    datuakKargatuOsoa();
-                    JOptionPane.showMessageDialog(this, "Herria eguneratuta.");
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea eguneratzean: " + e.getMessage());
+            try (Connection kon = DB_Konexioa.konektatu()) {
+                PreparedStatement pstSel = kon.prepareStatement("SELECT * FROM herriak WHERE id_herria = ?");
+                pstSel.setObject(1, id);
+                ResultSet rs = pstSel.executeQuery();
+                if (rs.next()) {
+                    JTextField izenaField = new JTextField(rs.getString("izena"));
+                    JTextField lurraldeaField = new JTextField(rs.getString("lurraldea"));
+                    JTextField nazioaField = new JTextField(rs.getString("nazioa"));
+
+                    Object[] message = { "Herria:", izenaField, "Lurraldea:", lurraldeaField, "Nazioa:", nazioaField };
+                    int option = JOptionPane.showConfirmDialog(null, message, "Editatu Herria",
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (option == JOptionPane.OK_OPTION) {
+                        PreparedStatement pstUpd = kon.prepareStatement(
+                                "UPDATE herriak SET izena = ?, lurraldea = ?, nazioa = ? WHERE id_herria = ?");
+                        pstUpd.setString(1, izenaField.getText());
+                        pstUpd.setString(2, lurraldeaField.getText());
+                        pstUpd.setString(3, nazioaField.getText());
+                        pstUpd.setObject(4, id);
+                        pstUpd.executeUpdate();
+                        datuakKargatuOsoa();
+                        JOptionPane.showMessageDialog(this, "Herria eguneratuta.");
+                    }
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Errorea eguneratzean: " + e.getMessage());
             }
         }
     }
@@ -909,6 +974,26 @@ public class MenuAdministrazioa extends JFrame {
         if (JOptionPane.showConfirmDialog(this, "Ziur zaude?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();
             new SaioaHastekoPanela().setVisible(true);
+        }
+    }
+
+    // Helper class for ComboBox items
+    private static class ComboItem {
+        private int id;
+        private String label;
+
+        public ComboItem(int id, String label) {
+            this.id = id;
+            this.label = label;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return label;
         }
     }
 }

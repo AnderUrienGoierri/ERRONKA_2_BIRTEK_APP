@@ -18,7 +18,7 @@ public class AdministrariLangilea extends Langilea {
     public void langileaSortu(String izena, String abizena, String nan, String emaila, String pasahitza, int sailaId,
             String helbidea, int herriaId, String postaKodea) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "INSERT INTO langileak (izena, abizena, nan_ifz, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -45,7 +45,7 @@ public class AdministrariLangilea extends Langilea {
     public void langileaEditatu(int idLangilea, String izena, String abizena, String nan, String emaila, int sailaId,
             String helbidea, int herriaId, String postaKodea) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan_ifz = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -72,7 +72,7 @@ public class AdministrariLangilea extends Langilea {
                         rs.getInt("id_langilea"),
                         rs.getString("izena"),
                         rs.getString("abizena"),
-                        rs.getString("nan_ifz"),
+                        rs.getString("nan"),
                         rs.getDate("jaiotza_data"),
                         rs.getInt("herria_id"),
                         rs.getString("helbidea"),
@@ -162,6 +162,25 @@ public class AdministrariLangilea extends Langilea {
             }
         }
         return saila;
+    }
+
+    public java.util.ArrayList<LangileSaila> sailakGuztiakIkusi() {
+        java.util.ArrayList<LangileSaila> zerrenda = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM langile_sailak";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql);
+                java.sql.ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                zerrenda.add(new LangileSaila(
+                        rs.getInt("id_saila"),
+                        rs.getString("izena"),
+                        rs.getString("kokapena"),
+                        rs.getString("deskribapena")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return zerrenda;
     }
 
     public java.util.ArrayList<Fitxaketa> fitxaketaGuztiakIkusi() {
