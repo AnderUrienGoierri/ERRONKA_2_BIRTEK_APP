@@ -16,9 +16,10 @@ public class AdministrariLangilea extends Langilea {
     }
 
     public void langileaSortu(String izena, String abizena, String nan, String emaila, String pasahitza, int sailaId,
-            String helbidea, int herriaId, String postaKodea) throws SQLException {
+            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData)
+            throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -29,6 +30,8 @@ public class AdministrariLangilea extends Langilea {
             pst.setString(7, helbidea);
             pst.setInt(8, herriaId);
             pst.setString(9, postaKodea);
+            pst.setString(10, telefonoa);
+            pst.setString(11, jaiotzaData);
             pst.executeUpdate();
         }
     }
@@ -43,9 +46,10 @@ public class AdministrariLangilea extends Langilea {
     }
 
     public void langileaEditatu(int idLangilea, String izena, String abizena, String nan, String emaila, int sailaId,
-            String helbidea, int herriaId, String postaKodea) throws SQLException {
+            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData)
+            throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, jaiotza_data = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -55,7 +59,9 @@ public class AdministrariLangilea extends Langilea {
             pst.setString(6, helbidea);
             pst.setInt(7, herriaId);
             pst.setString(8, postaKodea);
-            pst.setInt(9, idLangilea);
+            pst.setString(9, telefonoa);
+            pst.setString(10, jaiotzaData);
+            pst.setInt(11, idLangilea);
             pst.executeUpdate();
         }
     }
