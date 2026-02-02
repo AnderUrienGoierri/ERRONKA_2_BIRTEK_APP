@@ -179,6 +179,10 @@ public class MenuTeknikoa extends JFrame {
         botoiCrudPanela.add(editatuBotoia);
         botoiCrudPanela.add(ezabatuBotoia);
 
+        JButton prezioaBotoia = new JButton("Prezioa Ezarri");
+        prezioaBotoia.addActionListener(e -> prezioaEzarriElementua(pestainaPanela.getSelectedIndex()));
+        botoiCrudPanela.add(prezioaBotoia);
+
         JPanel behekoPanela = new JPanel(new BorderLayout());
         behekoPanela.add(botoiCrudPanela, BorderLayout.NORTH);
 
@@ -319,7 +323,9 @@ public class MenuTeknikoa extends JFrame {
             konponketaTaula.setRowSorter(konponketaOrdenatzailea);
 
             DefaultTableModel m2 = TaulaModelatzailea.ereduaEraiki(konexioa
-                    .prepareStatement("SELECT id_produktua, izena, produktu_egoera FROM produktuak").executeQuery());
+                    .prepareStatement(
+                            "SELECT id_produktua, izena, produktu_egoera, salmenta_prezioa, eskaintza FROM produktuak")
+                    .executeQuery());
             produktuTaula.setModel(m2);
             produktuOrdenatzailea = new TableRowSorter<>(m2);
             produktuTaula.setRowSorter(produktuOrdenatzailea);
@@ -564,6 +570,60 @@ public class MenuTeknikoa extends JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "Funtzio hau oraindik ez dago erabilgarri.");
+        }
+    }
+
+    private void prezioaEzarriElementua(int index) {
+        if (index != 1) { // 1 = Produktuak
+            JOptionPane.showMessageDialog(this, "Aukera hau produktuetan bakarrik dago erabilgarri.");
+            return;
+        }
+
+        int r = produktuTaula.getSelectedRow();
+        if (r == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu produktu bat prezioa ezartzeko.");
+            return;
+        }
+
+        int rm = produktuTaula.convertRowIndexToModel(r);
+        Object idObj = produktuTaula.getModel().getValueAt(rm, 0);
+        int idProduktua = Integer.parseInt(idObj.toString());
+
+        JTextField prezioaField = new JTextField();
+        JTextField eskaintzaField = new JTextField();
+        Object[] message = {
+                "Salmenta Prezioa (€):", prezioaField,
+                "Eskaintza (€) (Aukerazkoa):", eskaintzaField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Ezarri Prezioa", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String pStr = prezioaField.getText().replace(",", ".").trim();
+                String eStr = eskaintzaField.getText().replace(",", ".").trim();
+
+                if (pStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Prezioa derrigorrezkoa da.");
+                    return;
+                }
+
+                java.math.BigDecimal prezioa = new java.math.BigDecimal(pStr);
+                java.math.BigDecimal eskaintza = null;
+                if (!eStr.isEmpty()) {
+                    eskaintza = new java.math.BigDecimal(eStr);
+                }
+
+                langilea.prezioaEzarri(idProduktua, prezioa, eskaintza);
+                datuakKargatu();
+                JOptionPane.showMessageDialog(this, "Prezioa eguneratu da.");
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Mesedez, sartu zenbaki baliodunak (adib. 10.50).", "Errorea",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage(), "Errorea", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
