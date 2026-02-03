@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Langilea extends Pertsona implements IAutentifikagarria {
+public class Langilea extends Pertsona {
     private String iban;
     private byte[] kurrikuluma; // PDF formatuan
     private int sailaId;
@@ -226,8 +226,4 @@ public class Langilea extends Pertsona implements IAutentifikagarria {
         }
     }
 
-    @Override
-    public boolean autentifikatu(String pasahitza) {
-        return this.getPasahitza() != null && this.getPasahitza().equals(pasahitza);
-    }
 }

@@ -21,6 +21,7 @@ public class BiltegiLangilea extends Langilea {
                 PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setString(1, izena);
             pst.setString(2, sku);
+            
             pst.executeUpdate();
         }
     }
@@ -36,6 +37,7 @@ public class BiltegiLangilea extends Langilea {
             String sql = "DELETE FROM biltegiak WHERE id_biltegia = ?";
             try (PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setInt(1, idBiltegia);
+                
                 pst.executeUpdate();
             }
         }
@@ -148,8 +150,7 @@ public class BiltegiLangilea extends Langilea {
         // Funtzionalitate hau UI-ko sorkuntzaren zati zen, baina beharbada bereizita
         // behar da?
         // UI-ak ez zuen "Gehitu Oharra" botoi espliziturik lehendik zeuden
-        // produktuentzat, baina
-        // prompt-ean eskatuta.
+        // produktuentzat.
         String sql = "UPDATE produktuak SET produktu_egoera_oharra = ? WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {

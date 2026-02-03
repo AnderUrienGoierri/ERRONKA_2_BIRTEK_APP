@@ -24,7 +24,6 @@ public class SaioaHastekoPanela extends JFrame {
     private JComboBox<String> postaEremua;
 
     private JPasswordField pasahitzaEremua;
-    private JComboBox<String> hizkuntzaKaxa;
 
     // Testu etiketak
     private JLabel izenburuEtiketa;
@@ -80,21 +79,6 @@ public class SaioaHastekoPanela extends JFrame {
 
         // --- LOGIN FORMULARIOA (ESKUINALDEAN) ---
         int desplazamendua = 360;
-
-        // Hizkuntza hautatzailea
-        String[] langs = { "Euskera", "Castellano", "English" };
-        hizkuntzaKaxa = new JComboBox<>(langs);
-        hizkuntzaKaxa.setBounds(desplazamendua + 350, 10, 120, 25);
-
-        if ("ES".equals(Hizkuntza.hizkuntzaAukeratua))
-            hizkuntzaKaxa.setSelectedIndex(1);
-        else if ("EN".equals(Hizkuntza.hizkuntzaAukeratua))
-            hizkuntzaKaxa.setSelectedIndex(2);
-        else
-            hizkuntzaKaxa.setSelectedIndex(0);
-
-        hizkuntzaKaxa.addActionListener(e -> aldatuHizkuntza());
-        edukiPanela.add(hizkuntzaKaxa);
 
         // Titulua
         izenburuEtiketa = new JLabel();
@@ -176,24 +160,12 @@ public class SaioaHastekoPanela extends JFrame {
         }
     }
 
-    private void aldatuHizkuntza() {
-        String hautaketa = (String) hizkuntzaKaxa.getSelectedItem();
-        if ("Castellano".equals(hautaketa))
-            Hizkuntza.hizkuntzaAukeratua = "ES";
-        else if ("English".equals(hautaketa))
-            Hizkuntza.hizkuntzaAukeratua = "EN";
-        else
-            Hizkuntza.hizkuntzaAukeratua = "EU";
-
-        eguneratuTestuak();
-    }
-
     private void eguneratuTestuak() {
-        setTitle(Hizkuntza.lortu("login_title"));
-        izenburuEtiketa.setText(Hizkuntza.lortu("app_title"));
-        postaEtiketa.setText(Hizkuntza.lortu("email"));
-        pasahitzaEtiketa.setText(Hizkuntza.lortu("pass"));
-        saioaHasiBotoia.setText(Hizkuntza.lortu("login_btn"));
+        setTitle("Saioa Hasi");
+        izenburuEtiketa.setText("Birtek Kudeaketa");
+        postaEtiketa.setText("Emaila:");
+        pasahitzaEtiketa.setText("Pasahitza:");
+        saioaHasiBotoia.setText("Sartu");
     }
 
     private void saioaHasi() {

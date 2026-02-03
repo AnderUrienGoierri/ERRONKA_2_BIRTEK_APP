@@ -12,7 +12,7 @@ public class DB_Konexioa {
     private static final String PASAHITZA = "1MG32025";
 
     /**
-     * Datu-basera konektatzeko metodoa.
+     * Datu_basera konektatzeko metodoa.
      * 
      * @return Connection objektua edo null errore bat egonez gero.
      */
