@@ -48,9 +48,9 @@ public void fitxatu(String fitxaketa_mota) throws java.sql.SQLException {
             throw new java.sql.SQLException("Jada kanpoan zaude. Ezin duzu irten sartu gabe.");
         }
 
-        // Insert new record
-        String sartuGaldera = "INSERT INTO fitxaketak (langilea_id, mota, data, ordua) VALUES (?, ?, CURRENT_DATE, CURRENT_TIME)";
-        try (java.sql.PreparedStatement pstInsert = konexioa.prepareStatement(sartuGaldera)) {
+        // INSERT egin fitxaketak taulan: 
+        String insertKontsulta = "INSERT INTO fitxaketak (langilea_id, mota, data, ordua) VALUES (?, ?, CURRENT_DATE, CURRENT_TIME)";
+        try (java.sql.PreparedStatement pstInsert = konexioa.prepareStatement(insertKontsulta)) {
             pstInsert.setInt(1, this.getIdLangilea());
             pstInsert.setString(2, fitxaketa_mota);
             pstInsert.executeUpdate();

@@ -95,11 +95,4 @@ public class Eskaera {
         this.eskaeraEgoera = eskaeraEgoera;
     }
 
-    public EskaeraEgoera getEgoera() {
-        return EskaeraEgoera.fromString(this.eskaeraEgoera);
-    }
-
-    public void setEgoera(EskaeraEgoera egoera) {
-        this.eskaeraEgoera = egoera.getDeskribapena();
-    }
 }

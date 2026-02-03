@@ -184,24 +184,6 @@ public abstract class Produktua {
     }
 
     /**
-     * Mota lortzen du enumerazio bezala.
-     * 
-     * @return ProduktuMota.
-     */
-    public ProduktuMota getMotaEnum() {
-        return ProduktuMota.fromString(this.mota);
-    }
-
-    /**
-     * Mota ezartzen du enumerazioa erabiliz.
-     * 
-     * @param mota ProduktuMota.
-     */
-    public void setMotaEnum(ProduktuMota mota) {
-        this.mota = mota.getDeskribapena();
-    }
-
-    /**
      * Deskribapena lortzen du.
      * 
      * @return Deskribapena.
