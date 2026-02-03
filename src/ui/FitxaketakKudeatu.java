@@ -8,6 +8,11 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+/**
+ * FitxaketakKudeatu klasea.
+ * Langileen fitxaketak (sarrerak eta irteerak) kudeatzeko interfaze grafikoa.
+ * Fitxaketak ikusi, sortu, editatu eta ezabatzeko aukera ematen du.
+ */
 public class FitxaketakKudeatu extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +54,7 @@ public class FitxaketakKudeatu extends JFrame {
 	}
 
 	/**
-	 * Leioa sortu.
+	 * Leihoa sortu eta inizializatu.
 	 */
 	public FitxaketakKudeatu() {
 		setTitle("Birtek - Langileen Fitxaketak Kudeatu");
@@ -104,6 +109,9 @@ public class FitxaketakKudeatu extends JFrame {
 		datuakKargatu();
 	}
 
+	/**
+	 * Datu-basetik fitxaketa datuak kargatu eta taulan erakutsi.
+	 */
 	private void datuakKargatu() {
 		String galdera = "SELECT id_fitxaketa, langilea_id, data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak ORDER BY id_fitxaketa DESC";
 		try (Connection konexioa = DB_Konexioa.konektatu();
@@ -119,6 +127,11 @@ public class FitxaketakKudeatu extends JFrame {
 		}
 	}
 
+	/**
+	 * Langileen zerrenda lortu ComboBox-ean erakusteko.
+	 * 
+	 * @return Langileen ComboBox eredua.
+	 */
 	private DefaultComboBoxModel<Langilea> langileakLortu() {
 		DefaultComboBoxModel<Langilea> eredua = new DefaultComboBoxModel<>();
 		String galdera = "SELECT id_langilea, izena, abizena FROM langileak ORDER BY id_langilea";
@@ -137,6 +150,9 @@ public class FitxaketakKudeatu extends JFrame {
 		return eredua;
 	}
 
+	/**
+	 * Fitxaketa berri bat sortzeko elkarrizketa-leihoa ireki eta datuak gorde.
+	 */
 	private void fitxaketaBerria() {
 		JComboBox<Langilea> langileaHautatzailea = new JComboBox<>(langileakLortu());
 		String[] aukerak = { "Sarrera", "Irteera" };
@@ -174,6 +190,10 @@ public class FitxaketakKudeatu extends JFrame {
 		}
 	}
 
+	/**
+	 * Hautatutako fitxaketa editatzeko elkarrizketa-leihoa ireki eta aldaketak
+	 * gorde.
+	 */
 	private void fitxaketaAldatu() {
 		int errenkada = taula.getSelectedRow();
 		if (errenkada == -1) {
@@ -232,6 +252,9 @@ public class FitxaketakKudeatu extends JFrame {
 		}
 	}
 
+	/**
+	 * Hautatutako fitxaketa ezabatu.
+	 */
 	private void fitxaketaEzabatu() {
 		int errenkada = taula.getSelectedRow();
 		if (errenkada == -1) {

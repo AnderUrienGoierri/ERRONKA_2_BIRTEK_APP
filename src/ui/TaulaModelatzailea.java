@@ -6,8 +6,19 @@ import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * TaulaModelatzailea klasea.
+ * ResultSet batetik JTable baterako DefaultTableModel sortzeko utilitatea.
+ */
 public class TaulaModelatzailea {
 
+    /**
+     * ResultSet datuekin TableModel bat eraikitzen du.
+     * 
+     * @param emaitza SQL kontsultaren emaitza (ResultSet).
+     * @return Datuak dituen DefaultTableModel objektua.
+     * @throws SQLException SQL errorea gertatzen bada.
+     */
     public static DefaultTableModel ereduaEraiki(ResultSet emaitza) throws SQLException {
         ResultSetMetaData metaDatuak = emaitza.getMetaData();
 

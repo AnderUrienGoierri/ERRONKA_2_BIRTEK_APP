@@ -12,6 +12,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.*;
 
+/**
+ * MenuAdministrazioa klasea.
+ * Administrari langilearen interfaze nagusia.
+ * Langileak, sailak, fitxaketak, fakturak, hornitzaileak eta herriak kudeatzeko
+ * aukerak eskaintzen ditu.
+ */
 public class MenuAdministrazioa extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -33,16 +39,27 @@ public class MenuAdministrazioa extends JFrame {
     /**
      * Eraikitzailea eguneratua.
      */
+    /**
+     * Eraikitzailea parametroarekin.
+     * 
+     * @param oinarrizkoLangilea Saioa hasi duen langilea.
+     */
     public MenuAdministrazioa(Langilea oinarrizkoLangilea) {
         this.langilea = new AdministrariLangilea(oinarrizkoLangilea);
         pantailaPrestatu();
     }
 
+    /**
+     * Eraikitzailea lehenetsia (proba edo diseinurako).
+     */
     public MenuAdministrazioa() {
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
                 null, null, true, 2, "", null));
     }
 
+    /**
+     * Pantailaren osagaiak inizializatu eta kokatu.
+     */
     private void pantailaPrestatu() {
         setTitle("Birtek - ADMINISTRAZIOA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -244,6 +261,11 @@ public class MenuAdministrazioa extends JFrame {
     }
 
     // --- FITXAKETA LOGIKA ---
+    /**
+     * Fitxaketa bat burutzen du (Sarrera edo Irteera).
+     * 
+     * @param mota "Sarrera" edo "Irteera".
+     */
     private void fitxatu(String mota) {
         try {
             if ("Sarrera".equals(mota)) {
@@ -259,6 +281,9 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa egoera etiketa eguneratzen du (Barruan/Kanpoan).
+     */
     private void eguneratuFitxaketaEgoera() {
         fitxaketaInfoEtiketa.setText(langilea.getFitxaketaEgoera());
         if (fitxaketaInfoEtiketa.getText().contains("BARRUAN")) {
@@ -268,6 +293,9 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Erabiltzailearen fitxaketa historia erakusten duen leihoa ireki.
+     */
     private void ikusiFitxaketaHistoriala() {
         JDialog elkarrizketa = new JDialog(this, "Nire Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
@@ -292,11 +320,17 @@ public class MenuAdministrazioa extends JFrame {
         elkarrizketa.setVisible(true);
     }
 
+    /**
+     * Erabiltzailearen datuak editatzeko leihoa ireki.
+     */
     private void irekiNireDatuakEditatu() {
         NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
         dialog.setVisible(true);
     }
 
+    /**
+     * Taula guztietako datuak datu-basetik kargatu eta eguneratu.
+     */
     private void datuakKargatuOsoa() {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             // Langileak
@@ -364,6 +398,9 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Taulak iragazi bilaketa testuaren arabera.
+     */
     private void filtratu() {
         String testua = bilatuTestua.getText();
         if (unekoOrdenatzailea != null) {
@@ -374,6 +411,11 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako fitxaren elementua ezabatu.
+     * 
+     * @param index Fitxaren indizea (0: Langileak, 1: Sailak, etc.).
+     */
     private void ezabatuElementua(int index) {
         JTable unekoTaula = null;
         String taulaIzena = "";
@@ -437,6 +479,11 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Elementu berri bat gehitu hautatutako fitxaren arabera.
+     * 
+     * @param index Fitxaren indizea.
+     */
     private void gehituElementua(int index) {
         if (index == 0) { // Langileak
             JTextField izenaField = new JTextField();
@@ -664,6 +711,11 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako elementua editatu.
+     * 
+     * @param index Fitxaren indizea.
+     */
     private void editatuElementua(int index) {
         if (index == 0) { // Langileak
             if (langileTaula.getSelectedRow() == -1)
@@ -1008,6 +1060,9 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako fakturaren PDF fitxategia ireki.
+     */
     private void ikusiFaktura() {
         if (fakturaTaula.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this, "Aukeratu faktura bat zerrendatik.");
@@ -1047,6 +1102,9 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
+    /**
+     * Saioa itxi eta hasierako pantailara itzuli.
+     */
     private void saioaItxi() {
         if (JOptionPane.showConfirmDialog(this, "Ziur zaude?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();
@@ -1055,6 +1113,9 @@ public class MenuAdministrazioa extends JFrame {
     }
 
     // Helper class for ComboBox items
+    /**
+     * ComboBox-erako klase laguntzailea.
+     */
     private static class ComboItem {
         private int id;
         private String label;

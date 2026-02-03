@@ -20,6 +20,11 @@ import javax.swing.border.EmptyBorder;
 import model.Herria;
 import model.Langilea;
 
+/**
+ * NireDatuakDialog klasea.
+ * Erabiltzaileak bere datu pertsonalak (Pasahitza, Hizkuntza, Herria,
+ * Telefonoa, Helbidea) editatzeko elkarrizketa leihoa.
+ */
 public class NireDatuakDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -37,6 +42,12 @@ public class NireDatuakDialog extends JDialog {
 
     /**
      * Create the dialog.
+     */
+    /**
+     * Eraikitzailea.
+     * 
+     * @param parent   Guraso leihoa.
+     * @param langilea Editatu beharreko langile objektua.
      */
     public NireDatuakDialog(JFrame parent, Langilea langilea) {
         super(parent, "Nire Datuak Editatu", true);
@@ -100,6 +111,9 @@ public class NireDatuakDialog extends JDialog {
         buttonPane.add(cancelButton);
     }
 
+    /**
+     * Hasierako datuak kargatu interfazean (DBtik freskatuz).
+     */
     private void hasierakoDatuakJarri() {
         // DBtik datuak freskatu ziurtatzeko
         try (java.sql.Connection kon = db.DB_Konexioa.konektatu();
@@ -148,6 +162,9 @@ public class NireDatuakDialog extends JDialog {
         }
     }
 
+    /**
+     * Herrien zerrenda kargatu ComboBoxean.
+     */
     private void herriakKargatu() {
         herriaBox.removeAllItems();
         if (langilea != null) {
@@ -158,6 +175,9 @@ public class NireDatuakDialog extends JDialog {
         }
     }
 
+    /**
+     * Herri berria gehitzeko leihoa ireki eta sortu.
+     */
     private void herriaBerriaGehitu() {
         JTextField izenaF = new JTextField();
         JTextField lurraldeaF = new JTextField();
@@ -194,6 +214,9 @@ public class NireDatuakDialog extends JDialog {
         }
     }
 
+    /**
+     * Datuak gorde datu-basean.
+     */
     private void gordeDatuak() {
         String pass = new String(pasahitzaField.getPassword());
         String hizkuntza = (String) hizkuntzaBox.getSelectedItem();

@@ -20,6 +20,12 @@ import model.Bezeroa;
 import model.Herria;
 import model.SalmentaLangilea;
 
+/**
+ * BezeroaDialog klasea.
+ * Bezeroak sortzeko, editatzeko eta ikusteko leihoa (JDialog).
+ * Datuak sartzeko eremuak, balidazioak eta herrien kudeaketa barne hartzen
+ * ditu.
+ */
 public class BezeroaDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -50,6 +56,14 @@ public class BezeroaDialog extends JDialog {
 
     /**
      * Create the dialog.
+     */
+    /**
+     * BezeroaDialog eraikitzailea.
+     *
+     * @param parent         Guraso leihoa (JFrame).
+     * @param title          Leihoaren izenburua.
+     * @param bezeroaEdizioa Editatu beharreko bezeroa (null bada, sortu).
+     * @param langilea       Langilea objektua (herriak kudeatzeko).
      */
     public BezeroaDialog(JFrame parent, String title, Bezeroa bezeroaEdizioa, SalmentaLangilea langilea) {
         super(parent, title, true);
@@ -154,6 +168,9 @@ public class BezeroaDialog extends JDialog {
         buttonPane.add(cancelButton);
     }
 
+    /**
+     * Herrien zerrenda kargatzen du ComboBox-ean.
+     */
     private void herriakKargatu() {
         herriaBox.removeAllItems();
         if (langilea != null) {
@@ -164,6 +181,9 @@ public class BezeroaDialog extends JDialog {
         }
     }
 
+    /**
+     * Herri berria gehitzeko leihoa erakusten du eta datu-basean gordetzen du.
+     */
     private void herriaBerriaGehitu() {
         JTextField izenaF = new JTextField();
         JTextField lurraldeaF = new JTextField();
@@ -200,6 +220,9 @@ public class BezeroaDialog extends JDialog {
         }
     }
 
+    /**
+     * Editatu beharreko bezeroaren datuak kargatzen ditu eremuetan.
+     */
     private void datuakKargatu() {
         izenaField.setText(bezeroa.getIzenaEdoSoziala());
         abizenaField.setText(bezeroa.getAbizena());
@@ -227,6 +250,11 @@ public class BezeroaDialog extends JDialog {
         pasahitzaField.setText(bezeroa.getPasahitza());
     }
 
+    /**
+     * Sartutako datuak balidatzen ditu.
+     * 
+     * @return True datuak zuzenak badira, false bestela.
+     */
     private boolean balidatu() {
         if (izenaField.getText().trim().isEmpty() || nanField.getText().trim().isEmpty()
                 || emailField.getText().trim().isEmpty()) {
@@ -241,10 +269,20 @@ public class BezeroaDialog extends JDialog {
         return true;
     }
 
+    /**
+     * Erabiltzaileak OK botoia sakatu duen egiaztatzen du.
+     * 
+     * @return True onartu bada.
+     */
     public boolean isOnartua() {
         return onartua;
     }
 
+    /**
+     * Sortu edo editatutako Bezero objektua itzultzen du.
+     * 
+     * @return Bezeroa.
+     */
     public Bezeroa getBezeroa() {
         int id = (bezeroa != null) ? bezeroa.getIdBezeroa() : 0;
         Date jaiotza = null;
@@ -276,6 +314,11 @@ public class BezeroaDialog extends JDialog {
                 null, null, true);
     }
 
+    /**
+     * Leihoa ikusteko moduan jarri (editagarria ez izateko).
+     * 
+     * @param viewMode True ikusteko bada, false editatzeko.
+     */
     public void setViewMode(boolean viewMode) {
         izenaField.setEditable(!viewMode);
         abizenaField.setEditable(!viewMode);

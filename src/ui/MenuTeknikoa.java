@@ -10,6 +10,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
+/**
+ * MenuTeknikoa klasea.
+ * Teknikari langilearen interfaze nagusia (SAT).
+ * Konponketak, produktuak eta akatsak kudeatzeko aukerak.
+ */
 public class MenuTeknikoa extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +31,11 @@ public class MenuTeknikoa extends JFrame {
 
     /**
      * Eraikitzailea eguneratua.
+     */
+    /**
+     * MenuTeknikoa eraikitzailea.
+     * 
+     * @param oinarrizkoLangilea Saioa hasi duen langilea.
      */
     public MenuTeknikoa(Langilea oinarrizkoLangilea) {
         this.langilea = new TeknikariLangilea(oinarrizkoLangilea);
@@ -219,12 +229,20 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Eraikitzailea lehenetsia.
+     */
     public MenuTeknikoa() {
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, Sesioa.sailaIzena, null, 0, "", "", "", "",
                 "ES", "", "", null, null, true, 2, "", null));
     }
 
     // --- FITXAKETA METODOAK ---
+    /**
+     * Fitxaketa bat egin.
+     * 
+     * @param mota Fitxaketa mota (Sarrera/Irteera).
+     */
     private void fitxatu(String mota) {
         try {
             if ("Sarrera".equals(mota)) {
@@ -239,6 +257,9 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa egoera eguneratu interfazean.
+     */
     private void eguneratuFitxaketaEgoera() {
         fitxaketaInfoEtiketa.setText(langilea.getFitxaketaEgoera());
         if (fitxaketaInfoEtiketa.getText().contains("BARRUAN")) {
@@ -248,6 +269,9 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa historia ikusi.
+     */
     private void ikusiFitxaketaHistoriala() {
         JDialog elkarrizketa = new JDialog(this, "Nire Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
@@ -274,11 +298,17 @@ public class MenuTeknikoa extends JFrame {
         elkarrizketa.setVisible(true);
     }
 
+    /**
+     * Norberaren datuak editatzeko leihoa ireki.
+     */
     private void irekiNireDatuakEditatu() {
         NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
         dialog.setVisible(true);
     }
 
+    /**
+     * Datu guztiak (Konponketak, Produktuak, Akatsak) kargatu datu-basetik.
+     */
     private void datuakKargatu() {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             DefaultTableModel m1 = TaulaModelatzailea
@@ -317,6 +347,11 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako elementua ezabatu fitxaren arabera.
+     * 
+     * @param index Fitxaren indizea.
+     */
     private void ezabatuElementua(int index) {
         JTable t = (index == 0) ? konponketaTaula : (index == 1) ? produktuTaula : akatsTaula;
 
@@ -354,6 +389,11 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Elementu berria gehitu fitxaren arabera.
+     * 
+     * @param index Fitxaren indizea.
+     */
     private void gehituElementua(int index) {
         if (index == 0) { // Konponketak
             try {
@@ -458,6 +498,11 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako elementua editatu fitxaren arabera.
+     * 
+     * @param index Fitxaren indizea.
+     */
     private void editatuElementua(int index) {
         if (index == 0) { // Konponketak
             int r = konponketaTaula.getSelectedRow();
@@ -547,6 +592,11 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Produktu baten prezioa eta eskaintza ezarri.
+     * 
+     * @param index Fitxaren indizea (Produktuak fitxa izan behar du).
+     */
     private void prezioaEzarriElementua(int index) {
         if (index != 1) { // 1 = Produktuak
             JOptionPane.showMessageDialog(this, "Aukera hau produktuetan bakarrik dago erabilgarri.");
@@ -601,6 +651,11 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Konponketa baten xehetasunak editatzeko leihoa ireki.
+     * 
+     * @param idKonponketa Konponketaren IDa.
+     */
     private void irekiKonponketaXehetasuna(int idKonponketa) {
         try {
             // Balioak lortu taulatik
@@ -627,6 +682,9 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Taulak iragazi bilaketa testuaren arabera.
+     */
     private void filtratu() {
         String t = bilatuTestua.getText();
         if (unekoOrdenatzailea != null) {
@@ -637,6 +695,9 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
+    /**
+     * Saioa itxi.
+     */
     private void saioaItxi() {
         if (JOptionPane.showConfirmDialog(this, "Irten?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();
@@ -645,6 +706,9 @@ public class MenuTeknikoa extends JFrame {
     }
 
     // Helper class for ComboBox items
+    /**
+     * ComboBox-erako elementu laguntzailea.
+     */
     private static class ComboItem {
         private int id;
         private String label;

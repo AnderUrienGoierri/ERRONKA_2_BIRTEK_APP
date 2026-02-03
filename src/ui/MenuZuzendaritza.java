@@ -8,6 +8,11 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+/**
+ * MenuZuzendaritza klasea.
+ * Zuzendaritza edo Super Admin erabiltzaileen interfazea.
+ * Beste menu guztietara sartzeko aukera ematen du.
+ */
 public class MenuZuzendaritza extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -21,6 +26,14 @@ public class MenuZuzendaritza extends JFrame {
 
     /**
      * Eraikitzailea eguneratua.
+     */
+    /**
+     * MenuZuzendaritza eraikitzailea.
+     * 
+     * @param id      Erabiltzailearen IDa.
+     * @param izena   Izena.
+     * @param abizena Abizena.
+     * @param saila   Sailaren izena.
      */
     public MenuZuzendaritza(int id, String izena, String abizena, String saila) {
         this.erabiltzaileId = id;
@@ -140,11 +153,19 @@ public class MenuZuzendaritza extends JFrame {
         }
     }
 
+    /**
+     * Eraikitzailea lehenetsia (Sesio estatikoatik).
+     */
     public MenuZuzendaritza() {
         this(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, Sesioa.sailaIzena);
     }
 
     // --- FITXAKETA LOGIKA (Berdina) ---
+    /**
+     * Fitxaketa egin.
+     * 
+     * @param mota Fitxaketa mota.
+     */
     private void fitxatu(String mota) {
         String egiaztatuGaldera = "SELECT mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (Connection konexioa = DB_Konexioa.konektatu()) {
@@ -187,6 +208,9 @@ public class MenuZuzendaritza extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa egoera eguneratu.
+     */
     private void eguneratuFitxaketaEgoera() {
         String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -212,6 +236,9 @@ public class MenuZuzendaritza extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa historia ikusi.
+     */
     private void ikusiFitxaketaHistoriala() {
         JDialog elkarrizketa = new JDialog(this, "Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
@@ -236,6 +263,9 @@ public class MenuZuzendaritza extends JFrame {
         elkarrizketa.setVisible(true);
     }
 
+    /**
+     * Norberaren datuak editatzeko leihoa ireki.
+     */
     private void irekiNireDatuakEditatu() {
         // MenuZuzendaritza uses separate fields, so we need to construct a Langilea
         // object
@@ -285,6 +315,9 @@ public class MenuZuzendaritza extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Saioa itxi.
+     */
     private void saioaItxi() {
         if (JOptionPane.showConfirmDialog(this, "Irten?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();

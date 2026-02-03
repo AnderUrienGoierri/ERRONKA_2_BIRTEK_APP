@@ -8,6 +8,11 @@ import java.math.BigDecimal;
 import java.sql.*;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * EskaeraDialog klasea.
+ * Eskaerak sortzeko eta editatzeko leihoa.
+ * Bezeroa aukeratu, produktuak gehitu/kendu eta prezio totala kalkulatzen du.
+ */
 public class EskaeraDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +31,9 @@ public class EskaeraDialog extends JDialog {
     private JButton kenduLerroaBotoia;
 
     // Helper classes
+    /**
+     * Bezeroa ComboBox-ean erakusteko klase laguntzailea.
+     */
     public static class BezeroItem {
         int id;
         String izena;
@@ -41,6 +49,9 @@ public class EskaeraDialog extends JDialog {
         }
     }
 
+    /**
+     * Produktua ComboBox-ean erakusteko klase laguntzailea.
+     */
     public static class ProduktuaItem {
         int id;
         String izena;
@@ -61,6 +72,14 @@ public class EskaeraDialog extends JDialog {
     }
 
     // Constructor updated (price removed from arguments as it's calculated)
+    /**
+     * EskaeraDialog eraikitzailea.
+     *
+     * @param jabea     Guraso leihoa.
+     * @param izenburua Leihoaren izenburua.
+     * @param bezeroaId Bezeroaren IDa (editatzen bada), bestela null.
+     * @param egoera    Eskaeraren egoera (editatzen bada), bestela null.
+     */
     public EskaeraDialog(Frame jabea, String izenburua, Integer bezeroaId, String egoera) {
         super(jabea, izenburua, true);
         setLayout(new BorderLayout());
@@ -156,6 +175,9 @@ public class EskaeraDialog extends JDialog {
         add(behekoPanela, BorderLayout.SOUTH);
     }
 
+    /**
+     * Bezero aktiboak kargatzen ditu ComboBox-ean.
+     */
     private void kargatuBezeroak() {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 Statement stmt = konexioa.createStatement();
@@ -169,6 +191,9 @@ public class EskaeraDialog extends JDialog {
         }
     }
 
+    /**
+     * Salgai dauden produktuak kargatzen ditu ComboBox-ean.
+     */
     private void kargatuProduktuak() {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 Statement stmt = konexioa.createStatement();
@@ -183,6 +208,10 @@ public class EskaeraDialog extends JDialog {
         }
     }
 
+    /**
+     * Aukeratutako produktua saskiari gehitzen dio.
+     * Stock-a egiaztatzen du eta prezioak kalkulatzen ditu.
+     */
     private void lerroaGehitu() {
         ProduktuaItem p = (ProduktuaItem) produktuKomboa.getSelectedItem();
         if (p == null)
@@ -222,6 +251,9 @@ public class EskaeraDialog extends JDialog {
         totalaEguneratu();
     }
 
+    /**
+     * Aukeratutako lerroa saskitik kentzen du.
+     */
     private void lerroaKendu() {
         int selectedRow = lerroakTaula.getSelectedRow();
         if (selectedRow != -1) {
@@ -230,6 +262,9 @@ public class EskaeraDialog extends JDialog {
         }
     }
 
+    /**
+     * Saskiko prezio totala birkalkulatzen eta eguneratzen du.
+     */
     private void totalaEguneratu() {
         BigDecimal totala = BigDecimal.ZERO;
         for (int i = 0; i < lerroakModel.getRowCount(); i++) {
@@ -238,6 +273,11 @@ public class EskaeraDialog extends JDialog {
         prezioTotalaLabel.setText(String.format("%.2f \u20AC", totala));
     }
 
+    /**
+     * Bezero zehatz bat hautatzen du ComboBox-ean (editatzean).
+     * 
+     * @param id Bezeroaren IDa.
+     */
     private void hautatuBezeroa(int id) {
         for (int i = 0; i < bezeroKomboa.getItemCount(); i++) {
             if (bezeroKomboa.getItemAt(i).id == id) {
@@ -247,6 +287,11 @@ public class EskaeraDialog extends JDialog {
         }
     }
 
+    /**
+     * Eskaera balidatzen du (bezeroa aukeratuta eta lerroak egotea).
+     * 
+     * @return True baliozkoa bada.
+     */
     private boolean balidatu() {
         if (bezeroKomboa.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(this, "Aukeratu bezero bat.");
@@ -259,6 +304,15 @@ public class EskaeraDialog extends JDialog {
         return true;
     }
 
+    /**
+     * Lerro bat zuzenean gehitzen du taulara (kargatzean erabiltzen da).
+     *
+     * @param id         Produktu IDa.
+     * @param izena      Produktu izena.
+     * @param prezioa    Unitate prezioa.
+     * @param kantitatea Kantitatea.
+     * @param deskontua  Deskontua (%).
+     */
     public void addZuzeneanLerroa(int id, String izena, BigDecimal prezioa, int kantitatea, double deskontua) {
         BigDecimal prezioOsoa = prezioa.multiply(new BigDecimal(kantitatea));
         BigDecimal deskontuZenbatekoa = prezioOsoa.multiply(new BigDecimal(deskontua)).divide(new BigDecimal(100));
@@ -268,25 +322,49 @@ public class EskaeraDialog extends JDialog {
         totalaEguneratu();
     }
 
+    /**
+     * Erabiltzaileak onartu duen egiaztatzen du.
+     * 
+     * @return True onartu bada.
+     */
     public boolean isOnartua() {
         return onartua;
     }
 
+    /**
+     * Aukeratutako bezeroaren IDa itzultzen du.
+     * 
+     * @return Bezero IDa.
+     */
     public int getBezeroaId() {
         return ((BezeroItem) bezeroKomboa.getSelectedItem()).id;
     }
 
+    /**
+     * Aukeratutako egoera itzultzen du.
+     * 
+     * @return Egoera.
+     */
     public String getEgoera() {
         return (String) egoeraKomboa.getSelectedItem();
     }
 
+    /**
+     * Prezio totala itzultzen du.
+     * 
+     * @return Totala.
+     */
     public BigDecimal getPrezioTotala() {
         String t = prezioTotalaLabel.getText().replace(" \u20AC", "").replace(",", ".");
         return new BigDecimal(t);
     }
 
-    // Lerroak itzultzeko metodoa: [prodId, kantitatea,
-    // unitatePrezioa(deskontuarekin)]
+    /**
+     * Saskiko lerroak itzultzen ditu.
+     * 
+     * @return Objektu array zerrenda: [prodId, kantitatea, unitatePrezioa
+     *         (deskontuarekin)].
+     */
     public java.util.List<Object[]> getLerroak() {
         java.util.List<Object[]> lista = new java.util.ArrayList<>();
         for (int i = 0; i < lerroakModel.getRowCount(); i++) {

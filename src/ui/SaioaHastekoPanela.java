@@ -15,6 +15,11 @@ import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 
+/**
+ * SaioaHastekoPanela klasea.
+ * Aplikazioaren sarrera leihoa (Login).
+ * Erabiltzaileak posta eta pasahitza sartuz saioa hasteko aukera ematen du.
+ */
 public class SaioaHastekoPanela extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -32,6 +37,10 @@ public class SaioaHastekoPanela extends JFrame {
     private JLabel irudiEtiketa;
     private JButton saioaHasiBotoia;
 
+    /**
+     * SaioaHastekoPanela eraikitzailea.
+     * Leihoaren osagaiak inizializatzen ditu.
+     */
     public SaioaHastekoPanela() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -123,6 +132,9 @@ public class SaioaHastekoPanela extends JFrame {
     }
 
     // METODOA posta-helbideak eta sailak kargatzeko
+    /**
+     * Posta helbideak eta sailak DBtik kargatu ComboBox-era.
+     */
     private void postaKargatu() {
         String galdera = "SELECT l.emaila, s.izena AS saila_izena " +
                 "FROM langileak l " +
@@ -160,6 +172,9 @@ public class SaioaHastekoPanela extends JFrame {
         }
     }
 
+    /**
+     * Testu etiketak eguneratu.
+     */
     private void eguneratuTestuak() {
         setTitle("Saioa Hasi");
         izenburuEtiketa.setText("Birtek Kudeaketa");
@@ -168,6 +183,10 @@ public class SaioaHastekoPanela extends JFrame {
         saioaHasiBotoia.setText("Sartu");
     }
 
+    /**
+     * Saioa hasteko prozesua.
+     * Erabiltzailea eta pasahitza egiaztatzen ditu eta dagokion menua irekitzen du.
+     */
     private void saioaHasi() {
         String aukeratutakoa = (String) postaEremua.getSelectedItem();
 
@@ -225,6 +244,11 @@ public class SaioaHastekoPanela extends JFrame {
         }
     }
 
+    /**
+     * Sailaren araberako menua ireki.
+     * 
+     * @param sailaId Sailaren IDa.
+     */
     private void irekiSailMenua(int sailaId) {
         switch (sailaId) {
             case 1:

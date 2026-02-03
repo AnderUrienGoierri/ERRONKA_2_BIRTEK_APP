@@ -97,6 +97,14 @@ public void fakturaSortu(int idEskaera) throws Exception {
 }
 ```
 
+### `model.AdministrariLangilea`
+
+Administrazio funtzioak, hala nola langile berriak sortzea.
+
+**Langilea Sortu:**
+
+![LangileaSortu Metodoa](irudiak/langilea_sortu_metodoa.png)
+
 ## 3. Interfazea (UI)
 
 ### `ui.MenuSalmentak`

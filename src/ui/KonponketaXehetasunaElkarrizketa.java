@@ -16,6 +16,11 @@ import javax.swing.JTextArea;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+/**
+ * KonponketaXehetasunaElkarrizketa klasea.
+ * Konponketa baten egoera, akatsa eta oharrak editatzeko elkarrizketa-leihoa
+ * (JDialog).
+ */
 public class KonponketaXehetasunaElkarrizketa extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +30,15 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
     private JTextArea oharrakTestua;
     private int konponketaId;
 
+    /**
+     * KonponketaXehetasunaElkarrizketa eraikitzailea.
+     *
+     * @param id            Konponketaren IDa.
+     * @param unekoEgoera   Uneko egoera.
+     * @param unekoOharrak  Uneko oharrak.
+     * @param unekoAkatsaId Uneko akatsaren IDa.
+     * @param akatsakList   Akats posibleen zerrenda.
+     */
     public KonponketaXehetasunaElkarrizketa(int id, String unekoEgoera, String unekoOharrak, int unekoAkatsaId,
             java.util.List<Akatsa> akatsakList) {
         this.konponketaId = id;
@@ -86,6 +100,9 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
         botoiPanela.add(utziBotoia);
     }
 
+    /**
+     * Datuak datu-basean gordetzen ditu (UPDATE).
+     */
     private void gordeDatuak() {
         String egoeraBerria = (String) egoeraHautatzailea.getSelectedItem();
         ComboItem aukeratutakoAkatsa = (ComboItem) akatsaHautatzailea.getSelectedItem();
@@ -118,6 +135,9 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
     }
 
     // Helper class for ComboBox items
+    /**
+     * ComboBox-erako elementu laguntzailea (ID eta Testua).
+     */
     private static class ComboItem {
         private int id;
         private String label;

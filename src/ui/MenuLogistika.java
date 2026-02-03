@@ -14,6 +14,12 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * MenuLogistika klasea.
+ * Biltegi langilearen interfaze nagusia.
+ * Sarrerak, biltegiak, produktuak, eskaerak eta hornitzaileak kudeatzeko
+ * aukerak.
+ */
 public class MenuLogistika extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -73,16 +79,27 @@ public class MenuLogistika extends JFrame {
     /**
      * Eraikitzaileak eguneratua.
      */
+    /**
+     * MenuLogistika eraikitzailea.
+     * 
+     * @param oinarrizkoLangilea Saioa hasi duen langilea.
+     */
     public MenuLogistika(Langilea oinarrizkoLangilea) {
         this.langilea = new BiltegiLangilea(oinarrizkoLangilea);
         pantailaPrestatu();
     }
 
+    /**
+     * Eraikitzailea lehenetsia.
+     */
     public MenuLogistika() {
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
                 null, null, true, 2, "", null));
     }
 
+    /**
+     * Pantailaren osagaiak prestatu.
+     */
     private void pantailaPrestatu() {
         setTitle("Birtek - LOGISTIKA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -237,6 +254,11 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- FITXAKETA LOGIKA ---
+    /**
+     * Fitxaketa bat egin (Sarrera/Irteera).
+     * 
+     * @param mota Fitxaketa mota.
+     */
     private void fitxatu(String mota) {
         try {
             if ("Sarrera".equals(mota)) {
@@ -251,6 +273,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa egoera eguneratu interfazean.
+     */
     private void eguneratuFitxaketaEgoera() {
         fitxaketaInfoEtiketa.setText(langilea.getFitxaketaEgoera());
         if (fitxaketaInfoEtiketa.getText().contains("BARRUAN")) {
@@ -260,6 +285,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa historia erakutsi.
+     */
     private void ikusiFitxaketaHistoriala() {
         JDialog elkarrizketa = new JDialog(this, "Nire Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
@@ -285,6 +313,9 @@ public class MenuLogistika extends JFrame {
         elkarrizketa.setVisible(true);
     }
 
+    /**
+     * Norberaren datuak editatzeko leihoa ireki.
+     */
     private void irekiNireDatuakEditatu() {
         NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
         dialog.setVisible(true);
@@ -292,6 +323,9 @@ public class MenuLogistika extends JFrame {
 
     // --- TAB SARRERAK ---
     // --- TAB SARRERAK ---
+    /**
+     * Sarreren fitxa ("tab") sortu eta konfiguratu.
+     */
     private void sarreraTabSortu() {
         JPanel sarreraPanela = new JPanel(new BorderLayout());
         sarreraPanela.setOpaque(false);
@@ -335,6 +369,9 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- TAB BILTEGIAK ---
+    /**
+     * Biltegien fitxa sortu.
+     */
     private void biltegiTabSortu() {
         JPanel biltegiPanela = new JPanel(new BorderLayout());
         biltegiPanela.setOpaque(false);
@@ -361,6 +398,9 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- TAB PRODUKTUAK ---
+    /**
+     * Produktuen fitxa sortu.
+     */
     private void produktuTabSortu() {
         JPanel produktuPanela = new JPanel(new BorderLayout());
         produktuPanela.setOpaque(false);
@@ -392,6 +432,9 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- TAB ESKAERAK (NEW) ---
+    /**
+     * Eskaeren fitxa sortu.
+     */
     private void eskaeraTabSortu() {
         JPanel eskaeraPanela = new JPanel(new BorderLayout());
         eskaeraPanela.setOpaque(false);
@@ -427,6 +470,9 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- TAB SARRERA BERRIA ---
+    /**
+     * Sarrera berria egiteko fitxa sortu.
+     */
     private void sarreraBerriaTabSortu() {
         JPanel sarreraBerriaPanela = new JPanel(new BorderLayout());
         sarreraBerriaPanela.setOpaque(false);
@@ -619,12 +665,20 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- LAGUNTZAILEAK ---
+    /**
+     * Hornitzaile modua aldatu (lehendik dagoena edo berria).
+     */
     private void hornitzaileModuaAldatu() {
         boolean berriaDa = hornitzaileBerriaAukera.isSelected();
         hornitzaileBerriaGaitu(berriaDa);
         hornitzaileHautatzailea.setEnabled(!berriaDa);
     }
 
+    /**
+     * Hornitzaile berriaren eremuak gaitu edo desgaitu.
+     * 
+     * @param gaitu True gaitzeko.
+     */
     private void hornitzaileBerriaGaitu(boolean gaitu) {
         izenaBerriaTestua.setEnabled(gaitu);
         postaBerriaTestua.setEnabled(gaitu);
@@ -636,6 +690,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Sarrera berrirako hautatzaileak (ComboBox) kargatu datu-basetik.
+     */
     private void sarreraHautatzaileakKargatu() {
         hornitzaileHautatzailea.removeAllItems();
         kategoriaHautatzailea.removeAllItems();
@@ -656,6 +713,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Produktu lerro berria gehitu sarrera berriaren taulara.
+     */
     private void gehituLerroaTaulara() {
         String izena = produktuIzenaTestua.getText();
         String marka = markaTestua.getText();
@@ -689,6 +749,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Irudia igo eta proiektuan kopiatu.
+     */
     private void igoIrudia() {
         if (fitxategiHautatzailea == null) {
             fitxategiHautatzailea = new JFileChooser();
@@ -724,6 +787,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Sarrera osoa (eta produktuak/lerroak) datu-basean gorde.
+     */
     private void gordeSarreraOsoa() {
         if (lerroBerriEredua.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Ez dago produkturik zerrendan.");
@@ -809,6 +875,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Sarreren datuak taulan kargatu.
+     */
     private void sarreraDatuakKargatu() {
         try {
             String filter = (String) egoeraIragazkia.getSelectedItem();
@@ -829,6 +898,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Biltegien datuak taulan kargatu.
+     */
     private void biltegiDatuakKargatu() {
         String sql = "SELECT id_biltegia, izena, biltegi_sku FROM biltegiak";
         try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
@@ -841,8 +913,15 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Produktuen datuak taulan kargatu.
+     */
     private void produktuDatuakKargatu() {
-        String sql = "SELECT p.id_produktua, p.izena AS Produktua, b.izena AS Biltegia, s.id_sarrera AS 'Sarrera ID', sl.sarrera_lerro_egoera AS Egoera, s.data AS 'Sarrera Data', sl.id_sarrera_lerroa, p.produktu_egoera_oharra AS Oharra FROM sarrera_lerroak sl JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera JOIN produktuak p ON sl.produktua_id = p.id_produktua JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
+        String sql = "SELECT p.id_produktua, p.izena AS Produktua, b.izena AS Biltegia, s.id_sarrera AS 'Sarrera ID', sl.sarrera_lerro_egoera AS Egoera, s.data AS 'Sarrera Data', sl.id_sarrera_lerroa, p.produktu_egoera_oharra AS Oharra"
+                + "FROM sarrera_lerroak sl"
+                + "JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera"
+                + "JOIN produktuak p ON sl.produktua_id = p.id_produktua"
+                + "JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
         try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
             DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
             produktuTaula.setModel(eredua);
@@ -853,6 +932,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Taulak iragazi bilaketa testuaren arabera.
+     */
     private void filtratu() {
         String testua = bilatuTestua.getText();
         TableRowSorter<DefaultTableModel> unekoOrdenatzailea = null;
@@ -877,6 +959,9 @@ public class MenuLogistika extends JFrame {
 
     // --- SARRERA LOGIKA DESARROILUA ---
 
+    /**
+     * Hautatutako sarreraren lerroak ikusi eta haien egoera aldatzeko leihoa.
+     */
     private void ikusiSarreraLerroak() {
         int row = sarreraTaula.getSelectedRow();
         if (row == -1) {
@@ -935,6 +1020,12 @@ public class MenuLogistika extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Sarrera baten lerroak taulan kargatu.
+     * 
+     * @param idSarrera Sarreraren IDa.
+     * @param model     Taula eredua.
+     */
     private void kargatuSarreraLerroak(int idSarrera, DefaultTableModel model) {
         model.setRowCount(0);
         try {
@@ -948,6 +1039,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Sarrera baten egoera orokorra editatu.
+     */
     private void editatuSarrera() {
         int row = sarreraTaula.getSelectedRow();
         if (row == -1) {
@@ -972,6 +1066,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Sarrera bat eta bere lerro guztiak ezabatu.
+     */
     private void ezabatuSarrera() {
         int row = sarreraTaula.getSelectedRow();
         if (row == -1) {
@@ -997,6 +1094,9 @@ public class MenuLogistika extends JFrame {
 
     // --- ESKAERA LOGIKA DESARROILUA ---
 
+    /**
+     * Eskaeren datuak kargatu taulan.
+     */
     private void eskaeraDatuakKargatu() {
         try {
             String filter = (String) eskaeraEgoeraIragazkia.getSelectedItem();
@@ -1015,6 +1115,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Eskaera baten lerroak ikusi eta kudeatu.
+     */
     private void ikusiEskaeraLerroak() {
         int row = eskaeraTaula.getSelectedRow();
         if (row == -1) {
@@ -1071,6 +1174,12 @@ public class MenuLogistika extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Eskaera baten lerroak kargatu.
+     * 
+     * @param idEskaera Eskaeraren IDa.
+     * @param model     Taula eredua.
+     */
     private void kargatuEskaeraLerroak(int idEskaera, DefaultTableModel model) {
         model.setRowCount(0);
         try {
@@ -1083,6 +1192,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Produktu baten oharra editatu.
+     */
     private void editatuProduktuOharra() {
         int row = produktuTaula.getSelectedRow();
         if (row == -1) {
@@ -1108,6 +1220,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Biltegi berria sortu.
+     */
     private void sortuBiltegia() {
         JTextField izenaEremua = new JTextField();
         JTextField skuEremua = new JTextField();
@@ -1123,6 +1238,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Biltegi bat ezabatu.
+     */
     private void ezabatuBiltegia() {
         int row = biltegiTaula.getSelectedRow();
         if (row == -1)
@@ -1141,6 +1259,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Biltegi baten datuak (izena, SKU) aldatu.
+     */
     private void aldatuBiltegia() {
         int row = biltegiTaula.getSelectedRow();
         if (row == -1)
@@ -1162,6 +1283,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Produktu bat biltegi batetik bestera mugitu.
+     */
     private void aldatuProduktuarenBiltegia() {
         int row = produktuTaula.getSelectedRow();
         if (row == -1)
@@ -1188,14 +1312,25 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Produktu baten lerroa "Jasota" markatu.
+     */
     private void markatuProduktuaJasota() {
         produktuEgoeraAldatu("Jasota");
     }
 
+    /**
+     * Produktu baten lerroa "Bidean" markatu.
+     */
     private void markatuProduktuaBidean() {
         produktuEgoeraAldatu("Bidean");
     }
 
+    /**
+     * Produktu sarrera baten lerro egoera aldatu (Helper).
+     * 
+     * @param egoeraBerria Egoera berria.
+     */
     private void produktuEgoeraAldatu(String egoeraBerria) {
         int row = produktuTaula.getSelectedRow();
         if (row == -1)
@@ -1214,6 +1349,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Saioa itxi.
+     */
     private void saioaItxi() {
         if (JOptionPane.showConfirmDialog(this, "Ziur zaude saioa itxi nahi duzula?", "Logout",
                 JOptionPane.YES_NO_OPTION) == 0) {
@@ -1223,6 +1361,9 @@ public class MenuLogistika extends JFrame {
     }
 
     // --- HELPER CLASSES ---
+    /**
+     * Biltegi objektua ComboBox-erako.
+     */
     static class BiltegiElementua {
         int id;
         String izena;
@@ -1237,6 +1378,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Norberaren fitxaketen fitxa sortu.
+     */
     private void nireFitxaketaTabSortu() {
         JPanel nireFitxaketaPanela = new JPanel(new BorderLayout());
         nireFitxaketaPanela.setOpaque(false);
@@ -1245,6 +1389,9 @@ public class MenuLogistika extends JFrame {
         pestainaPanela.addTab("Nire Fitxaketak", null, nireFitxaketaPanela, null);
     }
 
+    /**
+     * Norberaren fitxaketen datuak kargatu.
+     */
     private void nireFitxaketaDatuakKargatu() {
         String sql = "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
         try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
@@ -1258,6 +1405,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Hornitzaile objektua ComboBox-erako.
+     */
     static class HornitzaileElementua {
         int id;
         String izena;
@@ -1272,6 +1422,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Kategoria objektua ComboBox-erako.
+     */
     static class KategoriaElementua {
         int id;
         String izena;
@@ -1286,6 +1439,9 @@ public class MenuLogistika extends JFrame {
         }
     }
 
+    /**
+     * Atzealdeko panela irudiarekin.
+     */
     static class AtzealdekoPanela extends JPanel {
         private static final long serialVersionUID = 1L;
         private Image irudia;

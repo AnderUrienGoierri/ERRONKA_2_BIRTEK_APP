@@ -21,14 +21,32 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * FakturaPDF klasea.
+ * Eskaera eta bezeroen datuetatik abiatuta PDF formatuko fakturak sortzen
+ * dituen klasea.
+ * iText liburutegia erabiltzen du PDFak sortzeko.
+ */
 public class FakturaPDF {
 
+    /**
+     * BezeroDatuak barne-klasea.
+     * Fakturan bistaratu beharreko bezeroaren datuak gordetzeko.
+     */
     public static class BezeroDatuak {
         public String izena;
         public String ifz;
         public String helbidea;
         public String emaila;
 
+        /**
+         * BezeroDatuak eraikitzailea.
+         *
+         * @param izena    Bezeroaren izena.
+         * @param ifz      Bezeroaren IFZ/NAN.
+         * @param helbidea Bezeroaren helbidea.
+         * @param emaila   Bezeroaren emaila.
+         */
         public BezeroDatuak(String izena, String ifz, String helbidea, String emaila) {
             this.izena = izena;
             this.ifz = ifz;
@@ -37,12 +55,24 @@ public class FakturaPDF {
         }
     }
 
+    /**
+     * LerroDatuak barne-klasea.
+     * Fakturako lerro bakoitzaren datuak gordetzeko.
+     */
     public static class LerroDatuak {
         public String produktua;
         public int kantitatea;
         public BigDecimal prezioa;
         public BigDecimal guztira;
 
+        /**
+         * LerroDatuak eraikitzailea.
+         *
+         * @param produktua  Produktuaren izena.
+         * @param kantitatea Produktu kantitatea.
+         * @param prezioa    Unitateko prezioa.
+         * @param guztira    Lerroaren prezio totala.
+         */
         public LerroDatuak(String produktua, int kantitatea, BigDecimal prezioa, BigDecimal guztira) {
             this.produktua = produktua;
             this.kantitatea = kantitatea;
@@ -54,6 +84,18 @@ public class FakturaPDF {
     // fakturak C/: karpetan XamPP barruan
     public static final String FAKTURA_BIDEA = "C:\\Xampp\\htdocs\\fakturak";
 
+    /**
+     * Faktura PDF bat sortzen du emandako datuekin.
+     *
+     * @param fitxategiPath PDF fitxategia gordeko den bidea.
+     * @param idEskaera     Eskaeraren IDa.
+     * @param data          Fakturaren data.
+     * @param bezeroa       Bezeroaren datuak dituen objektua.
+     * @param lerroak       Fakturako lerroen zerrenda.
+     * @param guztira       Fakturaren guztizko zenbatekoa.
+     * @throws DocumentException PDFa sortzean errorea gertatzen bada.
+     * @throws IOException       Fitxategia idaztean errorea gertatzen bada.
+     */
     public static void sortu(String fitxategiPath, int idEskaera, Timestamp data, BezeroDatuak bezeroa,
             List<LerroDatuak> lerroak, BigDecimal guztira)
             throws DocumentException, IOException {

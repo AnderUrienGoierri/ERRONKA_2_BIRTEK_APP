@@ -13,8 +13,20 @@ import java.util.List;
 import model.FakturaPDF.BezeroDatuak;
 import model.FakturaPDF.LerroDatuak;
 
+/**
+ * SalmentaLangilea klasea.
+ * Langilea klasearen azpiklasea da, eta salmenta arloko langileen
+ * funtzionalitateak kudeatzen ditu.
+ * Bezeroak, eskaerak, fakturak eta produktuak kudeatzeko metodoak ditu.
+ */
 public class SalmentaLangilea extends Langilea {
 
+    /**
+     * SalmentaLangilea eraikitzailea.
+     * Langilea objektu batetik abiatuta sortzen da.
+     * 
+     * @param l Langilea objektua.
+     */
     public SalmentaLangilea(Langilea l) {
         super(l.getIdLangilea(), l.getIzena(), l.getAbizena(), l.getNan(), l.getJaiotzaData(), l.getHerriaId(),
                 l.getHelbidea(), l.getPostaKodea(), l.getTelefonoa(), l.getEmaila(), l.getHizkuntza(),
@@ -28,6 +40,14 @@ public class SalmentaLangilea extends Langilea {
      * @param idEskaera Eskaeraren IDa
      * @return Sortutako PDF fitxategia
      * @throws Exception
+     */
+    /**
+     * Faktura bat sortzen du eskaera batetik abiatuta.
+     * PDF fitxategia sortzen du eta datu-basean erregistratzen du.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @return Sortutako PDF fitxategia, edo null errorea gertatu bada.
+     * @throws Exception Errorea prozesuan.
      */
     public File fakturaSortu(int idEskaera) throws Exception {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
@@ -112,6 +132,13 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idEskaera Eskaeraren IDa
      */
+    /**
+     * Faktura bat ezabatzen du eskaera IDa erabiliz.
+     * Fitxategi fisikoa eta datu-baseko erregistroa ezabatzen ditu.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @throws Exception Errorea ezabatzean.
+     */
     public void fakturaEzabatu(int idEskaera) throws Exception {
         String sqlSelect = "SELECT fitxategia_url FROM bezero_fakturak WHERE eskaera_id = ?";
         String sqlDelete = "DELETE FROM bezero_fakturak WHERE eskaera_id = ?";
@@ -152,6 +179,12 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param b Bezero objektua
      */
+    /**
+     * Bezero berri bat sortzen du datu-basean.
+     *
+     * @param b Bezeroa objektua.
+     * @throws Exception Errorea sortzean.
+     */
     public void bezeroBerriaSortu(Bezeroa b) throws Exception {
         String sql = "INSERT INTO bezeroak (izena_edo_soziala, abizena, ifz_nan, jaiotza_data, sexua, " +
                 "bezero_ordainketa_txartela, helbidea, herria_id, posta_kodea, telefonoa, emaila, " +
@@ -184,6 +217,12 @@ public class SalmentaLangilea extends Langilea {
      * Bezeroaren informazioa editatu.
      * 
      * @param b Bezero objektua (id-a barne)
+     */
+    /**
+     * Bezero baten informazioa editatzen du.
+     *
+     * @param b Bezero objektua (id-a barne).
+     * @throws Exception Errorea editatzean.
      */
     public void bezeroaEditatu(Bezeroa b) throws Exception {
         String sql = "UPDATE bezeroak SET izena_edo_soziala=?, abizena=?, ifz_nan=?, jaiotza_data=?, " +
@@ -218,6 +257,13 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idBezeroa Bezeroaren IDa
      */
+    /**
+     * Bezero bat ezabatzen du.
+     * Lehenik egiaztatzen du ea eskaerarik duen; badu, ezin da ezabatu.
+     *
+     * @param idBezeroa Bezeroaren IDa.
+     * @throws Exception Errorea ezabatzean edo eskaerak baditu.
+     */
     public void bezeroaKendu(int idBezeroa) throws Exception {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             // Check for existing orders
@@ -243,6 +289,13 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idBezeroa Bezeroaren IDa
      * @return Bezero objektua
+     */
+    /**
+     * Bezero baten informazioa lortzen du.
+     *
+     * @param idBezeroa Bezeroaren IDa.
+     * @return Bezero objektua edo null aurkitzen ez bada.
+     * @throws Exception Errorea irakurtzean.
      */
     public Bezeroa bezeroaIkusi(int idBezeroa) throws Exception {
         String sql = "SELECT * FROM bezeroak WHERE id_bezeroa=?";
@@ -284,6 +337,12 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idFaktura Fakturaren IDa
      */
+    /**
+     * Bezero baten faktura ezabatzen du IDaren arabera.
+     *
+     * @param idFaktura Fakturaren IDa.
+     * @throws Exception Errorea ezabatzean.
+     */
     public void bezeroFakturaEzabatu(int idFaktura) throws Exception {
         String sql = "DELETE FROM bezero_fakturak WHERE id_faktura=?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -307,6 +366,14 @@ public class SalmentaLangilea extends Langilea {
      * @param mota Produktu mota (adib. 'Eramangarria', 'Mugikorra'...). Null edo
      *             hutsik bada, denak itzuli.
      * @return Produktu zerrenda
+     */
+    /**
+     * Produktuak ikusten ditu, aukeran motaren arabera iragaziz.
+     *
+     * @param mota Produktu mota (adib. "Eramangarria", "Guztiak"...). Null edo
+     *             hutsik bada, denak itzultzen dira.
+     * @return Produktu zerrenda.
+     * @throws Exception Errorea datuak lortzean.
      */
     public List<Produktua> produktuakIkusi(String mota) throws Exception {
         List<Produktua> produktuak = new ArrayList<>();
@@ -339,6 +406,13 @@ public class SalmentaLangilea extends Langilea {
      * @param idProduktua Produktuaren IDa
      * @return Produktua objektua
      */
+    /**
+     * Produktu baten informazio zehatza lortzen du.
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @return Produktu objektua edo null.
+     * @throws Exception Errorea lortzean.
+     */
     public Produktua produktuaIkusi(int idProduktua) throws Exception {
         String sql = "SELECT * FROM produktuak WHERE id_produktua=?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -361,6 +435,14 @@ public class SalmentaLangilea extends Langilea {
      * @param rs ResultSet kurtsorea (dagoeneko .next() eginda egon behar du)
      * @return Produktuaren azpiklasearen instantzia (Eramangarria, Mugikorra...)
      * @throws Exception
+     */
+    /**
+     * ResultSet-etik Produktua azpiklase egokia instantziatzen duen metodo
+     * laguntzailea.
+     *
+     * @param rs ResultSet kurtsorea.
+     * @return Produktuaren azpiklasearen instantzia (Eramangarria, Mugikorra...).
+     * @throws Exception Errorea sortzean.
      */
     private Produktua instanziatuProduktua(ResultSet rs) throws Exception {
         String mota = rs.getString("mota");
@@ -437,6 +519,13 @@ public class SalmentaLangilea extends Langilea {
      * @param idProduktua Produktuaren IDa
      * @param eskaintza   Eskaintza berria
      */
+    /**
+     * Produktu bati eskaintza prezioa aldatzen dio.
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @param eskaintza   Eskaintza berria.
+     * @throws Exception Errorea eguneratzean.
+     */
     public void produktuariEskaintzaAldatzeko(int idProduktua, BigDecimal eskaintza) throws Exception {
         String sql = "UPDATE produktuak SET eskaintza=? WHERE id_produktua=?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -451,6 +540,12 @@ public class SalmentaLangilea extends Langilea {
      * Produktua salgai jarri (soilik prezioa definituta badu).
      * 
      * @param idProduktua Produktuaren IDa
+     */
+    /**
+     * Produktua salgai jartzen du (soilik prezioa definituta badu).
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @throws Exception Errorea eguneratzean.
      */
     public void produktuaSalgaijarri(int idProduktua) throws Exception {
         // Lehenengo prezioa daukala egiaztatu
@@ -489,6 +584,13 @@ public class SalmentaLangilea extends Langilea {
      * @param idProduktua Produktuaren IDa
      * @param prezioa     Prezio berria
      */
+    /**
+     * Produktuari salmenta prezioa ezartzen dio.
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @param prezioa     Prezio berria.
+     * @throws Exception Errorea eguneratzean.
+     */
     public void produktuariPrezioaJarri(int idProduktua, BigDecimal prezioa) throws Exception {
         String sql = "UPDATE produktuak SET salmenta_prezioa=? WHERE id_produktua=?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -509,6 +611,13 @@ public class SalmentaLangilea extends Langilea {
      * @param idEskaera Eskaeraren IDa
      * @return Eskaera lerroen zerrenda
      */
+    /**
+     * Eskaera baten lerroak (produktuak) lortzen ditu.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @return Eskaera lerroen zerrenda.
+     * @throws SQLException Errorea datu-basean.
+     */
     public List<EskaeraLerroa> eskaeraLerroakIkusi(int idEskaera) throws SQLException {
         return EskaeraLerroa.eskaeraLerroaIkusi(idEskaera);
     }
@@ -520,6 +629,15 @@ public class SalmentaLangilea extends Langilea {
      * @param idProduktua Produktuaren IDa
      * @param kantitatea  Kantitatea
      * @param prezioa     Unitateko prezioa
+     */
+    /**
+     * Eskaera bati lerro (produktu) berri bat gehitzen dio.
+     *
+     * @param idEskaera   Eskaeraren IDa.
+     * @param idProduktua Produktuaren IDa.
+     * @param kantitatea  Kantitatea.
+     * @param prezioa     Unitateko prezioa.
+     * @throws SQLException Errorea gehitzean.
      */
     public void eskaeraLerroaGehitu(int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)
             throws SQLException {
@@ -537,6 +655,16 @@ public class SalmentaLangilea extends Langilea {
      * @param kantitatea      Kantitatea
      * @param prezioa         Unitateko prezioa
      */
+    /**
+     * Eskaera lerro bat editatzen du.
+     *
+     * @param idEskaeraLerroa Lerroaren IDa.
+     * @param idEskaera       Eskaeraren IDa.
+     * @param idProduktua     Produktuaren IDa.
+     * @param kantitatea      Kantitatea.
+     * @param prezioa         Unitateko prezioa.
+     * @throws SQLException Errorea editatzean.
+     */
     public void eskaeraLerroakEditatu(int idEskaeraLerroa, int idEskaera, int idProduktua, int kantitatea,
             BigDecimal prezioa) throws SQLException {
         EskaeraLerroa el = new EskaeraLerroa(idEskaeraLerroa, idEskaera, idProduktua, kantitatea, prezioa,
@@ -549,6 +677,12 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idEskaeraLerroa Lerroaren IDa
      */
+    /**
+     * Eskaera lerro bat ezabatzen du.
+     *
+     * @param idEskaeraLerroa Lerroaren IDa.
+     * @throws SQLException Errorea ezabatzean.
+     */
     public void eskaeraLerroaEzabatu(int idEskaeraLerroa) throws SQLException {
         EskaeraLerroa.eskaeraLerroaEzabatu(idEskaeraLerroa);
     }
@@ -558,6 +692,13 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idProduktua Produktuaren IDa
      * @param prezioa     Prezio berria
+     */
+    /**
+     * Produktuari prezioa aldatzen dio (produktuariPrezioaJarri-ren berdina).
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @param prezioa     Prezio berria.
+     * @throws Exception Errorea eguneratzean.
      */
     public void produktuariPrezioaAldatu(int idProduktua, BigDecimal prezioa) throws Exception {
         produktuariPrezioaJarri(idProduktua, prezioa);
@@ -572,6 +713,13 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param idBezeroa Bezeroaren IDa
      * @return Eskaera zerrenda
+     */
+    /**
+     * Bezero baten eskaerak ikusten ditu.
+     *
+     * @param idBezeroa Bezeroaren IDa.
+     * @return Eskaera zerrenda.
+     * @throws Exception Errorea lortzean.
      */
     public List<Eskaera> eskaerakIkusi(int idBezeroa) throws Exception {
         List<Eskaera> eskaerak = new ArrayList<>();
@@ -602,6 +750,12 @@ public class SalmentaLangilea extends Langilea {
      * 
      * @param e Eskaera objektua
      */
+    /**
+     * Eskaera berria sortzen du datu-basean.
+     *
+     * @param e Eskaera objektua.
+     * @throws Exception Errorea sortzean.
+     */
     public void eskaeraSortu(Eskaera e) throws Exception {
         String sql = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, guztira_prezioa, eskaera_egoera) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -627,6 +781,12 @@ public class SalmentaLangilea extends Langilea {
      * Eskaera editatu.
      * 
      * @param e Eskaera objektua
+     */
+    /**
+     * Eskaera baten datuak editatzen ditu.
+     *
+     * @param e Eskaera objektua.
+     * @throws Exception Errorea editatzean.
      */
     public void eskaeraEditatu(Eskaera e) throws Exception {
         String sql = "UPDATE eskaerak SET bezeroa_id=?, langilea_id=?, data=?, guztira_prezioa=?, " +
@@ -654,6 +814,12 @@ public class SalmentaLangilea extends Langilea {
      * Eskaera ezabatu.
      * 
      * @param idEskaera Eskaeraren IDa
+     */
+    /**
+     * Eskaera bat ezabatzen du.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @throws Exception Errorea ezabatzean.
      */
     public void eskaeraEzabatu(int idEskaera) throws Exception {
         String sql = "DELETE FROM eskaerak WHERE id_eskaera=?";

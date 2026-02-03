@@ -11,6 +11,11 @@ import java.awt.event.*;
 import java.sql.*;
 import java.io.File;
 
+/**
+ * MenuSalmentak klasea.
+ * Salmenta langilearen interfaze nagusia.
+ * Bezeroak, eskaerak eta produktuak kudeatzeko aukerak eskaintzen ditu.
+ */
 public class MenuSalmentak extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -29,6 +34,11 @@ public class MenuSalmentak extends JFrame {
 
     /**
      * Eraikitzailea eguneratua.
+     */
+    /**
+     * MenuSalmentak eraikitzailea.
+     * 
+     * @param oinarrizkoLangilea Saioa hasi duen langilea.
      */
     public MenuSalmentak(Langilea oinarrizkoLangilea) {
         this.langilea = new SalmentaLangilea(oinarrizkoLangilea);
@@ -261,12 +271,20 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Eraikitzailea lehenetsia.
+     */
     public MenuSalmentak() {
         this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
                 null, null, true, 2, "", null));
     }
 
     // --- FITXAKETA METODO BERRIAK ---
+    /**
+     * Fitxaketa bat egin (Sarrera/Irteera).
+     * 
+     * @param mota Fitxaketa mota.
+     */
     private void fitxatu(String mota) {
         try {
             if ("Sarrera".equals(mota)) {
@@ -281,6 +299,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa egoera eguneratu interfazeko etiketan.
+     */
     private void eguneratuFitxaketaEgoera() {
         fitxaketaInfoEtiketa.setText(langilea.getFitxaketaEgoera());
         if (fitxaketaInfoEtiketa.getText().contains("BARRUAN")) {
@@ -290,6 +311,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Fitxaketa historialaren leihoa ireki.
+     */
     private void ikusiFitxaketaHistoriala() {
         JDialog elkarrizketa = new JDialog(this, "Fitxaketa Historiala", true);
         elkarrizketa.setSize(500, 400);
@@ -308,11 +332,17 @@ public class MenuSalmentak extends JFrame {
         elkarrizketa.setVisible(true);
     }
 
+    /**
+     * Norberaren datuak editatzeko leihoa ireki.
+     */
     private void irekiNireDatuakEditatu() {
         NireDatuakDialog dialog = new NireDatuakDialog(this, langilea);
         dialog.setVisible(true);
     }
 
+    /**
+     * Hautatutako eskaeraren lerroak beheko taulan kargatu.
+     */
     private void fokatutakoEskaeraKargatu() {
         int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
         if (aukeratutakoLerroa != -1) {
@@ -337,6 +367,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Taulak iragazi bilaketa testuaren eta filtroen arabera.
+     */
     private void filtratu() {
         int pestainaIdx = pestainaPanelaRef.getSelectedIndex();
 
@@ -375,6 +408,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Saioa itxi.
+     */
     private void saioaItxi() {
         if (JOptionPane.showConfirmDialog(this, "Irten?", "Saioa Itxi", JOptionPane.YES_NO_OPTION) == 0) {
             dispose();
@@ -382,6 +418,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Datu guztiak (Bezeroak, Eskaerak, Produktuak) datu-basetik kargatu.
+     */
     private void datuakKargatu() {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             DefaultTableModel m1 = TaulaModelatzailea.ereduaEraiki(konexioa
@@ -406,6 +445,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Eskaera berria sortzeko prozesua (Dialogo bidez).
+     */
     private void eskaeraGehitu() {
         EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
         dialog.setVisible(true);
@@ -463,6 +505,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako eskaera editatu.
+     */
     private void eskaeraEditatu() {
         int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
         if (aukeratutakoLerroa == -1) {
@@ -563,6 +608,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako eskaera ezabatu.
+     */
     private void eskaeraEzabatu() {
         int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
         if (aukeratutakoLerroa == -1) {
@@ -589,6 +637,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Hautatutako eskaeraren faktura sortu (PDF).
+     */
     private void fakturaSortu() {
         int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
         if (aukeratutakoLerroa == -1) {
@@ -622,6 +673,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Osatua/Bidalita dauden eskaera guztien fakturak sortu.
+     */
     private void fakturaGuztiakSortu() {
         String sql = "SELECT id_eskaera FROM eskaerak WHERE eskaera_egoera = 'Osatua/Bidalita'";
         java.util.List<Integer> idZerrenda = new java.util.ArrayList<>();
@@ -655,6 +709,9 @@ public class MenuSalmentak extends JFrame {
         JOptionPane.showMessageDialog(this, kontagailua + " faktura sortu dira zuzen.");
     }
 
+    /**
+     * Eskaera baten faktura logikoa ezabatu (fitxategia mantendu daiteke).
+     */
     private void fakturaEzabatu() {
         int aukeratutakoLerroa = eskaeraTaula.getSelectedRow();
         if (aukeratutakoLerroa == -1) {
@@ -681,6 +738,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Bezero baten xehetasunak ikusi.
+     */
     private void bezeroaIkusi() {
         int r = bezeroTaula.getSelectedRow();
         if (r == -1) {
@@ -704,6 +764,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Bezero berria sortu.
+     */
     private void bezeroaGehitu() {
         BezeroaDialog dialog = new BezeroaDialog(this, "Bezero Berria", null, langilea);
         dialog.setVisible(true);
@@ -719,6 +782,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Bezero baten datuak editatu.
+     */
     private void bezeroaEditatu() {
         int r = bezeroTaula.getSelectedRow();
         if (r == -1) {
@@ -749,6 +815,9 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
+    /**
+     * Bezero bat ezabatu.
+     */
     private void bezeroaEzabatu() {
         int r = bezeroTaula.getSelectedRow();
         if (r == -1) {
@@ -776,6 +845,9 @@ public class MenuSalmentak extends JFrame {
     // Klaseko aldagaia JTabbedPane gordetzeko
     private JTabbedPane pestainaPanelaRef;
 
+    /**
+     * Bezero baten eskaera historia ikusteko iragazkia aktibatu eskaeren fitxan.
+     */
     private void bezeroHistorialaIkusi() {
         int r = bezeroTaula.getSelectedRow();
         if (r == -1) {
