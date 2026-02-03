@@ -16,11 +16,10 @@ public class MenuAdministrazioa extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel edukiPanela;
-    private JTable langileTaula, sailaTaula, fitxaketaTaula, fakturaTaula, hornitzaileTaula, herriaTaula,
-            nireFitxaketaTaula;
+    private JTable langileTaula, sailaTaula, fitxaketaTaula, fakturaTaula, hornitzaileTaula, herriaTaula;
     private JTextField bilatuTestua;
     private TableRowSorter<DefaultTableModel> langileOrdenatzailea, sailaOrdenatzailea, fitxaketaOrdenatzailea,
-            fakturaOrdenatzailea, hornitzaileOrdenatzailea, herriaOrdenatzailea, nireFitxaketaOrdenatzailea,
+            fakturaOrdenatzailea, hornitzaileOrdenatzailea, herriaOrdenatzailea,
             unekoOrdenatzailea;
 
     // Fitxaketa informazioa
@@ -175,12 +174,6 @@ public class MenuAdministrazioa extends JFrame {
         herriaTaula = new JTable();
         herriaPanela.add(new JScrollPane(herriaTaula), BorderLayout.CENTER);
 
-        // --- NIRE FITXAKETAK TAB ---
-        JPanel nireFitxaketakTabPanela = new JPanel(new BorderLayout());
-        pestainaPanela.addTab("Nire Fitxaketak", null, nireFitxaketakTabPanela, null);
-        nireFitxaketaTaula = new JTable();
-        nireFitxaketakTabPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
-
         JPanel botoiCrudPanela = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         gehituBotoia = new JButton("Gehitu +");
         editatuBotoia = new JButton("Editatu");
@@ -234,9 +227,7 @@ public class MenuAdministrazioa extends JFrame {
                 case 5:
                     unekoOrdenatzailea = herriaOrdenatzailea;
                     break;
-                case 6:
-                    unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
-                    break;
+
             }
         });
 
@@ -333,15 +324,6 @@ public class MenuAdministrazioa extends JFrame {
             fitxaketaTaula.setModel(mF);
             fitxaketaOrdenatzailea = new TableRowSorter<>(mF);
             fitxaketaTaula.setRowSorter(fitxaketaOrdenatzailea);
-
-            // Nire Fitxaketak (Pertsonala)
-            PreparedStatement pstNF = konexioa.prepareStatement(
-                    "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC");
-            pstNF.setInt(1, langilea.getIdLangilea());
-            DefaultTableModel mNF = TaulaModelatzailea.ereduaEraiki(pstNF.executeQuery());
-            nireFitxaketaTaula.setModel(mNF);
-            nireFitxaketaOrdenatzailea = new TableRowSorter<>(mNF);
-            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
 
             // Fakturak
             // Hobekuntza: Bezeroaren izena erakutsi eskaera ID hutsaren ordez
