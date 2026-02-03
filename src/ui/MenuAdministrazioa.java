@@ -509,6 +509,11 @@ public class MenuAdministrazioa extends JFrame {
 
             JTextField postaKodeaField = new JTextField();
 
+            JTextField hizkuntzaField = new JTextField("Euskara");
+            JTextField saltoField = new JTextField();
+            JCheckBox aktiboBox = new JCheckBox("Aktibo", true);
+            JTextField ibanField = new JTextField();
+
             Object[] message = {
                     "Izena:", izenaField,
                     "Abizena:", abizenaField,
@@ -521,7 +526,11 @@ public class MenuAdministrazioa extends JFrame {
                     "Helbidea:", helbideaField,
                     "Herria:", herriaBox,
                     "", herriBerriaBotoia,
-                    "Posta Kodea:", postaKodeaField
+                    "Posta Kodea:", postaKodeaField,
+                    "Hizkuntza (Euskara, Gaztelania, Frantsesa, Ingelesa):", hizkuntzaField,
+                    "Salto Txartela UID:", saltoField,
+                    "Egoera:", aktiboBox,
+                    "IBAN:", ibanField
             };
 
             int option = JOptionPane.showConfirmDialog(null, message, "Langile Berria", JOptionPane.OK_CANCEL_OPTION);
@@ -541,7 +550,11 @@ public class MenuAdministrazioa extends JFrame {
                             selectedHerria != null ? selectedHerria.getId() : 0,
                             postaKodeaField.getText(),
                             telefonoaField.getText(),
-                            jaiotzaDataField.getText());
+                            jaiotzaDataField.getText(),
+                            hizkuntzaField.getText(),
+                            saltoField.getText(),
+                            aktiboBox.isSelected(),
+                            ibanField.getText());
 
                     datuakKargatuOsoa();
                     JOptionPane.showMessageDialog(this, "Langilea gordeta.");
@@ -677,40 +690,38 @@ public class MenuAdministrazioa extends JFrame {
             int rm = langileTaula.convertRowIndexToModel(r);
             Object id = langileTaula.getModel().getValueAt(rm, 0);
 
-            try (Connection kon = DB_Konexioa.konektatu()) {
-                PreparedStatement pstSel = kon.prepareStatement("SELECT * FROM langileak WHERE id_langilea = ?");
-                pstSel.setObject(1, id);
-                ResultSet rs = pstSel.executeQuery();
-                if (rs.next()) {
-                    JTextField izenaField = new JTextField(rs.getString("izena"));
-                    JTextField abizenaField = new JTextField(rs.getString("abizena"));
-                    JTextField nanField = new JTextField(rs.getString("nan"));
-                    JTextField jaiotzaDataField = new JTextField(rs.getString("jaiotza_data"));
-                    JTextField telefonoaField = new JTextField(rs.getString("telefonoa"));
-                    JTextField emailField = new JTextField(rs.getString("emaila"));
-                    JTextField helbideaField = new JTextField(rs.getString("helbidea"));
-                    JTextField postaKodeaField = new JTextField(rs.getString("posta_kodea"));
+            try {
+                int idInt = (id instanceof Number) ? ((Number) id).intValue() : Integer.parseInt(id.toString());
+                Langilea l = langilea.langileaIkusi(idInt);
+                if (l != null) {
+                    JTextField izenaField = new JTextField(l.getIzena());
+                    JTextField abizenaField = new JTextField(l.getAbizena());
+                    JTextField nanField = new JTextField(l.getNan());
+                    JTextField jaiotzaDataField = new JTextField(
+                            l.getJaiotzaData() != null ? l.getJaiotzaData().toString() : "");
+                    JTextField telefonoaField = new JTextField(l.getTelefonoa());
+                    JTextField emailField = new JTextField(l.getEmaila());
+                    JTextField helbideaField = new JTextField(l.getHelbidea());
+                    JTextField postaKodeaField = new JTextField(l.getPostaKodea());
 
-                    int currentSailaId = rs.getInt("saila_id");
                     JComboBox<ComboItem> sailaBox = new JComboBox<>();
                     ComboItem selectedSaila = null;
                     for (LangileSaila s : langilea.sailakGuztiakIkusi()) {
                         ComboItem item = new ComboItem(s.getIdSaila(), s.getIzena());
                         sailaBox.addItem(item);
-                        if (s.getIdSaila() == currentSailaId) {
+                        if (s.getIdSaila() == l.getSailaId()) {
                             selectedSaila = item;
                         }
                     }
                     if (selectedSaila != null)
                         sailaBox.setSelectedItem(selectedSaila);
 
-                    int currentHerriaId = rs.getInt("herria_id");
                     JComboBox<ComboItem> herriaBox = new JComboBox<>();
                     ComboItem selectedHerria = null;
                     for (Herria h : langilea.herriakIkusi()) {
                         ComboItem item = new ComboItem(h.getIdHerria(), h.getIzena());
                         herriaBox.addItem(item);
-                        if (h.getIdHerria() == currentHerriaId) {
+                        if (h.getIdHerria() == l.getHerriaId()) {
                             selectedHerria = item;
                         }
                     }
@@ -746,6 +757,12 @@ public class MenuAdministrazioa extends JFrame {
                         }
                     });
 
+                    JTextField hizkuntzaField = new JTextField(l.getHizkuntza());
+                    JPasswordField passFieldInput = new JPasswordField(l.getPasahitza());
+                    JTextField saltoField = new JTextField(l.getSaltoTxartelaUid());
+                    JCheckBox aktiboBox = new JCheckBox("Aktibo", l.isAktibo());
+                    JTextField ibanField = new JTextField(l.getIban());
+
                     Object[] message = {
                             "Izena:", izenaField,
                             "Abizena:", abizenaField,
@@ -753,11 +770,16 @@ public class MenuAdministrazioa extends JFrame {
                             "Jaiotza Data:", jaiotzaDataField,
                             "Telefonoa:", telefonoaField,
                             "Email:", emailField,
+                            "Pasahitza:", passFieldInput,
                             "Saila:", sailaBox,
                             "Helbidea:", helbideaField,
                             "Posta Kodea:", postaKodeaField,
                             "Herria:", herriaBox,
-                            "", herriBerriaBotoia
+                            "", herriBerriaBotoia,
+                            "Hizkuntza:", hizkuntzaField,
+                            "Salto Txartela UID:", saltoField,
+                            "Egoera:", aktiboBox,
+                            "IBAN:", ibanField
                     };
 
                     int option = JOptionPane.showConfirmDialog(null, message, "Editatu Langilea",
@@ -767,7 +789,7 @@ public class MenuAdministrazioa extends JFrame {
                         ComboItem selHerria = (ComboItem) herriaBox.getSelectedItem();
 
                         langilea.langileaEditatu(
-                                (Integer) id,
+                                idInt,
                                 izenaField.getText(),
                                 abizenaField.getText(),
                                 nanField.getText(),
@@ -777,10 +799,14 @@ public class MenuAdministrazioa extends JFrame {
                                 selHerria != null ? selHerria.getId() : 0,
                                 postaKodeaField.getText(),
                                 telefonoaField.getText(),
-                                jaiotzaDataField.getText());
+                                jaiotzaDataField.getText(),
+                                hizkuntzaField.getText(),
+                                new String(passFieldInput.getPassword()),
+                                saltoField.getText(),
+                                aktiboBox.isSelected(),
+                                ibanField.getText());
 
                         datuakKargatuOsoa();
-                        JOptionPane.showMessageDialog(this, "Langilea eguneratuta.");
                     }
                 }
             } catch (Exception e) {
