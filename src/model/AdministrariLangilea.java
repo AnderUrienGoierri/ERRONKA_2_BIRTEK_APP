@@ -16,10 +16,11 @@ public class AdministrariLangilea extends Langilea {
     }
 
     public void langileaSortu(String izena, String abizena, String nan, String emaila, String pasahitza, int sailaId,
-            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData)
+            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData,
+            String hizkuntza, String saltoTxartelaUid, boolean aktibo, String iban)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data, hizkuntza, salto_txartela_uid, aktibo, iban) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -32,6 +33,10 @@ public class AdministrariLangilea extends Langilea {
             pst.setString(9, postaKodea);
             pst.setString(10, telefonoa);
             pst.setString(11, jaiotzaData);
+            pst.setString(12, hizkuntza);
+            pst.setString(13, saltoTxartelaUid);
+            pst.setBoolean(14, aktibo);
+            pst.setString(15, iban);
             pst.executeUpdate();
         }
     }
@@ -46,10 +51,11 @@ public class AdministrariLangilea extends Langilea {
     }
 
     public void langileaEditatu(int idLangilea, String izena, String abizena, String nan, String emaila, int sailaId,
-            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData)
+            String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData,
+            String hizkuntza, String pasahitza, String saltoTxartelaUid, boolean aktibo, String iban)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, jaiotza_data = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+            String sql = "UPDATE langileak SET izena = ?, abizena = ?, nan = ?, emaila = ?, saila_id = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, jaiotza_data = ?, hizkuntza = ?, pasahitza = ?, salto_txartela_uid = ?, aktibo = ?, iban = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -61,7 +67,12 @@ public class AdministrariLangilea extends Langilea {
             pst.setString(8, postaKodea);
             pst.setString(9, telefonoa);
             pst.setString(10, jaiotzaData);
-            pst.setInt(11, idLangilea);
+            pst.setString(11, hizkuntza);
+            pst.setString(12, pasahitza);
+            pst.setString(13, saltoTxartelaUid);
+            pst.setBoolean(14, aktibo);
+            pst.setString(15, iban);
+            pst.setInt(16, idLangilea);
             pst.executeUpdate();
         }
     }
