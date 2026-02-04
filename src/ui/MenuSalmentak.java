@@ -198,16 +198,12 @@ public class MenuSalmentak extends JFrame {
         eskaeraFakturaEzabatuBotoia.addActionListener(e -> fakturaEzabatu());
         eskaeraFakturaGuztiakBotoia.addActionListener(e -> fakturaGuztiakSortu());
 
-        JButton eskaeraGarbituBotoia = new JButton("Filtroa Garbitu");
-        eskaeraGarbituBotoia.addActionListener(e -> garbituEskaeraFiltroa());
-
         eskaeraBotoiPanela.add(eskaeraGehituBotoia);
         eskaeraBotoiPanela.add(eskaeraEditatuBotoia);
         eskaeraBotoiPanela.add(eskaeraEzabatuBotoia);
         eskaeraBotoiPanela.add(eskaeraFakturaBotoia);
         eskaeraBotoiPanela.add(eskaeraFakturaEzabatuBotoia);
         eskaeraBotoiPanela.add(eskaeraFakturaGuztiakBotoia);
-        eskaeraBotoiPanela.add(eskaeraGarbituBotoia);
 
         eskaeraPanela.add(eskaeraBotoiPanela, BorderLayout.SOUTH);
 
@@ -678,6 +674,7 @@ public class MenuSalmentak extends JFrame {
                 "Faktura Ezabatu", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             try {
                 langilea.fakturaEzabatu(idEskaera);
+                datuakKargatu();
                 JOptionPane.showMessageDialog(this, "Faktura ondo ezabatu da.");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -928,13 +925,6 @@ public class MenuSalmentak extends JFrame {
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
             }
-        }
-    }
-
-    private void garbituEskaeraFiltroa() {
-        bilatuTestua.setText("");
-        if (eskaeraOrdenatzailea != null) {
-            eskaeraOrdenatzailea.setRowFilter(null);
         }
     }
 
