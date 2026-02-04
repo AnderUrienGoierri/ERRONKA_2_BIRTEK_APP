@@ -872,11 +872,36 @@ public class SalmentaLangilea extends Langilea {
      * @throws Exception Errorea ezabatzean.
      */
     public void eskaeraEzabatu(int idEskaera) throws Exception {
-        String sql = "DELETE FROM eskaerak WHERE id_eskaera=?";
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement pst = konexioa.prepareStatement(sql)) {
-            pst.setInt(1, idEskaera);
-            pst.executeUpdate();
+        Connection konexioa = null;
+        try {
+            konexioa = DB_Konexioa.konektatu();
+            konexioa.setAutoCommit(false);
+
+            // 1. Eskaera lerroak ezabatu (Foreign Key constraint dela eta)
+            String sqlLerroak = "DELETE FROM eskaera_lerroak WHERE eskaera_id = ?";
+            try (PreparedStatement pstLerroak = konexioa.prepareStatement(sqlLerroak)) {
+                pstLerroak.setInt(1, idEskaera);
+                pstLerroak.executeUpdate();
+            }
+
+            // 2. Eskaera bera ezabatu
+            String sqlEskaera = "DELETE FROM eskaerak WHERE id_eskaera = ?";
+            try (PreparedStatement pstEskaera = konexioa.prepareStatement(sqlEskaera)) {
+                pstEskaera.setInt(1, idEskaera);
+                pstEskaera.executeUpdate();
+            }
+
+            konexioa.commit();
+        } catch (SQLException ex) {
+            if (konexioa != null) {
+                konexioa.rollback();
+            }
+            throw ex;
+        } finally {
+            if (konexioa != null) {
+                konexioa.setAutoCommit(true);
+                konexioa.close();
+            }
         }
     }
 }
