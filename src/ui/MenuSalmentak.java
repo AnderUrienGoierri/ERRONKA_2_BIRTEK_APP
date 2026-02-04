@@ -59,6 +59,15 @@ public class MenuSalmentak extends JFrame {
             }
         });
         bilatzailePanela.add(bilatuTestua);
+
+        JButton eguneratuBotoia = new JButton("Eguneratu");
+        eguneratuBotoia.setBackground(new Color(173, 216, 230)); // Light Blue
+        eguneratuBotoia.addActionListener(e -> {
+            datuakKargatu();
+            kargatuKategoriak();
+        });
+        bilatzailePanela.add(eguneratuBotoia);
+
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
         // ESKUINALDEA: Erabiltzailea + Fitxaketa + Saioa Itxi
@@ -811,6 +820,10 @@ public class MenuSalmentak extends JFrame {
     }
 
     private void kargatuKategoriak() {
+        if (kategoriaFiltroa != null) {
+            kategoriaFiltroa.removeAllItems();
+            kategoriaFiltroa.addItem("Kategoria Denak");
+        }
         try (Connection konexioa = DB_Konexioa.konektatu();
                 Statement stmt = konexioa.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT izena FROM produktu_kategoriak")) {
