@@ -111,6 +111,16 @@ public class MenuLogistika extends JFrame {
             }
         });
         bilatzailePanela.add(bilatuTestua);
+
+        JButton eguneratuBotoia = new JButton("Eguneratu");
+        eguneratuBotoia.setBackground(new Color(173, 216, 230)); // Light Blue
+        eguneratuBotoia.addActionListener(e -> {
+            sarreraDatuakKargatu();
+            biltegiDatuakKargatu();
+            produktuDatuakKargatu();
+            eskaeraDatuakKargatu();
+        });
+        bilatzailePanela.add(eguneratuBotoia);
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
         // ESKUINALDEA: Erabiltzailea + Fitxaketa + Saioa Itxi

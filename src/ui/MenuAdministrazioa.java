@@ -75,6 +75,12 @@ public class MenuAdministrazioa extends JFrame {
             }
         });
         bilatzailePanela.add(bilatuTestua);
+
+        JButton eguneratuBotoia = new JButton("Eguneratu");
+        eguneratuBotoia.setBackground(new Color(173, 216, 230)); // Light Blue
+        eguneratuBotoia.addActionListener(e -> datuakKargatuOsoa());
+        bilatzailePanela.add(eguneratuBotoia);
+
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
         // ESKUINALDEA: Erabiltzailearen informazioa + Fitxaketa + Saioa Itxi
