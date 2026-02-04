@@ -30,7 +30,7 @@ public class MenuAdministrazioa extends JFrame {
 
     // Fitxaketa informazioa
     private JLabel fitxaketaInfoEtiketa;
-    private JButton gehituBotoia, editatuBotoia, ezabatuBotoia, ikusiFakturaBotoia;
+    private JButton gehituBotoia, editatuBotoia, ezabatuBotoia, ikusiFakturaBotoia, ikusiKbBotoia;
 
     // Erabiltzailearen datuak
     // Erabiltzailea (OOP)
@@ -194,16 +194,20 @@ public class MenuAdministrazioa extends JFrame {
         ezabatuBotoia = new JButton("Ezabatu");
         ikusiFakturaBotoia = new JButton("Ikusi Faktura");
         ikusiFakturaBotoia.setVisible(false); // Hasieran ezkutatu
+        ikusiKbBotoia = new JButton("Kurrikuluma Ikusi");
+        ikusiKbBotoia.setVisible(true); // Langileak hasieran hautatuta dagoenez, ikusi
 
         gehituBotoia.addActionListener(e -> gehituElementua(pestainaPanela.getSelectedIndex()));
         editatuBotoia.addActionListener(e -> editatuElementua(pestainaPanela.getSelectedIndex()));
         ezabatuBotoia.addActionListener(e -> ezabatuElementua(pestainaPanela.getSelectedIndex()));
         ikusiFakturaBotoia.addActionListener(e -> ikusiFaktura());
+        ikusiKbBotoia.addActionListener(e -> ikusiKurrikuluma());
 
         botoiCrudPanela.add(gehituBotoia);
         botoiCrudPanela.add(editatuBotoia);
         botoiCrudPanela.add(ezabatuBotoia);
         botoiCrudPanela.add(ikusiFakturaBotoia);
+        botoiCrudPanela.add(ikusiKbBotoia);
 
         JPanel behekoPanela = new JPanel(new BorderLayout());
         behekoPanela.add(botoiCrudPanela, BorderLayout.NORTH);
@@ -212,6 +216,7 @@ public class MenuAdministrazioa extends JFrame {
             bilatuTestua.setText("");
             int index = pestainaPanela.getSelectedIndex();
             ikusiFakturaBotoia.setVisible(index == 3); // 3 = Fakturak
+            ikusiKbBotoia.setVisible(index == 0); // 0 = Langileak
 
             // Fakturak (index 3) denean, ezin da gehitu, editatu edo ezabatu
             // Hornitzaileak (index 4) denean, ezin da gehitu
@@ -1138,6 +1143,28 @@ public class MenuAdministrazioa extends JFrame {
     /**
      * ComboBox-erako klase laguntzailea.
      */
+    /**
+     * Hautatutako langilearen kurrikuluma ikusteko metodoa.
+     */
+    private void ikusiKurrikuluma() {
+        int aukeratutakoLerroa = langileTaula.getSelectedRow();
+        if (aukeratutakoLerroa == -1) {
+            JOptionPane.showMessageDialog(this, "Aukeratu langile bat kurrikuluma ikusteko.");
+            return;
+        }
+
+        aukeratutakoLerroa = langileTaula.convertRowIndexToModel(aukeratutakoLerroa);
+        Object idObj = langileTaula.getModel().getValueAt(aukeratutakoLerroa, 0);
+        int idLangilea = (idObj instanceof Number) ? ((Number) idObj).intValue()
+                : Integer.parseInt(idObj.toString());
+
+        try {
+            langilea.kurrikulumaIkusi(idLangilea);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+        }
+    }
+
     private static class ComboItem {
         private int id;
         private String label;

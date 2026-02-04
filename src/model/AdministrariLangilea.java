@@ -4,7 +4,11 @@ import db.DB_Konexioa;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.awt.Desktop;
 
 /**
  * AdministrariLangilea klasea.
@@ -566,6 +570,42 @@ public class AdministrariLangilea extends Langilea {
             pst.setString(3, nazioa);
             pst.setInt(4, idHerria);
             pst.executeUpdate();
+        }
+    }
+
+    /**
+     * Langile baten kurrikuluma (PDF BLOB) lortzen du eta irekitzen du.
+     *
+     * @param idLangilea Langilearen IDa.
+     * @throws Exception Errorea datuak lortzean edo fitxategia irekitzean.
+     */
+    public void kurrikulumaIkusi(int idLangilea) throws Exception {
+        String sql = "SELECT kurrikuluma FROM langileak WHERE id_langilea = ?";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setInt(1, idLangilea);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    byte[] pdfBytes = rs.getBytes("kurrikuluma");
+                    if (pdfBytes != null && pdfBytes.length > 0) {
+                        File tempFile = File.createTempFile("kurrikuluma_" + idLangilea + "_", ".pdf");
+                        tempFile.deleteOnExit();
+                        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                            fos.write(pdfBytes);
+                        }
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().open(tempFile);
+                        } else {
+                            throw new Exception(
+                                    "Sistemak ez du fitxategiak irekitzeko aukera onartzen (Desktop ez da bateragarria).");
+                        }
+                    } else {
+                        throw new Exception("Ez dago kurrikulumik igota");
+                    }
+                } else {
+                    throw new Exception("Ez da langilea aurkitu.");
+                }
+            }
         }
     }
 }

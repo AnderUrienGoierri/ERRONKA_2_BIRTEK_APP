@@ -330,7 +330,7 @@ CREATE TABLE IF NOT EXISTS eskaerak (
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     guztira_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     
-    faktura_zenbakia VARCHAR(20) UNIQUE NOT NULL,
+    faktura_zenbakia VARCHAR(20) UNIQUE,
 	faktura_url VARCHAR(255),
     
     eskaera_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
