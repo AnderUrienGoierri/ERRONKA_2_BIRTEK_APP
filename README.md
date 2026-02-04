@@ -166,26 +166,31 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
   - Erabiltzailea identifikatu eta dagokion menua irekitzen du bere rolaren (Saila) arabera.
 
 - **`MenuSalmentak`**: Salmenta sailaren interfazea.
-  - `eskaeraGehitu()`, `eskaeraEditatu()`, `eskaeraEzabatu()`: Eskaeren CRUD kudeaketa, modeloko logikari deituz (SalmentaLangilea).
+  - `eskaeraGehitu()`, `eskaeraEditatu()`, `eskaeraEzabatu()`: Eskaeren CRUD kudeaketa, modeloko logikari deituz (**delegazioa**).
   - `fakturaSortu()`: Hautatutako eskaeraren faktura sortu eta ireki.
+  - `bilatzailePanela`: **"Eguneratu"** botoia dauka datu guztiak freskatzeko.
   - `garbituEskaeraFiltroa()`: Eskaeren fitxan bilatzailea eta filtroak garbitzen ditu.
   - `fitxatu(...)`: Langilearen sarrera/irteera botoiak.
 
 - **`MenuLogistika`**: Biltegi sailaren interfazea.
+  - `bilatzailePanela`: **"Eguneratu"** botoia dauka sarrerak, biltegiak eta eskaerak freskatzeko.
   - `sarreraTabSortu()`: Sarrerak ikusteko eta kudeatzeko fitxa. "Sarrera Berria +" botoia daukan elkarrizketa-leihoa irekitzeko.
   - `ikusiSarreraLerroak()`: Sarrera baten xehetasunak erakusten dituen lehioa ireki.
   - `editatuSarrera()`: Sarreraren egoera aldatzeko lehioa ireki.
-  - `ezabatuSarrera()`: Sarrera bat ezabatu.
+  - `ezabatuSarrera()`: Sarrera bat ezabatu (ereduaren bidez).
   - `ikusiEskaeraLerroak()`: Eskaera baten lerroak ikusi eta kudeatzeko lehioa.
   - `editatuProduktuOharra()`: Produktu bati oharra gehitu/aldatu.
   - `igoIrudia()`: Produktuei irudiak esleitzeko fitxategi-hautatzailea.
 
 - **`MenuTeknikoa`**: SAT / Konponketa sailaren interfazea.
+  - `bilatzailePanela`: **"Eguneratu"** botoia dauka konponketak eta akatsak freskatzeko.
   - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
+  - `ezabatuElementua()`: Konponketak eta produktuak ezabatu, **modelora delegatuz**.
 
 - **`MenuAdministrazioa`**: Kudeaketa orokorra.
   - `datuakKargatuOsoa()`: Langileak, sailak eta datu-maisuak kudeatzeko taulak (CRUD eragiketekin).
-  - `gehituElementua(...)`, `editatuElementua(...)`, `ezabatuElementua(...)`: Datu orokorren kudeaketa.
+  - `bilatzailePanela`: **"Eguneratu"** botoia dauka datu-maisu guztiak freskatzeko.
+  - `gehituElementua(...)`, `editatuElementua(...)`, `ezabatuElementua(...)`: Datu orokorren kudeaketa, **modeloko metodoen bidez**.
 
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
   - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).

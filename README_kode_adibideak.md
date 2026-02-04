@@ -86,22 +86,31 @@ public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int her
 
 ### `model.SalmentaLangilea`
 
-Salmenta espezifikoak diren funtzioak (adb. faktura sortu).
+Salmenta espezifikoak diren funtzioak (adb. faktura sortu eta eskaera osoa kudeatu).
 
-// Eskaera osoa transakzio bidez sortzeko metodoa
-public void eskaeraOsoaSortu(Eskaera e, List<EskaeraLerroa> lerroak) throws SQLException {
-Connection kon = DB_Konexioa.konektatu();
-try {
-kon.setAutoCommit(false);
-// ... Eskaera nagusia txertatu ...
-// ... Lerroak batch bidez txertatu ...
-kon.commit();
-} catch (SQLException ex) {
-kon.rollback();
-throw ex;
-}
-}
+**Eskaera osoa transakzio bidez sortu:**
 
+```java
+public int eskaeraOsoaSortu(Eskaera e, List<EskaeraLerroa> lerroak) throws SQLException {
+    try (Connection kon = DB_Konexioa.konektatu()) {
+        kon.setAutoCommit(false);
+        // 1. Eskaera nagusia txertatu...
+        // 2. Sortutako ID-a lortu...
+        // 3. Lerroak banan-banan txertatu...
+        kon.commit();
+        return idEskaera;
+    } catch (SQLException ex) {
+        // Errorea badago, atzera egin (Rollback)
+        throw ex;
+    }
+}
+```
+
+```java
+// Faktura sortzeko laguntzailea
+public File fakturaSortu(int idEskaera) throws Exception {
+    // FakturaPDF utilitatea erabili...
+}
 ```
 
 ### `model.AdministrariLangilea`
@@ -118,15 +127,16 @@ Administrazio funtzioak, hala nola langile berriak sortzea.
 
 Salmenta menu nagusiaren logika.
 
-**Eskaera Sortu:**
+**Eskaera Sortu (Modelora delegatuz):**
 
+```java
 private void eskaeraGehitu() {
     EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
     dialog.setVisible(true);
     if (dialog.isOnartua()) {
         try {
-            // Logika guztia modelora mugitu da
-            salmentaLangilea.eskaeraOsoaSortu(dialog.getEskaera(), dialog.getEskaeraLerroak());
+            // Logika guztia modelora mugitu da:
+            langilea.eskaeraOsoaSortu(dialog.getEskaeraObektua(), dialog.getLerro Zerrenda());
             datuakKargatu();
             JOptionPane.showMessageDialog(this, "Eskaera ondo sortu da.");
         } catch (SQLException e) {

@@ -411,7 +411,8 @@ public class SalmentaLangilea extends Langilea {
         // mota already retrieved
         String deskribapena = rs.getString("deskribapena");
         String irudiaUrl = rs.getString("irudia_url");
-        Integer biltegiId = (Integer) rs.getObject("biltegi_id");
+        Object bIdObj = rs.getObject("biltegi_id");
+        Integer biltegiId = (bIdObj == null) ? null : ((Number) bIdObj).intValue();
         String egoera = rs.getString("produktu_egoera");
         String egoeraOharra = rs.getString("produktu_egoera_oharra");
         boolean salgai = rs.getBoolean("salgai");
