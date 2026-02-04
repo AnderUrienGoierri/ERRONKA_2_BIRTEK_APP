@@ -167,8 +167,7 @@ public class Langilea extends Pertsona {
 
     // --- FITXAKETA LOGIKA (OOP) ---
 
-    // Langile batatek fitxaketa egiteko metodoa
-    // Langile batatek fitxaketa egiteko metodoa
+    // Langile batentzat fitxaketa egiteko metodoa
     /**
      * Fitxaketa (Sarrera edo Irteera) bat erregistratzen du.
      * Lehenik egiaztatzen du ea langilea barruan edo kanpoan dagoen, egoera

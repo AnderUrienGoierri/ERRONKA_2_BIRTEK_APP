@@ -59,7 +59,7 @@ public class MenuTeknikoa extends JFrame {
         bilatzailePanela.add(bilatuTestua);
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
-        // ESKUINA: Erabiltzailea + Fitxaketa + Logout
+        // ESKUINALDEA: Erabiltzailea + Fitxaketa + Saioa Itxi
         JPanel eskuinekoPanela = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 
         JLabel erabiltzaileEtiketa = new JLabel(langilea.getSailaId() + " | " + langilea.getIzena() + " "
@@ -146,7 +146,7 @@ public class MenuTeknikoa extends JFrame {
         });
 
         JLabel informazioEtiketa = new JLabel(
-                "Klik bikoitza egin konponketa bat editatzeko / Doble click para editar");
+                "Klik bikoitza egin konponketa bat kudeatzeko");
         informazioEtiketa.setHorizontalAlignment(SwingConstants.CENTER);
         informazioEtiketa.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         konponketaPanela.add(informazioEtiketa, BorderLayout.SOUTH);

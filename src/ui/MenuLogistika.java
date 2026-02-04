@@ -136,7 +136,7 @@ public class MenuLogistika extends JFrame {
         bilatzailePanela.add(bilatuTestua);
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
-        // ESKUINA: Erabiltzailea + Fitxaketa + Logout
+        // ESKUINALDEA: Erabiltzailea + Fitxaketa + Saioa Itxi
         JPanel erabiltzaileInfoPanela = new JPanel(new GridBagLayout());
         erabiltzaileInfoPanela.setOpaque(false);
 
@@ -308,8 +308,8 @@ public class MenuLogistika extends JFrame {
         dialog.setVisible(true);
     }
 
-    // --- TAB SARRERAK ---
-    // --- TAB SARRERAK ---
+    // --- SARRERAK FITXA ---
+    // --- SARRERAK FITXA ---
     /**
      * Sarreren fitxa ("tab") sortu eta konfiguratu.
      */
@@ -332,7 +332,7 @@ public class MenuLogistika extends JFrame {
         eguneratuBotoia.addActionListener(e -> sarreraDatuakKargatu());
         goikoAukeraPanela.add(eguneratuBotoia);
 
-        // NEW BUTTONS
+        // BOTOI BERRIAK
         JButton ikusiLerroakBotoia = new JButton("Ikusi Lerroak");
         ikusiLerroakBotoia.addActionListener(e -> ikusiSarreraLerroak());
         goikoAukeraPanela.add(ikusiLerroakBotoia);
@@ -355,7 +355,7 @@ public class MenuLogistika extends JFrame {
         pestainaPanela.addTab("Sarrerak", null, sarreraPanela, null);
     }
 
-    // --- TAB BILTEGIAK ---
+    // --- BILTEGIAK FITXA ---
     /**
      * Biltegien fitxa sortu.
      */
@@ -384,7 +384,7 @@ public class MenuLogistika extends JFrame {
         pestainaPanela.addTab("Biltegiak", null, biltegiPanela, null);
     }
 
-    // --- TAB PRODUKTUAK ---
+    // --- PRODUKTUAK FITXA ---
     /**
      * Produktuen fitxa sortu.
      */
@@ -418,7 +418,7 @@ public class MenuLogistika extends JFrame {
         pestainaPanela.addTab("Produktuak eta Kokapena", null, produktuPanela, null);
     }
 
-    // --- TAB ESKAERAK (NEW) ---
+    // --- ESKAERAK FITXA ---
     /**
      * Eskaeren fitxa sortu.
      */
@@ -456,7 +456,7 @@ public class MenuLogistika extends JFrame {
         pestainaPanela.addTab("Eskaerak", null, eskaeraPanela, null);
     }
 
-    // --- TAB SARRERA BERRIA ---
+    // --- SARRERA BERRIA FITXA ---
     /**
      * Sarrera berria egiteko fitxa sortu.
      */

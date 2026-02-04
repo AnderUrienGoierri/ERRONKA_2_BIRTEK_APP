@@ -38,7 +38,7 @@ import db.DB_Konexioa;
 public class FakturaPDF {
 
     /**
-     * Faktura PDF bat sortzen du emandako datuekin (Domain objects).
+     * Faktura PDF bat sortzen du emandako datuekin (objektuen bidez).
      *
      * @param fitxategiPath PDF fitxategia gordeko den bidea.
      * @param eskaera       Eskaera objektua.
@@ -69,10 +69,10 @@ public class FakturaPDF {
         Font taulaGoiburua = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
 
         // GOIBURUA: LOGOA + ENPRESA DATUAK (Taula batekin hobeto lerrokatzeko)
-        PdfPTable headerTable = new PdfPTable(2);
-        headerTable.setWidthPercentage(100);
-        headerTable.setWidths(new float[] { 1, 1 });
-        headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+        PdfPTable goiburukoTaula = new PdfPTable(2);
+        goiburukoTaula.setWidthPercentage(100);
+        goiburukoTaula.setWidths(new float[] { 1, 1 });
+        goiburukoTaula.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
         // LOGOA (Ezkerrean)
         try {
@@ -84,7 +84,7 @@ public class FakturaPDF {
                 PdfPCell logoCell = new PdfPCell(img);
                 logoCell.setBorder(Rectangle.NO_BORDER);
                 logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                headerTable.addCell(logoCell);
+                goiburukoTaula.addCell(logoCell);
             } else {
                 // beste bide batetik saiatzen gara
                 logoPath = "C:\\Ander\\Workspace\\Java\\eclipse-workspace\\ERRONKA_2_BIRTEK_APP\\irudiak\\birtek_logo_zuri_borobila.png";
@@ -94,13 +94,13 @@ public class FakturaPDF {
                     PdfPCell logoCell = new PdfPCell(img);
                     logoCell.setBorder(Rectangle.NO_BORDER);
                     logoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    headerTable.addCell(logoCell);
+                    goiburukoTaula.addCell(logoCell);
                 } else {
-                    headerTable.addCell(""); // Hutsik
+                    goiburukoTaula.addCell(""); // Hutsik
                 }
             }
         } catch (Exception e) {
-            headerTable.addCell(""); // Errorea egonez gero, hutsik
+            goiburukoTaula.addCell(""); // Errorea egonez gero, hutsik
         }
 
         // ENPRESA DATUAK (Eskuinean)
@@ -110,9 +110,9 @@ public class FakturaPDF {
         PdfPCell infoCell = new PdfPCell(empresaInfo);
         infoCell.setBorder(Rectangle.NO_BORDER);
         infoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        headerTable.addCell(infoCell);
+        goiburukoTaula.addCell(infoCell);
 
-        document.add(headerTable);
+        document.add(goiburukoTaula);
 
         document.add(Chunk.NEWLINE);
 
@@ -178,7 +178,7 @@ public class FakturaPDF {
     }
 
     private static String getProduktuaIzena(int produktuaId) {
-        String izena = "Produktua " + produktuaId; // Fallback
+        String izena = "Produktua " + produktuaId; // Ordezko izena
         String sql = "SELECT izena FROM produktuak WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {

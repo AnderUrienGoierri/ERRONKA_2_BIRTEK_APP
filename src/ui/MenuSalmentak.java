@@ -61,7 +61,7 @@ public class MenuSalmentak extends JFrame {
         bilatzailePanela.add(bilatuTestua);
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
-        // ESKUINA: Erabiltzailea + Fitxaketa + Logout
+        // ESKUINALDEA: Erabiltzailea + Fitxaketa + Saioa Itxi
         JPanel eskuinekoPanela = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 
         JLabel erabiltzaileEtiketa = new JLabel(langilea.getIzena() + " " + langilea.getAbizena());
@@ -361,19 +361,19 @@ public class MenuSalmentak extends JFrame {
             if (produktuOrdenatzailea != null) {
                 java.util.List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
 
-                // Testu filtroa
+                // Testu iragazkia
                 String t = bilatuTestua.getText();
                 if (!t.isEmpty()) {
                     filters.add(RowFilter.regexFilter("(?i)" + t));
                 }
 
-                // Kategoria filtroa
+                // Kategoria iragazkia
                 String kat = (String) kategoriaFiltroa.getSelectedItem();
                 if (kat != null && !"Kategoria Denak".equals(kat)) {
                     filters.add(RowFilter.regexFilter("^" + kat + "$", 1)); // 1 = Kategoria zutabea
                 }
 
-                // Mota filtroa
+                // Mota iragazkia
                 String mota = (String) motaFiltroa.getSelectedItem();
                 if (mota != null && !"Mota Denak".equals(mota)) {
                     filters.add(RowFilter.regexFilter("^" + mota + "$", 4)); // 4 = Mota zutabea

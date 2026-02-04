@@ -77,10 +77,10 @@ public class MenuAdministrazioa extends JFrame {
         bilatzailePanela.add(bilatuTestua);
         goikoPanela.add(bilatzailePanela, BorderLayout.WEST);
 
-        // ESKUINA: Erabiltzaile Info + Fitxaketa + Logout
+        // ESKUINALDEA: Erabiltzailearen informazioa + Fitxaketa + Saioa Itxi
         JPanel eskuinekoPanela = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 
-        // 1. User Info Label
+        // 1. Erabiltzailearen informazioaren etiketa
         JLabel erabiltzaileEtiketa = new JLabel(langilea.getIzena() + " " + langilea.getAbizena());
         erabiltzaileEtiketa.setFont(new Font("SansSerif", Font.BOLD, 12));
         erabiltzaileEtiketa.setForeground(new Color(0, 102, 102));
@@ -126,7 +126,7 @@ public class MenuAdministrazioa extends JFrame {
         fitxaketaPanela.add(botoiPanela);
         fitxaketaPanela.add(fitxaketaInfoEtiketa);
 
-        // 3. Logout
+        // 3. Saioa Itxi
         JButton saioaItxiBotoia = new JButton("Saioa Itxi");
         saioaItxiBotoia.setBackground(new Color(220, 20, 60));
         saioaItxiBotoia.setForeground(Color.WHITE);
