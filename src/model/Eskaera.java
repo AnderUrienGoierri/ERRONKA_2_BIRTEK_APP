@@ -3,6 +3,11 @@ package model;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ * Eskaera klasea.
+ * Bezeroen eskaeren informazioa kudeatzen du.
+ * Eskaeraren data, prezioa, egoera eta lotutako bezero/langilea gordetzen ditu.
+ */
 public class Eskaera {
     private int idEskaera;
     private int bezeroaId;
@@ -12,6 +17,17 @@ public class Eskaera {
     private BigDecimal guztiraPrezioa;
     private String eskaeraEgoera;
 
+    /**
+     * Eskaera eraikitzailea.
+     *
+     * @param idEskaera      Eskaeraren IDa.
+     * @param bezeroaId      Bezeroaren IDa.
+     * @param langileaId     Langilearen IDa (aukerakoa).
+     * @param data           Eskaeraren data.
+     * @param eguneratzeData Azken eguneratze data.
+     * @param guztiraPrezioa Eskaeraren prezio totala.
+     * @param eskaeraEgoera  Eskaeraren egoera.
+     */
     public Eskaera(int idEskaera, int bezeroaId, Integer langileaId, Timestamp data, Timestamp eguneratzeData,
             BigDecimal guztiraPrezioa, String eskaeraEgoera) {
         this.idEskaera = idEskaera;
@@ -79,11 +95,4 @@ public class Eskaera {
         this.eskaeraEgoera = eskaeraEgoera;
     }
 
-    public EskaeraEgoera getEgoera() {
-        return EskaeraEgoera.fromString(this.eskaeraEgoera);
-    }
-
-    public void setEgoera(EskaeraEgoera egoera) {
-        this.eskaeraEgoera = egoera.getDeskribapena();
-    }
 }

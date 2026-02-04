@@ -152,8 +152,9 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 
 #### Beste Klaseak
 
-- **`FakturaPDF`**: PDF dokumentuak sortzeko utilitatea (iText liburutegia).
+- **`FakturaPDF`**: PDF dokumentuak sortzeko eta kudeatzeko utilitatea (iText liburutegia).
   - `sortu(...)`: Goiburua, logoa, bezero datuak, lerroak eta totalak dituen faktura PDFa sortzen du.
+  - `fakturaIgoZerbitzarira(String fitxategiPath, String fitxategiIzena)`: Sortutako faktura FTP bidez zerbitzarira (XAMPP/htdocs/fakturak) igotzen du.
 - **Entitateak (POJO)**: Datu-baseko taulen errepresentazio soilak (Getter/Setter-ekin):
   - `Bezeroa`, `Produktua` (Eramangarria, Mugikorra, etab.), `Eskaera`, `EskaeraLerroa`, `Fitxaketa`, `Hornitzailea`, `Konponketa`, `Akatsa`, `Herria`.
 

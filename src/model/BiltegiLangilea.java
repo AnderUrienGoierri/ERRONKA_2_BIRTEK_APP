@@ -6,8 +6,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * BiltegiLangilea klasea.
+ * Langilea klasearen azpiklasea da, eta biltegiko langileen funtzioak ditu.
+ * Produktuak, sarrerak, biltegiak kudeatzeko metodoak eskaintzen ditu.
+ */
 public class BiltegiLangilea extends Langilea {
 
+    /**
+     * BiltegiLangilea eraikitzailea.
+     * Langilea objektu batetik abiatuta BiltegiLangilea sortzen du.
+     *
+     * @param l Langilea objektua.
+     */
     public BiltegiLangilea(Langilea l) {
         super(l.getIdLangilea(), l.getIzena(), l.getAbizena(), l.getNan(), l.getJaiotzaData(), l.getHerriaId(),
                 l.getHelbidea(), l.getPostaKodea(), l.getTelefonoa(), l.getEmaila(), l.getHizkuntza(),
@@ -15,16 +26,31 @@ public class BiltegiLangilea extends Langilea {
                 l.isAktibo(), l.getSailaId(), l.getIban(), l.getKurrikuluma());
     }
 
+    /**
+     * Biltegi berri bat sortzen du.
+     *
+     * @param izena Biltegiaren izena.
+     * @param sku   Biltegiaren SKU kodea.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void biltegiaSortu(String izena, String sku) throws SQLException {
         String sql = "INSERT INTO biltegiak (izena, biltegi_sku) VALUES (?, ?)";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setString(1, izena);
             pst.setString(2, sku);
+
             pst.executeUpdate();
         }
     }
 
+    /**
+     * Biltegi bat ezabatzen du.
+     *
+     * @param idBiltegia Ezabatu nahi den biltegiaren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada edo biltegiak
+     *                      produktuak baditu.
+     */
     public void biltegiaEzabatu(int idBiltegia) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             PreparedStatement pstCheck = kon.prepareStatement("SELECT COUNT(*) FROM produktuak WHERE biltegi_id = ?");
@@ -36,11 +62,20 @@ public class BiltegiLangilea extends Langilea {
             String sql = "DELETE FROM biltegiak WHERE id_biltegia = ?";
             try (PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setInt(1, idBiltegia);
+
                 pst.executeUpdate();
             }
         }
     }
 
+    /**
+     * Biltegi baten datuak eguneratzen ditu.
+     *
+     * @param idBiltegia Aldatu nahi den biltegiaren IDa.
+     * @param izena      Izen berria.
+     * @param sku        SKU kode berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void biltegiaEditatu(int idBiltegia, String izena, String sku) throws SQLException {
         String sql = "UPDATE biltegiak SET izena = ?, biltegi_sku = ? WHERE id_biltegia = ?";
         try (Connection kon = DB_Konexioa.konektatu();
@@ -52,6 +87,16 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Hornitzaile berri bat sortzen du.
+     *
+     * @param izena  Hornitzailearen izena.
+     * @param ifz    Hornitzailearen IFZ.
+     * @param emaila Hornitzailearen emaila.
+     * @return Sortutako hornitzailearen IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada edo hornitzailea
+     *                      existitzen bada.
+     */
     public int hornitzaileBerriaSortu(String izena, String ifz, String emaila) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             PreparedStatement pstCheck = kon
@@ -77,6 +122,15 @@ public class BiltegiLangilea extends Langilea {
         throw new SQLException("Errorea hornitzailea sortzean.");
     }
 
+    /**
+     * Produktuen sarrera berri bat sortzen du.
+     * Transaction bidez kudeatzen da osotasuna bermatzeko.
+     *
+     * @param hornitzaileaId Hornitzailearen IDa.
+     * @param produktuak     Sartuko diren produktuen zerrenda.
+     * @param lerroak        Sarrera lerroen zerrenda.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuSarreraBerriaSortu(int hornitzaileaId, List<Produktua> produktuak, List<SarreraLerroa> lerroak)
             throws SQLException {
         Connection con = null;
@@ -144,12 +198,18 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Produktu baten egoeraren oharra eguneratzen du.
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @param oharra      Ohar berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuEgoeraOharraJarri(int idProduktua, String oharra) throws SQLException {
         // Funtzionalitate hau UI-ko sorkuntzaren zati zen, baina beharbada bereizita
         // behar da?
         // UI-ak ez zuen "Gehitu Oharra" botoi espliziturik lehendik zeuden
-        // produktuentzat, baina
-        // prompt-ean eskatuta.
+        // produktuentzat.
         String sql = "UPDATE produktuak SET produktu_egoera_oharra = ? WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
@@ -159,6 +219,13 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Produktu bat biltegi batetik bestera mugitzen du.
+     *
+     * @param idProduktua Produktuaren IDa.
+     * @param idBiltegia  Biltegi berriaren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuarenBiltegiaAldatu(int idProduktua, int idBiltegia) throws SQLException {
         String sql = "UPDATE produktuak SET biltegi_id = ? WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
@@ -183,6 +250,14 @@ public class BiltegiLangilea extends Langilea {
     // hobeto,
     // TableModel egiturarekin bat datorren Object[] zerrenda bat itzuli.
 
+    /**
+     * Produktu sarrerak ikusten ditu, egoeraren arabera iragazita.
+     *
+     * @param egoeraIragazkia Iragazkia ("Bidean", "Jasota" edo null denak
+     *                        ikusteko).
+     * @return Objektu array zerrenda bat sarreren informazioarekin.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public List<Object[]> produktuSarrerakIkusi(String egoeraIragazkia) throws SQLException {
         String baseSql = "SELECT s.id_sarrera, h.izena_soziala AS Hornitzailea, s.data, s.sarrera_egoera FROM sarrerak s JOIN hornitzaileak h ON s.hornitzailea_id = h.id_hornitzailea ";
         String sql = baseSql;
@@ -209,6 +284,13 @@ public class BiltegiLangilea extends Langilea {
         return emaitza;
     }
 
+    /**
+     * Sarrera baten egoera eguneratzen du eta bere lerro guztiena ere bai.
+     *
+     * @param idSarrera Sarreraren IDa.
+     * @param egoera    Egoera berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuSarreraEditatu(int idSarrera, String egoera) throws SQLException {
         // Cascading: Update Parent -> Update All Lines
         String sql = "UPDATE sarrerak SET sarrera_egoera = ? WHERE id_sarrera = ?";
@@ -244,6 +326,15 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Sarrera lerro baten egoera aldatzen du.
+     * Lerro guztiak jasota badaude, sarrera osoaren egoera ere eguneratzen da.
+     *
+     * @param idSarreraLerroa Sarrera lerroaren IDa.
+     * @param egoera          Egoera berria.
+     * @param idSarrera       Sarreraren IDa (gurasoa).
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuSarreraEgoeraAldatu(int idSarreraLerroa, String egoera, int idSarrera) throws SQLException {
         try (Connection con = DB_Konexioa.konektatu()) {
             PreparedStatement pst = con.prepareStatement(
@@ -264,6 +355,13 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Eskaera baten egoera aldatzen du eta bere lerro guztiena ere bai.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @param egoera    Egoera berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuEskaeraEgoeraAldatu(int idEskaera, String egoera) throws SQLException {
         // Cascading: Update Parent -> Update All Lines
         String sql = "UPDATE eskaerak SET eskaera_egoera = ? WHERE id_eskaera = ?";
@@ -299,6 +397,13 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Sarrera baten lerroak ikusten ditu.
+     *
+     * @param idSarrera Sarreraren IDa.
+     * @return Objektu array zerrenda sarrera lerroen informazioarekin.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public List<Object[]> produktuSarreraLerroakIkusi(int idSarrera) throws SQLException {
         String sql = "SELECT sl.id_sarrera_lerroa, p.izena, p.marka, sl.kantitatea, sl.sarrera_lerro_egoera " +
                 "FROM sarrera_lerroak sl " +
@@ -322,6 +427,14 @@ public class BiltegiLangilea extends Langilea {
         return emaitza;
     }
 
+    /**
+     * Sarrera lerro baten egoera aldatzen du eta guraso sarreraren egoera
+     * egiaztatzen du.
+     *
+     * @param idSarreraLerroa Sarrera lerroaren IDa.
+     * @param egoera          Egoera berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuSarreraLerroEgoeraAldatu(int idSarreraLerroa, String egoera) throws SQLException {
         // Update Line -> Check Peers -> Update Parent (Internal - No Cascade)
         String sql = "UPDATE sarrera_lerroak SET sarrera_lerro_egoera = ? WHERE id_sarrera_lerroa = ?";
@@ -368,6 +481,12 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Sarrera bat eta bere lerroak ezabatzen ditu.
+     *
+     * @param idSarrera Ezabatu nahi den sarreraren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuSarreraEzabatu(int idSarrera) throws SQLException {
         String sqlLerroak = "DELETE FROM sarrera_lerroak WHERE sarrera_id = ?";
         String sqlSarrera = "DELETE FROM sarrerak WHERE id_sarrera = ?";
@@ -400,6 +519,13 @@ public class BiltegiLangilea extends Langilea {
         }
     }
 
+    /**
+     * Eskaerak ikusten ditu, egoeraren arabera iragazita.
+     *
+     * @param egoeraIragazkia Iragazkia (Egoera zehatza edo "Denak").
+     * @return Objektu array zerrenda eskaeren informazioarekin.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public List<Object[]> produktuEskaerakIkusi(String egoeraIragazkia) throws SQLException {
         String sql = "SELECT e.id_eskaera, b.izena_edo_soziala, e.data, e.guztira_prezioa, e.eskaera_egoera " +
                 "FROM eskaerak e " +
@@ -432,6 +558,13 @@ public class BiltegiLangilea extends Langilea {
         return emaitza;
     }
 
+    /**
+     * Eskaera baten lerroak ikusten ditu.
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @return Objektu array zerrenda eskaera lerroen informazioarekin.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public List<Object[]> produktuEskaeraLerroakIkusi(int idEskaera) throws SQLException {
         String sql = "SELECT el.id_eskaera_lerroa, p.izena, el.kantitatea, el.unitate_prezioa, el.eskaera_lerro_egoera "
                 +
@@ -456,6 +589,15 @@ public class BiltegiLangilea extends Langilea {
         return emaitza;
     }
 
+    /**
+     * Eskaera lerro baten egoera aldatzen du eta eskaera osoaren egoera eguneratzen
+     * du.
+     *
+     * @param idEskaeraLerroa Eskaera lerroaren IDa.
+     * @param egoera          Egoera berria.
+     * @param idEskaera       Eskaeraren IDa (gurasoa).
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void produktuEskaeraLerroEgoeraAldatu(int idEskaeraLerroa, String egoera, int idEskaera)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {

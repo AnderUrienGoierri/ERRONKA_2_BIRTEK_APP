@@ -11,8 +11,20 @@ import java.util.List;
 
 import db.DB_Konexioa;
 
+/**
+ * TeknikariLangilea klasea.
+ * Langilea klasearen azpiklasea da, eta teknikari arloko langileen
+ * funtzionalitateak kudeatzen ditu.
+ * Produktuen mantenua, konponketak eta akatsen kudeaketa egiteko metodoak ditu.
+ */
 public class TeknikariLangilea extends Langilea {
 
+    /**
+     * TeknikariLangilea eraikitzailea.
+     * Langilea objektu batetik abiatuta sortzen da.
+     * 
+     * @param l Langilea objektua.
+     */
     public TeknikariLangilea(Langilea l) {
         super(l.getIdLangilea(), l.getIzena(), l.getAbizena(), l.getNan(), l.getJaiotzaData(), l.getHerriaId(),
                 l.getHelbidea(), l.getPostaKodea(), l.getTelefonoa(), l.getEmaila(), l.getHizkuntza(),
@@ -29,6 +41,13 @@ public class TeknikariLangilea extends Langilea {
      * daudenak).
      * 
      * @return Produktu guztien zerrenda.
+     */
+    /**
+     * Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez
+     * daudenak).
+     * 
+     * @return Produktu guztien zerrenda.
+     * @throws SQLException Errorea irakurtzean.
      */
     public List<Produktua> produktuakIkusi() throws SQLException {
         List<Produktua> produktuak = new ArrayList<>();
@@ -75,6 +94,15 @@ public class TeknikariLangilea extends Langilea {
      * @param egoera      Produktuaren egoera ('Berria', 'Berritua A', 'Berritua B',
      *                    'Hondatua', 'Zehazteko').
      */
+    /**
+     * Produktu bat editatu (egoera eta salgai).
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @param salgai      Salgai dagoen ala ez.
+     * @param egoera      Produktuaren egoera ('Berria', 'Berritua A', 'Berritua B',
+     *                    'Hondatua', 'Zehazteko').
+     * @throws SQLException Errorea editatzean.
+     */
     public void produktuaEditatu(int idProduktua, boolean salgai, String egoera) throws SQLException {
         String sql = "UPDATE produktuak SET salgai = ?, produktu_egoera = ? WHERE id_produktua = ?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -91,6 +119,13 @@ public class TeknikariLangilea extends Langilea {
      * 
      * @param idProduktua Produktuaren IDa.
      * @param irudiaUrl   Irudiaren izena edo bidea (jpg).
+     */
+    /**
+     * Produktuari irudia gehitu.
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @param irudiaUrl   Irudiaren izena edo bidea (jpg).
+     * @throws SQLException Errorea eguneratzean.
      */
     public void produktuariIrudiaGehitu(int idProduktua, String irudiaUrl) throws SQLException {
         String sql = "UPDATE produktuak SET irudia_url = ? WHERE id_produktua = ?";
@@ -109,6 +144,14 @@ public class TeknikariLangilea extends Langilea {
      * @param prezioa     Salmenta prezioa.
      * @param eskaintza   Eskaintza prezioa (baldin badago).
      */
+    /**
+     * Produktuari prezioa eta eskaintza ezarri.
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @param prezioa     Salmenta prezioa.
+     * @param eskaintza   Eskaintza prezioa (baldin badago).
+     * @throws SQLException Errorea eguneratzean.
+     */
     public void prezioaEzarri(int idProduktua, BigDecimal prezioa, BigDecimal eskaintza) throws SQLException {
         String sql = "UPDATE produktuak SET salmenta_prezioa = ?, eskaintza = ? WHERE id_produktua = ?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -124,6 +167,12 @@ public class TeknikariLangilea extends Langilea {
      * Produktu bat sistematik ezabatu.
      * 
      * @param idProduktua Produktuaren IDa.
+     */
+    /**
+     * Produktu bat sistematik ezabatu.
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @throws SQLException Errorea ezabatzean.
      */
     public void produktuaBorratu(int idProduktua) throws SQLException {
         String sql = "DELETE FROM produktuak WHERE id_produktua = ?";
@@ -142,6 +191,12 @@ public class TeknikariLangilea extends Langilea {
      * Konponketa guztiak bistaratu.
      * 
      * @return Konponketa zerrenda.
+     */
+    /**
+     * Konponketa guztiak bistaratu.
+     * 
+     * @return Konponketa zerrenda.
+     * @throws SQLException Errorea irakurtzean.
      */
     public List<Konponketa> konponketakIkusi() throws SQLException {
         List<Konponketa> konponketak = new ArrayList<>();
@@ -173,6 +228,12 @@ public class TeknikariLangilea extends Langilea {
      * 
      * @param k Konponketa objektua.
      */
+    /**
+     * Konponketa berri bat sortu.
+     * 
+     * @param k Konponketa objektua.
+     * @throws SQLException Errorea sortzean.
+     */
     public void konponketaEgin(Konponketa k) throws SQLException {
         String sql = "INSERT INTO konponketak (produktua_id, langilea_id, hasiera_data, konponketa_egoera, akatsa_id, oharrak) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -191,6 +252,12 @@ public class TeknikariLangilea extends Langilea {
      * Sortuta dagoen konponketa baten datuak aldatu.
      * 
      * @param k Konponketa objektua (id-a barne).
+     */
+    /**
+     * Sortuta dagoen konponketa baten datuak aldatu.
+     * 
+     * @param k Konponketa objektua (id-a barne).
+     * @throws SQLException Errorea editatzean.
      */
     public void konponketaEditatu(Konponketa k) throws SQLException {
         String sql = "UPDATE konponketak SET produktua_id = ?, langilea_id = ?, hasiera_data = ?, amaiera_data = ?, konponketa_egoera = ?, akatsa_id = ?, oharrak = ? WHERE id_konponketa = ?";
@@ -213,6 +280,12 @@ public class TeknikariLangilea extends Langilea {
      * 
      * @param idKonponketa Konponketaren IDa.
      */
+    /**
+     * Konponketa jakin bat ezabatu.
+     * 
+     * @param idKonponketa Konponketaren IDa.
+     * @throws SQLException Errorea ezabatzean.
+     */
     public void konponketaEzabatu(int idKonponketa) throws SQLException {
         String sql = "DELETE FROM konponketak WHERE id_konponketa = ?";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -225,6 +298,13 @@ public class TeknikariLangilea extends Langilea {
     /**
      * Produktu berri bat sortu (Bakarrik TeknikariLangilea eta BiltegiLangilea-k
      * egin dezakete).
+     */
+    /**
+     * Produktu berri bat sortu (Bakarrik TeknikariLangilea eta BiltegiLangilea-k
+     * egin dezakete).
+     * 
+     * @param p Produktua
+     * @throws SQLException Errorea sortzean.
      */
     public void produktuBatSortu(Produktua p) throws SQLException {
         // Oharra: Metodo honek produktu bat sortzen du 'produktuak' taulan.
@@ -266,6 +346,12 @@ public class TeknikariLangilea extends Langilea {
      * 
      * @return Akatsen zerrenda.
      */
+    /**
+     * Akatsen informazioa ikusi.
+     * 
+     * @return Akatsen zerrenda.
+     * @throws SQLException Errorea irakurtzean.
+     */
     public List<Akatsa> akatsaIkusi() throws SQLException {
         List<Akatsa> akatsak = new ArrayList<>();
         String sql = "SELECT * FROM akatsak";
@@ -290,6 +376,12 @@ public class TeknikariLangilea extends Langilea {
      * 
      * @param a Akatsa objektua.
      */
+    /**
+     * Akats berri bat sortu.
+     * 
+     * @param a Akatsa objektua.
+     * @throws SQLException Errorea sortzean.
+     */
     public void akatsaSortu(Akatsa a) throws SQLException {
         String sql = "INSERT INTO akatsak (izena, deskribapena) VALUES (?, ?)";
         try (Connection konexioa = DB_Konexioa.konektatu();
@@ -304,6 +396,12 @@ public class TeknikariLangilea extends Langilea {
      * Akats bat editatu.
      * 
      * @param a Akatsa objektua (id-a barne).
+     */
+    /**
+     * Akats bat editatu.
+     * 
+     * @param a Akatsa objektua (id-a barne).
+     * @throws SQLException Errorea editatzean.
      */
     public void akatsaEditatu(Akatsa a) throws SQLException {
         String sql = "UPDATE akatsak SET izena = ?, deskribapena = ? WHERE id_akatsa = ?";
@@ -320,6 +418,12 @@ public class TeknikariLangilea extends Langilea {
      * Akats bat ezabatu.
      * 
      * @param idAkatsa Akatsaren IDa.
+     */
+    /**
+     * Akats bat ezabatu.
+     * 
+     * @param idAkatsa Akatsaren IDa.
+     * @throws SQLException Errorea ezabatzean.
      */
     public void akatsaEzabatu(int idAkatsa) throws SQLException {
         String sql = "DELETE FROM akatsak WHERE id_akatsa = ?";

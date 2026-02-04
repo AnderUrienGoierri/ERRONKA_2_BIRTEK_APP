@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Datu-baserako konexioa kudeatzen duen klasea.
+ * Singleton eredua erabiltzen du konexio bakarra bermatzeko.
+ */
 public class DB_Konexioa {
 
     // Konfigurazio datuak
@@ -12,9 +16,7 @@ public class DB_Konexioa {
     private static final String PASAHITZA = "1MG32025";
 
     /**
-     * Datu-basera konektatzeko metodoa.
-     * 
-     * @return Connection objektua edo null errore bat egonez gero.
+     * Connection instantzia estatikoa (Singleton).
      */
     private static Connection instance = null;
 

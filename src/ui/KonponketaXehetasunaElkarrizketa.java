@@ -16,6 +16,11 @@ import javax.swing.JTextArea;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+/**
+ * KonponketaXehetasunaElkarrizketa klasea.
+ * Konponketa baten egoera, akatsa eta oharrak editatzeko elkarrizketa-leihoa
+ * (JDialog).
+ */
 public class KonponketaXehetasunaElkarrizketa extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -25,10 +30,19 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
     private JTextArea oharrakTestua;
     private int konponketaId;
 
+    /**
+     * KonponketaXehetasunaElkarrizketa eraikitzailea.
+     *
+     * @param id            Konponketaren IDa.
+     * @param unekoEgoera   Uneko egoera.
+     * @param unekoOharrak  Uneko oharrak.
+     * @param unekoAkatsaId Uneko akatsaren IDa.
+     * @param akatsakList   Akats posibleen zerrenda.
+     */
     public KonponketaXehetasunaElkarrizketa(int id, String unekoEgoera, String unekoOharrak, int unekoAkatsaId,
             java.util.List<Akatsa> akatsakList) {
         this.konponketaId = id;
-        setTitle(Hizkuntza.lortu("dialog_rep_title") + " (ID: " + id + ")");
+        setTitle("Editatu Konponketa" + " (ID: " + id + ")");
         setBounds(100, 100, 450, 400); // Increased height
         getContentPane().setLayout(new BorderLayout());
         edukiPanela.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -36,7 +50,7 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
         edukiPanela.setLayout(null);
 
         // Egoera
-        JLabel egoeraEtiketa = new JLabel(Hizkuntza.lortu("status"));
+        JLabel egoeraEtiketa = new JLabel("Egoera:");
         egoeraEtiketa.setBounds(20, 30, 80, 14);
         edukiPanela.add(egoeraEtiketa);
 
@@ -63,7 +77,7 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
         edukiPanela.add(akatsaHautatzailea);
 
         // Oharrak
-        JLabel oharrakEtiketa = new JLabel(Hizkuntza.lortu("notes"));
+        JLabel oharrakEtiketa = new JLabel("Oharrak:");
         oharrakEtiketa.setBounds(20, 120, 80, 14);
         edukiPanela.add(oharrakEtiketa);
 
@@ -77,7 +91,7 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
         botoiPanela.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(botoiPanela, BorderLayout.SOUTH);
 
-        JButton gordeBotoia = new JButton(Hizkuntza.lortu("save"));
+        JButton gordeBotoia = new JButton("GORDE");
         gordeBotoia.addActionListener(e -> gordeDatuak());
         botoiPanela.add(gordeBotoia);
 
@@ -86,6 +100,9 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
         botoiPanela.add(utziBotoia);
     }
 
+    /**
+     * Datuak datu-basean gordetzen ditu (UPDATE).
+     */
     private void gordeDatuak() {
         String egoeraBerria = (String) egoeraHautatzailea.getSelectedItem();
         ComboItem aukeratutakoAkatsa = (ComboItem) akatsaHautatzailea.getSelectedItem();
@@ -118,6 +135,9 @@ public class KonponketaXehetasunaElkarrizketa extends JDialog {
     }
 
     // Helper class for ComboBox items
+    /**
+     * ComboBox-erako elementu laguntzailea (ID eta Testua).
+     */
     private static class ComboItem {
         private int id;
         private String label;

@@ -20,15 +20,37 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
+import java.io.FileInputStream;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
+/**
+ * FakturaPDF klasea.
+ * Eskaera eta bezeroen datuetatik abiatuta PDF formatuko fakturak sortzen
+ * dituen klasea.
+ * iText liburutegia erabiltzen du PDFak sortzeko.
+ */
 public class FakturaPDF {
 
+    /**
+     * BezeroDatuak barne-klasea.
+     * Fakturan bistaratu beharreko bezeroaren datuak gordetzeko.
+     */
     public static class BezeroDatuak {
         public String izena;
         public String ifz;
         public String helbidea;
         public String emaila;
 
+        /**
+         * BezeroDatuak eraikitzailea.
+         *
+         * @param izena    Bezeroaren izena.
+         * @param ifz      Bezeroaren IFZ/NAN.
+         * @param helbidea Bezeroaren helbidea.
+         * @param emaila   Bezeroaren emaila.
+         */
         public BezeroDatuak(String izena, String ifz, String helbidea, String emaila) {
             this.izena = izena;
             this.ifz = ifz;
@@ -37,12 +59,24 @@ public class FakturaPDF {
         }
     }
 
+    /**
+     * LerroDatuak barne-klasea.
+     * Fakturako lerro bakoitzaren datuak gordetzeko.
+     */
     public static class LerroDatuak {
         public String produktua;
         public int kantitatea;
         public BigDecimal prezioa;
         public BigDecimal guztira;
 
+        /**
+         * LerroDatuak eraikitzailea.
+         *
+         * @param produktua  Produktuaren izena.
+         * @param kantitatea Produktu kantitatea.
+         * @param prezioa    Unitateko prezioa.
+         * @param guztira    Lerroaren prezio totala.
+         */
         public LerroDatuak(String produktua, int kantitatea, BigDecimal prezioa, BigDecimal guztira) {
             this.produktua = produktua;
             this.kantitatea = kantitatea;
@@ -53,6 +87,19 @@ public class FakturaPDF {
 
     // fakturak C/: karpetan XamPP barruan
     public static final String FAKTURA_BIDEA = "C:\\Xampp\\htdocs\\fakturak";
+
+    /**
+     * Faktura PDF bat sortzen du emandako datuekin.
+     *
+     * @param fitxategiPath PDF fitxategia gordeko den bidea.
+     * @param idEskaera     Eskaeraren IDa.
+     * @param data          Fakturaren data.
+     * @param bezeroa       Bezeroaren datuak dituen objektua.
+     * @param lerroak       Fakturako lerroen zerrenda.
+     * @param guztira       Fakturaren guztizko zenbatekoa.
+     * @throws DocumentException PDFa sortzean errorea gertatzen bada.
+     * @throws IOException       Fitxategia idaztean errorea gertatzen bada.
+     */
 
     public static void sortu(String fitxategiPath, int idEskaera, Timestamp data, BezeroDatuak bezeroa,
             List<LerroDatuak> lerroak, BigDecimal guztira)
@@ -197,5 +244,74 @@ public class FakturaPDF {
         cellValue.setBorder(Rectangle.NO_BORDER);
         cellValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
         table.addCell(cellValue);
+    }
+
+    /**
+     * Faktura FTP bidez zerbitzarira igotzeko metodoa.
+     * 
+     * @param fitxategiPath  Igo nahi den fitxategiaren bide osoa.
+     * @param fitxategiIzena Fitxategiak zerbitzarian izango duen izena.
+     */
+    public static void fakturaIgoZerbitzarira(String fitxategiPath, String fitxategiIzena) {
+        String server = "localhost";
+        int port = 21;
+        String user = "root"; // FTP erabiltzailea
+        String pass = "1MG32025"; // FTP pasahitza
+
+        FTPClient ftpClient = new FTPClient();
+        try {
+            ftpClient.connect(server, port);
+            ftpClient.login(user, pass);
+            ftpClient.enterLocalPassiveMode();
+
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            // "htdocs/fakturak" karpetara joan
+            // Aldatu direktorioa beharrezkoa bada.
+            // XAMPP-en FileZilla-k askotan erroa zuzenean ezartzen du erabiltzailearen
+            // home gisa.
+            // Hemen suposatzen dugu "htdocs/fakturak" existitzen dela edo sortu behar dela.
+            // Baina erabiltzaileak esan du "htdocs/fakturak" karpetan gorde nahi duela.
+
+            // Saiatu direktorioa aldatzen, bestela sortu
+            if (!ftpClient.changeWorkingDirectory("htdocs/fakturak")) {
+                if (ftpClient.makeDirectory("htdocs")) {
+                    ftpClient.changeWorkingDirectory("htdocs");
+                    ftpClient.makeDirectory("fakturak");
+                    ftpClient.changeWorkingDirectory("fakturak");
+                } else {
+                    // Agian zuzenean fakturak karpeta erroan dago edo beste egitura bat du
+                    ftpClient.makeDirectory("fakturak");
+                    ftpClient.changeWorkingDirectory("fakturak");
+                }
+            }
+
+            File firstLocalFile = new File(fitxategiPath);
+
+            String firstRemoteFile = fitxategiIzena;
+            FileInputStream inputStream = new FileInputStream(firstLocalFile);
+
+            System.out.println("Fitxategia igotzen hasten...");
+            boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
+            inputStream.close();
+            if (done) {
+                System.out.println("Fitxategia ondo igo da.");
+            } else {
+                System.out.println("Errorea fitxategia igotzean.");
+            }
+
+        } catch (IOException ex) {
+            System.out.println("Errorea: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (ftpClient.isConnected()) {
+                    ftpClient.logout();
+                    ftpClient.disconnect();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

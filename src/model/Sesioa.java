@@ -1,7 +1,8 @@
 package model;
 
 /**
- * Saioa hasi duen langilearen informazioa gordetzeko klasea.
+ * Saioa kudeatzeko klase estatikoa.
+ * Uneko saioan logeatu den langilearen informazioa gordetzen du.
  */
 public class Sesioa {
     public static int idLangilea;
@@ -11,7 +12,8 @@ public class Sesioa {
     public static String sailaIzena;
 
     /**
-     * Saioa garbitzeko (logout egitean adibidez).
+     * Saioa ixten du.
+     * Gordetako datu guztiak ezabatzen ditu (null edo 0 ezarriz).
      */
     public static void itxiSaioa() {
         idLangilea = 0;

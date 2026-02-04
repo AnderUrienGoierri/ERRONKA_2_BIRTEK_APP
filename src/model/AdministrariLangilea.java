@@ -6,8 +6,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * AdministrariLangilea klasea.
+ * Langilea klasearen azpiklasea da, eta administrazio-lanak egiteko metodoak
+ * ditu.
+ * Langileak, sailak, fakturak eta bestelako entitateak kudeatzeko aukera ematen
+ * du.
+ */
 public class AdministrariLangilea extends Langilea {
 
+    /**
+     * AdministrariLangileaeraikitzailea.
+     * Langilea objektu batetik abiatuta AdministrariLangilea sortzen du.
+     *
+     * @param l Langilea objektua, oinarrizko datuekin.
+     */
     public AdministrariLangilea(Langilea l) {
         super(l.getIdLangilea(), l.getIzena(), l.getAbizena(), l.getNan(), l.getJaiotzaData(), l.getHerriaId(),
                 l.getHelbidea(), l.getPostaKodea(), l.getTelefonoa(), l.getEmaila(), l.getHizkuntza(),
@@ -15,12 +28,33 @@ public class AdministrariLangilea extends Langilea {
                 l.isAktibo(), l.getSailaId(), l.getIban(), l.getKurrikuluma());
     }
 
+    /**
+     * Langile berri bat sortzen du datu-basean.
+     *
+     * @param izena            Langilearen izena.
+     * @param abizena          Langilearen abizena.
+     * @param nan              Langilearen NAN zenbakia.
+     * @param emaila           Langilearen email helbidea.
+     * @param pasahitza        Langilearen pasahitza.
+     * @param sailaId          Langilea dagokion sailaren IDa.
+     * @param helbidea         Langilearen helbidea.
+     * @param herriaId         Langilea bizi den herriaren IDa.
+     * @param postaKodea       Posta kodea.
+     * @param telefonoa        Harremanetarako telefonoa.
+     * @param jaiotzaData      Jaiotza data (YYYY-MM-DD formatuan).
+     * @param hizkuntza        Hizkuntza lehenetsia.
+     * @param saltoTxartelaUid Salto sistemako txartelaren UIDa.
+     * @param aktibo           Langilea aktibo dagoen edo ez.
+     * @param iban             Bankuko kontuaren IBAN zenbakia.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileaSortu(String izena, String abizena, String nan, String emaila, String pasahitza, int sailaId,
             String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData,
             String hizkuntza, String saltoTxartelaUid, boolean aktibo, String iban)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data, hizkuntza, salto_txartela_uid, aktibo, iban) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data, hizkuntza, salto_txartela_uid, aktibo, iban)"
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, abizena);
@@ -41,6 +75,12 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Langile bat ezabatzen du datu-basetik.
+     *
+     * @param idLangilea Ezabatu nahi den langilearen IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileaEzabatu(int idLangilea) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "DELETE FROM langileak WHERE id_langilea = ?";
@@ -50,6 +90,27 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Langile baten datuak eguneratzen ditu.
+     *
+     * @param idLangilea       Aldatu nahi den langilearen IDa.
+     * @param izena            Izen berria.
+     * @param abizena          Abizen berria.
+     * @param nan              NAN berria.
+     * @param emaila           Email berria.
+     * @param sailaId          Sail berriaren IDa.
+     * @param helbidea         Helbide berria.
+     * @param herriaId         Herri berriaren IDa.
+     * @param postaKodea       Posta kode berria.
+     * @param telefonoa        Telefono berria.
+     * @param jaiotzaData      Jaiotza data berria.
+     * @param hizkuntza        Hizkuntza berria.
+     * @param pasahitza        Pasahitz berria.
+     * @param saltoTxartelaUid Salto txartelaren UID berria.
+     * @param aktibo           Egoera (aktibo/ez-aktibo).
+     * @param iban             IBAN berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileaEditatu(int idLangilea, String izena, String abizena, String nan, String emaila, int sailaId,
             String helbidea, int herriaId, String postaKodea, String telefonoa, String jaiotzaData,
             String hizkuntza, String pasahitza, String saltoTxartelaUid, boolean aktibo, String iban)
@@ -77,6 +138,13 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Langile baten datuak lortzen ditu bere IDa erabiliz.
+     *
+     * @param idLangilea Bilatu nahi den langilearen IDa.
+     * @return Langilea objektua datuekin, edo null aurkitzen ez bada.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public Langilea langileaIkusi(int idLangilea) throws SQLException {
         Langilea langilea = null;
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -110,6 +178,13 @@ public class AdministrariLangilea extends Langilea {
         return langilea;
     }
 
+    /**
+     * Bezero baten fakturaren datuak ikusteko metodoa.
+     *
+     * @param idFaktura Fakturaren IDa.
+     * @return BezeroFaktura objektua, datuekin.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public BezeroFaktura bezeroaFakturaIkusi(int idFaktura) throws SQLException {
         BezeroFaktura faktura = null;
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -130,6 +205,14 @@ public class AdministrariLangilea extends Langilea {
         return faktura;
     }
 
+    /**
+     * Langile sail berri bat sortzen du.
+     *
+     * @param izena        Sailaren izena.
+     * @param kokapena     Sailaren kokapena.
+     * @param deskribapena Sailaren deskribapena.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileSailaSortu(String izena, String kokapena, String deskribapena) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "INSERT INTO langile_sailak (izena, kokapena, deskribapena) VALUES (?, ?, ?)";
@@ -141,6 +224,12 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Langile sail bat ezabatzen du.
+     *
+     * @param idSaila Ezabatu nahi den sailaren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileSailaEzabatu(int idSaila) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "DELETE FROM langile_sailak WHERE id_saila = ?";
@@ -150,6 +239,15 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Langile sail baten datuak eguneratzen ditu.
+     *
+     * @param idSaila      Aldatu nahi den sailaren IDa.
+     * @param izena        Sailaren izen berria.
+     * @param kokapena     Sailaren kokapen berria.
+     * @param deskribapena Sailaren deskribapen berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void langileSailaEditatu(int idSaila, String izena, String kokapena, String deskribapena)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -163,6 +261,13 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Sail baten informazioa lortzen du IDaren bidez.
+     *
+     * @param idSaila Sailaren IDa.
+     * @return LangileSaila objektua.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public LangileSaila langileSailaikusi(int idSaila) throws SQLException {
         LangileSaila saila = null;
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -181,6 +286,11 @@ public class AdministrariLangilea extends Langilea {
         return saila;
     }
 
+    /**
+     * Sail guztiak zerrendatzen ditu.
+     *
+     * @return LangileSaila objektuen zerrenda.
+     */
     public java.util.ArrayList<LangileSaila> sailakGuztiakIkusi() {
         java.util.ArrayList<LangileSaila> zerrenda = new java.util.ArrayList<>();
         String sql = "SELECT * FROM langile_sailak";
@@ -200,6 +310,11 @@ public class AdministrariLangilea extends Langilea {
         return zerrenda;
     }
 
+    /**
+     * Fitxaketa guztiak ikusteko metodoa.
+     *
+     * @return Fitxaketa objektuen zerrenda.
+     */
     public java.util.ArrayList<Fitxaketa> fitxaketaGuztiakIkusi() {
         java.util.ArrayList<Fitxaketa> zerrenda = new java.util.ArrayList<>();
         String galdera = "SELECT * FROM fitxaketak ORDER BY id_fitxaketa DESC";
@@ -221,6 +336,12 @@ public class AdministrariLangilea extends Langilea {
         return zerrenda;
     }
 
+    /**
+     * Fitxaketa bat ezabatzen du.
+     *
+     * @param idFitxaketa Ezabatu nahi den fitxaketaren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void fitxaketaEzabatu(int idFitxaketa) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "DELETE FROM fitxaketak WHERE id_fitxaketa = ?";
@@ -230,6 +351,15 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Fitxaketa baten datuak eguneratzen ditu.
+     *
+     * @param idFitxaketa Aldatu nahi den fitxaketaren IDa.
+     * @param data        Data berria.
+     * @param ordua       Ordu berria.
+     * @param mota        Mota berria (SARRERA/IRTEERA).
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void fitxaketaEditatu(int idFitxaketa, java.sql.Date data, java.sql.Time ordua, String mota)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -243,6 +373,15 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Fitxaketa berri bat sortzen du.
+     *
+     * @param langileaId Fitxaketa egin duen langilearen IDa.
+     * @param data       Fitxaketaren data.
+     * @param ordua      Fitxaketaren ordua.
+     * @param mota       Fitxaketaren mota.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void fitxaketaSortu(int langileaId, java.sql.Date data, java.sql.Time ordua, String mota)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -256,6 +395,13 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Hornitzaile baten datuak ikusten ditu.
+     *
+     * @param idHornitzailea Hornitzailearen IDa.
+     * @return Hornitzailea objektua.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public Hornitzailea hornitzaileaIkusi(int idHornitzailea) throws SQLException {
         Hornitzailea hornitzailea = null;
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -283,6 +429,12 @@ public class AdministrariLangilea extends Langilea {
         return hornitzailea;
     }
 
+    /**
+     * Hornitzaile bat ezabatzen du.
+     *
+     * @param idHornitzailea Ezabatu nahi den hornitzailearen IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void hornitzaileaEzabatu(int idHornitzailea) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "DELETE FROM hornitzaileak WHERE id_hornitzailea = ?";
@@ -292,6 +444,21 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Hornitzaile baten datuak eguneratzen ditu.
+     *
+     * @param idHornitzailea   Aldatu nahi den hornitzailearen IDa.
+     * @param izenaSoziala     Izen sozial berria.
+     * @param nan              NAN edo IFZ berria.
+     * @param kontaktuPertsona Kontaktu pertsona berria.
+     * @param helbidea         Helbide berria.
+     * @param herriaId         Herriaren ID berria.
+     * @param postaKodea       Posta kode berria.
+     * @param telefonoa        Telefono berria.
+     * @param emaila           Email berria.
+     * @param hizkuntza        Hizkuntza berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void hornitzaileaEditatu(int idHornitzailea, String izenaSoziala, String nan, String kontaktuPertsona,
             String helbidea, int herriaId, String postaKodea, String telefonoa, String emaila, String hizkuntza)
             throws SQLException {
@@ -312,6 +479,11 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Herri guztien zerrenda lortzen du.
+     *
+     * @return Herria objektuen zerrenda.
+     */
     public java.util.ArrayList<Herria> herriakIkusi() {
         java.util.ArrayList<Herria> zerrenda = new java.util.ArrayList<>();
         String sql = "SELECT * FROM herriak";
@@ -331,6 +503,14 @@ public class AdministrariLangilea extends Langilea {
         return zerrenda;
     }
 
+    /**
+     * Herri berri bat sortzen du.
+     *
+     * @param izena     Herriaren izena.
+     * @param lurraldea Lurraldea (Probintzia).
+     * @param nazioa    Nazioa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void herriBerriaSortu(String izena, String lurraldea, String nazioa) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
@@ -342,6 +522,12 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Herri bat ezabatzen du.
+     *
+     * @param idHerria Ezabatu nahi den herriaren IDa.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void herriaEzabatu(int idHerria) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "DELETE FROM herriak WHERE id_herria = ?";
@@ -351,6 +537,15 @@ public class AdministrariLangilea extends Langilea {
         }
     }
 
+    /**
+     * Herri baten datuak eguneratzen ditu.
+     *
+     * @param idHerria  Aldatu nahi den herriaren IDa.
+     * @param izena     Izen berria.
+     * @param lurraldea Lurralde berria.
+     * @param nazioa    Nazio berria.
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
     public void herriaEditatu(int idHerria, String izena, String lurraldea, String nazioa) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "UPDATE herriak SET izena = ?, lurraldea = ?, nazioa = ? WHERE id_herria = ?";
