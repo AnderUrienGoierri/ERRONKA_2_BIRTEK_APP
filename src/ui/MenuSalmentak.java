@@ -263,14 +263,6 @@ public class MenuSalmentak extends JFrame {
         }
     }
 
-    /**
-     * Eraikitzailea lehenetsia.
-     */
-    public MenuSalmentak() {
-        this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
-                null, null, true, 2, "", null));
-    }
-
     // --- FITXAKETA METODO BERRIAK ---
     /**
      * Fitxaketa bat egin (Sarrera/Irteera).

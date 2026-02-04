@@ -16,17 +16,12 @@ import java.sql.*;
 public class MenuZuzendaritza extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private int erabiltzaileId;
-    private String erabiltzaileIzena;
-    private String erabiltzaileAbizena;
+    private Langilea langilea;
     private String erabiltzaileSaila;
 
     // Fitxaketa
     private JLabel fitxaketaInfoEtiketa;
 
-    /**
-     * Eraikitzailea eguneratua.
-     */
     /**
      * MenuZuzendaritza eraikitzailea.
      * 
@@ -36,9 +31,8 @@ public class MenuZuzendaritza extends JFrame {
      * @param saila   Sailaren izena.
      */
     public MenuZuzendaritza(int id, String izena, String abizena, String saila) {
-        this.erabiltzaileId = id;
-        this.erabiltzaileIzena = izena;
-        this.erabiltzaileAbizena = abizena;
+        this.langilea = new Langilea(id, izena, abizena, "", null, 0, "", "", "", "", "ES", "", "", null, null, true,
+                1, "", null);
         this.erabiltzaileSaila = saila;
 
         setTitle("Birtek - SISTEMAK (Super Admin)");
@@ -49,11 +43,13 @@ public class MenuZuzendaritza extends JFrame {
         // HEADER
         JPanel goikoPanela = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 
-        JLabel erabiltzaileEtiketa = new JLabel(erabiltzaileSaila + " | " + erabiltzaileIzena + " "
-                + erabiltzaileAbizena + " (ID: " + erabiltzaileId + ")");
+        JLabel erabiltzaileEtiketa = new JLabel(erabiltzaileSaila + " | " + langilea.getIzena() + " "
+                + langilea.getAbizena() + " (ID: " + langilea.getIdLangilea() + ")");
         erabiltzaileEtiketa.setFont(new Font("SansSerif", Font.BOLD, 12));
         erabiltzaileEtiketa.setForeground(new Color(0, 102, 102));
 
+        // ... (fitxaketa panela eta besteak berdin mantentzen dira, baina fitxatu()
+        // metodoak langilea erabiliko du)
         // Fitxaketa Panela
         JPanel fitxaketaPanela = new JPanel();
         fitxaketaPanela.setLayout(new BoxLayout(fitxaketaPanela, BoxLayout.Y_AXIS));
@@ -105,30 +101,22 @@ public class MenuZuzendaritza extends JFrame {
 
         JButton adminBotoia = new JButton("ADMINISTRAZIOA");
         adminBotoia.addActionListener(e -> {
-            Langilea l = new Langilea(erabiltzaileId, erabiltzaileIzena, erabiltzaileAbizena, "", null, 0, "", "", "",
-                    "", "ES", "", "", null, null, true, 2, "", null);
-            new MenuAdministrazioa(l).setVisible(true);
+            new MenuAdministrazioa(langilea).setVisible(true);
         });
 
         JButton teknikariBotoia = new JButton("TEKNIKOA");
         teknikariBotoia.addActionListener(e -> {
-            Langilea l = new Langilea(erabiltzaileId, erabiltzaileIzena, erabiltzaileAbizena, "", null, 0, "", "", "",
-                    "", "ES", "", "", null, null, true, 2, "", null);
-            new MenuTeknikoa(l).setVisible(true);
+            new MenuTeknikoa(langilea).setVisible(true);
         });
 
         JButton salmentaBotoia = new JButton("SALMENTAK");
         salmentaBotoia.addActionListener(e -> {
-            Langilea l = new Langilea(erabiltzaileId, erabiltzaileIzena, erabiltzaileAbizena, "", null, 0, "", "", "",
-                    "", "ES", "", "", null, null, true, 2, "", null);
-            new MenuSalmentak(l).setVisible(true);
+            new MenuSalmentak(langilea).setVisible(true);
         });
 
         JButton logistikaBotoia = new JButton("LOGISTIKA");
         logistikaBotoia.addActionListener(e -> {
-            Langilea l = new Langilea(erabiltzaileId, erabiltzaileIzena, erabiltzaileAbizena, "", null, 0, "", "", "",
-                    "", "ES", "", "", null, null, true, 2, "", null);
-            new MenuLogistika(l).setVisible(true);
+            new MenuLogistika(langilea).setVisible(true);
         });
 
         JButton probaBotoia = new JButton("DB CHECK");
@@ -153,13 +141,6 @@ public class MenuZuzendaritza extends JFrame {
         }
     }
 
-    /**
-     * Eraikitzailea lehenetsia (Sesio estatikoatik).
-     */
-    public MenuZuzendaritza() {
-        this(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, Sesioa.sailaIzena);
-    }
-
     // --- FITXAKETA LOGIKA (Berdina) ---
     /**
      * Fitxaketa egin.
@@ -170,7 +151,7 @@ public class MenuZuzendaritza extends JFrame {
         String egiaztatuGaldera = "SELECT mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             try (PreparedStatement pstEgiaztatu = konexioa.prepareStatement(egiaztatuGaldera)) {
-                pstEgiaztatu.setInt(1, this.erabiltzaileId);
+                pstEgiaztatu.setInt(1, langilea.getIdLangilea());
                 try (ResultSet rs = pstEgiaztatu.executeQuery()) {
                     String azkenMota = null;
                     if (rs.next())
@@ -194,7 +175,7 @@ public class MenuZuzendaritza extends JFrame {
             }
             String sartuGaldera = "INSERT INTO fitxaketak (langilea_id, mota) VALUES (?, ?)";
             try (PreparedStatement pstSartu = konexioa.prepareStatement(sartuGaldera)) {
-                pstSartu.setInt(1, this.erabiltzaileId);
+                pstSartu.setInt(1, langilea.getIdLangilea());
                 pstSartu.setString(2, mota);
                 if (pstSartu.executeUpdate() > 0) {
                     // JOptionPane.showMessageDialog(this, mota + " erregistratuta.", "Ongi",
@@ -215,7 +196,7 @@ public class MenuZuzendaritza extends JFrame {
         String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, this.erabiltzaileId);
+            sententzia.setInt(1, langilea.getIdLangilea());
             ResultSet rs = sententzia.executeQuery();
             if (rs.next()) {
                 String mota = rs.getString("mota");
@@ -252,7 +233,7 @@ public class MenuZuzendaritza extends JFrame {
         String galdera = "SELECT mota, data, ordua FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement sententzia = konexioa.prepareStatement(galdera)) {
-            sententzia.setInt(1, this.erabiltzaileId);
+            sententzia.setInt(1, langilea.getIdLangilea());
             ResultSet rs = sententzia.executeQuery();
             while (rs.next()) {
                 eredua.addRow(new Object[] { rs.getString("mota"), rs.getDate("data"), rs.getTime("ordua") });
@@ -275,14 +256,15 @@ public class MenuZuzendaritza extends JFrame {
 
         // We need current password and other details. Let's fetch them first or create
         // a Langilea and refresh after.
-        Langilea l = new Langilea(erabiltzaileId, erabiltzaileIzena, erabiltzaileAbizena, "", null, 0, "", "", "", "",
-                "ES", "", "", null, null, true, 2, "", null);
+        Langilea l = new Langilea(langilea.getIdLangilea(), langilea.getIzena(), langilea.getAbizena(), "", null, 0, "",
+                "", "", "",
+                "ES", "", "", null, null, true, 1, "", null);
 
         // Retrieve actual data from DB to ensure we have the latest (password, town,
         // etc.)
         try (Connection k = DB_Konexioa.konektatu();
                 PreparedStatement ps = k.prepareStatement("SELECT * FROM langileak WHERE id_langilea = ?")) {
-            ps.setInt(1, erabiltzaileId);
+            ps.setInt(1, langilea.getIdLangilea());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 l = new Langilea(

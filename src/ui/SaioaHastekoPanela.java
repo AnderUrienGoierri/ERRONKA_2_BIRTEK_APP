@@ -218,14 +218,32 @@ public class SaioaHastekoPanela extends JFrame {
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-                // Saioaren datuak gorde
-                Sesioa.idLangilea = rs.getInt("id_langilea");
-                Sesioa.izena = rs.getString("izena");
-                Sesioa.abizena = rs.getString("abizena");
-                Sesioa.sailaId = rs.getInt("saila_id");
-                Sesioa.sailaIzena = rs.getString("saila_izena");
+                // Langilea objektua sortu saioaren datuekin
+                Langilea l = new Langilea(
+                        rs.getInt("id_langilea"),
+                        rs.getString("izena"),
+                        rs.getString("abizena"),
+                        "", // NAN (ez dugu behar login-erako)
+                        null, // Jaiotza data
+                        0, // Herria ID
+                        "", // Helbidea
+                        "", // Posta kodea
+                        "", // Telefonoa
+                        email,
+                        "ES", // Hizkuntza lehenetsia
+                        pasahitza,
+                        "", // Salto UID
+                        null, // Alta data
+                        null, // Eguneratze data
+                        true, // Aktibo
+                        rs.getInt("saila_id"),
+                        "", // IBAN
+                        null // Kurrikuluma
+                );
 
-                irekiSailMenua(Sesioa.sailaId);
+                String sailaIzena = rs.getString("saila_izena");
+
+                irekiSailMenua(l, sailaIzena);
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Login Error: Pasahitza okerra / Contraseña incorrecta", "Error",
@@ -247,24 +265,25 @@ public class SaioaHastekoPanela extends JFrame {
     /**
      * Sailaren araberako menua ireki.
      * 
-     * @param sailaId Sailaren IDa.
+     * @param l          Saioa hasi duen langilea.
+     * @param sailaIzena Sailaren izena.
      */
-    private void irekiSailMenua(int sailaId) {
-        switch (sailaId) {
+    private void irekiSailMenua(Langilea l, String sailaIzena) {
+        switch (l.getSailaId()) {
             case 1:
-                new MenuZuzendaritza().setVisible(true);
+                new MenuZuzendaritza(l.getIdLangilea(), l.getIzena(), l.getAbizena(), sailaIzena).setVisible(true);
                 break;
             case 2:
-                new MenuAdministrazioa().setVisible(true);
+                new MenuAdministrazioa(l).setVisible(true);
                 break;
             case 3:
-                new MenuSalmentak().setVisible(true);
+                new MenuSalmentak(l).setVisible(true);
                 break;
             case 4:
-                new MenuTeknikoa().setVisible(true);
+                new MenuTeknikoa(l).setVisible(true);
                 break;
             case 5:
-                new MenuLogistika().setVisible(true);
+                new MenuLogistika(l).setVisible(true);
                 break;
             default:
                 JOptionPane.showMessageDialog(null, "ID Ezezaguna / Desconocido");

@@ -220,14 +220,6 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
-    /**
-     * Eraikitzailea lehenetsia.
-     */
-    public MenuTeknikoa() {
-        this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, Sesioa.sailaIzena, null, 0, "", "", "", "",
-                "ES", "", "", null, null, true, 2, "", null));
-    }
-
     // --- FITXAKETA METODOAK ---
     /**
      * Fitxaketa bat egin.

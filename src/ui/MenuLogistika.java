@@ -88,14 +88,6 @@ public class MenuLogistika extends JFrame {
     }
 
     /**
-     * Eraikitzailea lehenetsia.
-     */
-    public MenuLogistika() {
-        this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
-                null, null, true, 2, "", null));
-    }
-
-    /**
      * Pantailaren osagaiak prestatu.
      */
     private void pantailaPrestatu() {

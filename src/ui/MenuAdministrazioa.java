@@ -50,14 +50,6 @@ public class MenuAdministrazioa extends JFrame {
     }
 
     /**
-     * Eraikitzailea lehenetsia (proba edo diseinurako).
-     */
-    public MenuAdministrazioa() {
-        this(new Langilea(Sesioa.idLangilea, Sesioa.izena, Sesioa.abizena, "", null, 0, "", "", "", "", "ES", "", "",
-                null, null, true, 2, "", null));
-    }
-
-    /**
      * Pantailaren osagaiak inizializatu eta kokatu.
      */
     private void pantailaPrestatu() {
@@ -142,7 +134,6 @@ public class MenuAdministrazioa extends JFrame {
 
         // 4. Atzera botoia (Zuzendaritza bakarrik - hau kentzen dugu momentuz edo
         // logika hobetu beharko litzateke)
-        // if ("Zuzendaritza".equalsIgnoreCase(Sesioa.sailaIzena)) { ... }
 
         // Gehitu panelera
         eskuinekoPanela.add(erabiltzaileEtiketa);
