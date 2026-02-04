@@ -430,42 +430,20 @@ public class MenuSalmentak extends JFrame {
         EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
         dialog.setVisible(true);
         if (dialog.isOnartua()) {
-            String sqlEskaera = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, eguneratze_data, guztira_prezioa, eskaera_egoera) VALUES (?, ?, NOW(), NOW(), ?, ?)";
+            try {
+                // Eskaera objektua prestatu
+                Eskaera e = new Eskaera(0, dialog.getBezeroaId(), langilea.getIdLangilea(), null, null,
+                        dialog.getPrezioTotala(), null, null, dialog.getEgoera());
 
-            try (Connection konexioa = DB_Konexioa.konektatu()) {
-                konexioa.setAutoCommit(false); // Transakzioa hasi
-
-                int idEskaera = -1;
-
-                try (PreparedStatement pst = konexioa.prepareStatement(sqlEskaera, Statement.RETURN_GENERATED_KEYS)) {
-                    pst.setInt(1, dialog.getBezeroaId());
-                    pst.setInt(2, langilea.getIdLangilea());
-                    pst.setBigDecimal(3, dialog.getPrezioTotala());
-                    pst.setString(4, dialog.getEgoera());
-                    pst.executeUpdate();
-
-                    ResultSet rs = pst.getGeneratedKeys();
-
-                    if (rs.next()) {
-                        idEskaera = rs.getInt(1);
-                        String egoera = dialog.getEgoera();
-
-                        String sqlLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlLerroa)) {
-                            for (Object[] lerroa : dialog.getLerroak()) {
-                                pstLerroa.setInt(1, idEskaera);
-                                pstLerroa.setInt(2, (int) lerroa[0]); // Produktua ID
-                                pstLerroa.setInt(3, (int) lerroa[1]); // Kantitatea
-                                pstLerroa.setBigDecimal(4, (java.math.BigDecimal) lerroa[2]); // Unitate Prezioa
-                                pstLerroa.setString(5, egoera);
-                                pstLerroa.addBatch();
-                            }
-                            pstLerroa.executeBatch();
-                        }
-                    }
+                // Lerroak prestatu
+                java.util.List<EskaeraLerroa> lerroak = new java.util.ArrayList<>();
+                for (Object[] obj : dialog.getLerroak()) {
+                    lerroak.add(new EskaeraLerroa(0, 0, (int) obj[0], (int) obj[1], (java.math.BigDecimal) obj[2],
+                            dialog.getEgoera()));
                 }
 
-                konexioa.commit(); // Transakzioa baieztatu
+                // Modeloko metodoari deitu
+                int idEskaera = langilea.eskaeraOsoaSortu(e, lerroak);
 
                 // Faktura automatikoa sortu
                 if ("Osatua/Bidalita".equalsIgnoreCase(dialog.getEgoera()) && idEskaera != -1) {
@@ -476,9 +454,9 @@ public class MenuSalmentak extends JFrame {
                     }
                 }
                 datuakKargatu();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Errorea eskaera sortzean: " + e.getMessage());
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea eskaera sortzean: " + ex.getMessage());
             }
         }
     }
@@ -532,43 +510,20 @@ public class MenuSalmentak extends JFrame {
         dialog.setVisible(true);
 
         if (dialog.isOnartua()) {
-            String sqlUpdate = "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() WHERE id_eskaera = ?";
-            String sqlDeleteLerroak = "DELETE FROM eskaera_lerroak WHERE eskaera_id = ?";
+            try {
+                // Eskaera objektua prestatu
+                Eskaera e = new Eskaera(idEskaera, dialog.getBezeroaId(), langilea.getIdLangilea(), null, null,
+                        dialog.getPrezioTotala(), null, null, dialog.getEgoera());
 
-            try (Connection konexioa = DB_Konexioa.konektatu()) {
-                konexioa.setAutoCommit(false);
-
-                // Eskaera eguneratu
-                try (PreparedStatement pst = konexioa.prepareStatement(sqlUpdate)) {
-                    pst.setInt(1, dialog.getBezeroaId());
-                    pst.setBigDecimal(2, dialog.getPrezioTotala());
-                    pst.setString(3, dialog.getEgoera());
-                    pst.setInt(4, idEskaera);
-                    pst.executeUpdate();
+                // Lerroak prestatu
+                java.util.List<EskaeraLerroa> lerroak = new java.util.ArrayList<>();
+                for (Object[] obj : dialog.getLerroak()) {
+                    lerroak.add(new EskaeraLerroa(0, idEskaera, (int) obj[0], (int) obj[1],
+                            (java.math.BigDecimal) obj[2], dialog.getEgoera()));
                 }
 
-                // Lerro zaharrak ezabatu
-                try (PreparedStatement pstDalete = konexioa.prepareStatement(sqlDeleteLerroak)) {
-                    pstDalete.setInt(1, idEskaera);
-                    pstDalete.executeUpdate();
-                }
-
-                // Lerro berriak sartu
-                String egoeraBerria = dialog.getEgoera();
-                String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
-                try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlInsertLerroa)) {
-                    for (Object[] lerroa : dialog.getLerroak()) {
-                        pstLerroa.setInt(1, idEskaera);
-                        pstLerroa.setInt(2, (int) lerroa[0]);
-                        pstLerroa.setInt(3, (int) lerroa[1]);
-                        pstLerroa.setBigDecimal(4, (java.math.BigDecimal) lerroa[2]);
-                        pstLerroa.setString(5, egoeraBerria);
-                        pstLerroa.addBatch();
-                    }
-                    pstLerroa.executeBatch();
-                }
-
-                konexioa.commit();
+                // Modeloko metodoari deitu
+                langilea.eskaeraOsoaEditatu(e, lerroak);
 
                 // Faktura automatikoa sortu
                 if ("Osatua/Bidalita".equalsIgnoreCase(dialog.getEgoera())) {
@@ -579,9 +534,9 @@ public class MenuSalmentak extends JFrame {
                     }
                 }
                 datuakKargatu();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Errorea eskaera editatzean: " + e.getMessage());
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea eskaera editatzean: " + ex.getMessage());
             }
         }
     }
@@ -602,13 +557,10 @@ public class MenuSalmentak extends JFrame {
 
         if (JOptionPane.showConfirmDialog(this, "Ziur zaude eskaera hau ezabatu nahi duzula?", "Ezabatu",
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            String sql = "DELETE FROM eskaerak WHERE id_eskaera = ?";
-            try (Connection konexioa = DB_Konexioa.konektatu();
-                    PreparedStatement pst = konexioa.prepareStatement(sql)) {
-                pst.setInt(1, idEskaera);
-                pst.executeUpdate();
+            try {
+                langilea.eskaeraEzabatu(idEskaera);
                 datuakKargatu();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Errorea eskaera ezabatzean: " + e.getMessage());
             }

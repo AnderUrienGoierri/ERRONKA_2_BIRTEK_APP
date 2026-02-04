@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -739,68 +740,122 @@ public class SalmentaLangilea extends Langilea {
     }
 
     /**
-     * Eskaera sortu.
-     * README.md
-     * 
-     * @param e Eskaera objektua
-     */
-    /**
-     * Eskaera berria sortzen du datu-basean.
+     * Eskaera osoa (eskaera + lerroak) sortzen du transakzio bakarrean.
      *
-     * @param e Eskaera objektua.
-     * @throws Exception Errorea sortzean.
+     * @param e       Eskaera objektua.
+     * @param lerroak Eskaera lerroen zerrenda.
+     * @return Sortutako eskaeraren IDa.
+     * @throws SQLException Errorea datu-basean.
      */
-    public void eskaeraSortu(Eskaera e) throws Exception {
-        String sql = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, guztira_prezioa, eskaera_egoera) " +
-                "VALUES (?, ?, ?, ?, ?)";
+    public int eskaeraOsoaSortu(Eskaera e, List<EskaeraLerroa> lerroak) throws SQLException {
+        Connection konexioa = null;
+        int idEskaera = -1;
+        try {
+            konexioa = DB_Konexioa.konektatu();
+            konexioa.setAutoCommit(false);
 
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement pst = konexioa.prepareStatement(sql)) {
+            String sqlEskaera = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, guztira_prezioa, eskaera_egoera) VALUES (?, ?, NOW(), ?, ?)";
+            try (PreparedStatement pst = konexioa.prepareStatement(sqlEskaera, Statement.RETURN_GENERATED_KEYS)) {
+                pst.setInt(1, e.getBezeroaId());
+                if (e.getLangileaId() != null) {
+                    pst.setInt(2, e.getLangileaId());
+                } else {
+                    pst.setNull(2, java.sql.Types.INTEGER);
+                }
+                pst.setBigDecimal(3, e.getGuztiraPrezioa());
+                pst.setString(4, e.getEskaeraEgoera());
+                pst.executeUpdate();
 
-            pst.setInt(1, e.getBezeroaId());
-            if (e.getLangileaId() != null) {
-                pst.setInt(2, e.getLangileaId());
-            } else {
-                pst.setNull(2, java.sql.Types.INTEGER);
+                ResultSet rs = pst.getGeneratedKeys();
+                if (rs.next()) {
+                    idEskaera = rs.getInt(1);
+                } else {
+                    throw new SQLException("Ez da eskaera IDrik sortu.");
+                }
             }
-            pst.setTimestamp(3, e.getData());
-            pst.setBigDecimal(4, e.getGuztiraPrezioa());
-            pst.setString(5, e.getEskaeraEgoera());
 
-            pst.executeUpdate();
+            String sqlLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlLerroa)) {
+                for (EskaeraLerroa l : lerroak) {
+                    pstLerroa.setInt(1, idEskaera);
+                    pstLerroa.setInt(2, l.getProduktuaId());
+                    pstLerroa.setInt(3, l.getKantitatea());
+                    pstLerroa.setBigDecimal(4, l.getUnitatePrezioa());
+                    pstLerroa.setString(5, e.getEskaeraEgoera());
+                    pstLerroa.addBatch();
+                }
+                pstLerroa.executeBatch();
+            }
+
+            konexioa.commit();
+            return idEskaera;
+        } catch (SQLException ex) {
+            if (konexioa != null)
+                konexioa.rollback();
+            throw ex;
+        } finally {
+            if (konexioa != null) {
+                konexioa.setAutoCommit(true);
+                konexioa.close();
+            }
         }
     }
 
     /**
-     * Eskaera editatu.
-     * 
-     * @param e Eskaera objektua
-     */
-    /**
-     * Eskaera baten datuak editatzen ditu.
+     * Eskaera osoa (eskaera + lerroak) editatzen du transakzio bakarrean.
+     * Lerro zaharrak ezabatu eta berriak sartzen ditu.
      *
-     * @param e Eskaera objektua.
-     * @throws Exception Errorea editatzean.
+     * @param e       Eskaera objektua (id-a barne).
+     * @param lerroak Eskaera lerroen zerrenda berria.
+     * @throws SQLException Errorea datu-basean.
      */
-    public void eskaeraEditatu(Eskaera e) throws Exception {
-        String sql = "UPDATE eskaerak SET bezeroa_id=?, langilea_id=?, data=?, guztira_prezioa=?, " +
-                "eskaera_egoera=? WHERE id_eskaera=?";
+    public void eskaeraOsoaEditatu(Eskaera e, List<EskaeraLerroa> lerroak) throws SQLException {
+        Connection konexioa = null;
+        try {
+            konexioa = DB_Konexioa.konektatu();
+            konexioa.setAutoCommit(false);
 
-        try (Connection konexioa = DB_Konexioa.konektatu();
-                PreparedStatement pst = konexioa.prepareStatement(sql)) {
-
-            pst.setInt(1, e.getBezeroaId());
-            if (e.getLangileaId() != null) {
-                pst.setInt(2, e.getLangileaId());
-            } else {
-                pst.setNull(2, java.sql.Types.INTEGER);
+            // 1. Eskaera eguneratu
+            String sqlUpdate = "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() WHERE id_eskaera = ?";
+            try (PreparedStatement pst = konexioa.prepareStatement(sqlUpdate)) {
+                pst.setInt(1, e.getBezeroaId());
+                pst.setBigDecimal(2, e.getGuztiraPrezioa());
+                pst.setString(3, e.getEskaeraEgoera());
+                pst.setInt(4, e.getIdEskaera());
+                pst.executeUpdate();
             }
-            pst.setTimestamp(3, e.getData());
-            pst.setBigDecimal(4, e.getGuztiraPrezioa());
-            pst.setString(5, e.getEskaeraEgoera());
-            pst.setInt(6, e.getIdEskaera());
 
-            pst.executeUpdate();
+            // 2. Lerro zaharrak ezabatu
+            String sqlDeleteLerroak = "DELETE FROM eskaera_lerroak WHERE eskaera_id = ?";
+            try (PreparedStatement pstDelete = konexioa.prepareStatement(sqlDeleteLerroak)) {
+                pstDelete.setInt(1, e.getIdEskaera());
+                pstDelete.executeUpdate();
+            }
+
+            // 3. Lerro berriak sartu
+            String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlInsertLerroa)) {
+                for (EskaeraLerroa l : lerroak) {
+                    pstLerroa.setInt(1, e.getIdEskaera());
+                    pstLerroa.setInt(2, l.getProduktuaId());
+                    pstLerroa.setInt(3, l.getKantitatea());
+                    pstLerroa.setBigDecimal(4, l.getUnitatePrezioa());
+                    pstLerroa.setString(5, e.getEskaeraEgoera());
+                    pstLerroa.addBatch();
+                }
+                pstLerroa.executeBatch();
+            }
+
+            konexioa.commit();
+        } catch (SQLException ex) {
+            if (konexioa != null)
+                konexioa.rollback();
+            throw ex;
+        } finally {
+            if (konexioa != null) {
+                konexioa.setAutoCommit(true);
+                konexioa.close();
+            }
         }
     }
 

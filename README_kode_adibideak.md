@@ -48,7 +48,7 @@ public void fitxatu(String fitxaketa_mota) throws java.sql.SQLException {
             throw new java.sql.SQLException("Jada kanpoan zaude. Ezin duzu irten sartu gabe.");
         }
 
-        // INSERT egin fitxaketak taulan: 
+        // INSERT egin fitxaketak taulan:
         String insertKontsulta = "INSERT INTO fitxaketak (langilea_id, mota, data, ordua) VALUES (?, ?, CURRENT_DATE, CURRENT_TIME)";
         try (java.sql.PreparedStatement pstInsert = konexioa.prepareStatement(insertKontsulta)) {
             pstInsert.setInt(1, this.getIdLangilea());
@@ -88,13 +88,20 @@ public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int her
 
 Salmenta espezifikoak diren funtzioak (adb. faktura sortu).
 
-```java
-// Faktura PDF sortzeko metodo nagusia
-public void fakturaSortu(int idEskaera) throws Exception {
-    // ... Datuak lortu eta PDF sortu ...
-    FakturaPDF.sortu(fakturaZenbakia, data, bezeroDatuak, lerroak, guztira, fitxategia.getAbsolutePath());
-    // ... DBan erregistratu ...
+// Eskaera osoa transakzio bidez sortzeko metodoa
+public void eskaeraOsoaSortu(Eskaera e, List<EskaeraLerroa> lerroak) throws SQLException {
+Connection kon = DB_Konexioa.konektatu();
+try {
+kon.setAutoCommit(false);
+// ... Eskaera nagusia txertatu ...
+// ... Lerroak batch bidez txertatu ...
+kon.commit();
+} catch (SQLException ex) {
+kon.rollback();
+throw ex;
 }
+}
+
 ```
 
 ### `model.AdministrariLangilea`
@@ -113,20 +120,17 @@ Salmenta menu nagusiaren logika.
 
 **Eskaera Sortu:**
 
-```java
 private void eskaeraGehitu() {
     EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
     dialog.setVisible(true);
     if (dialog.isOnartua()) {
-        String sqlEskaera = "INSERT INTO eskaerak (bezeroa_id, langilea_id, data, eguneratze_data, guztira_prezioa, eskaera_egoera) VALUES (?, ?, NOW(), NOW(), ?, ?)";
-
-        try (Connection konexioa = DB_Konexioa.konektatu()) {
-            konexioa.setAutoCommit(false); // Transakzioa hasi
-            // ... (Eskaera eta lerroak txertatu) ...
-            konexioa.commit(); // Transakzioa baieztatu
+        try {
+            // Logika guztia modelora mugitu da
+            salmentaLangilea.eskaeraOsoaSortu(dialog.getEskaera(), dialog.getEskaeraLerroak());
             datuakKargatu();
+            JOptionPane.showMessageDialog(this, "Eskaera ondo sortu da.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
         }
     }
 }
