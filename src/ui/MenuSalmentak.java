@@ -271,12 +271,7 @@ public class MenuSalmentak extends JFrame {
      */
     private void fitxatu(String mota) {
         try {
-            if ("Sarrera".equals(mota)) {
-                langilea.sarreraFitxaketaEgin();
-            } else {
-                langilea.irteeraFitxaketaEgin();
-            }
-            eguneratuFitxaketaEgoera();
+            langilea.fitxatu(mota);
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);

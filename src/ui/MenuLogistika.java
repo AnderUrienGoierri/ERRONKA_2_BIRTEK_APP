@@ -11,8 +11,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 /**
  * MenuLogistika klasea.
@@ -24,7 +22,6 @@ public class MenuLogistika extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel edukiPanela;
-    private JFileChooser fitxategiHautatzailea;
     private JTextField bilatuTestua;
 
     // Erabiltzailea (OOP)
@@ -37,26 +34,6 @@ public class MenuLogistika extends JFrame {
     private JTable sarreraTaula;
     private JTable biltegiTaula;
     private JTable produktuTaula;
-
-    // Sarrera Berria elementuak
-    private JComboBox<HornitzaileElementua> hornitzaileHautatzailea;
-    private JCheckBox hornitzaileBerriaAukera;
-    private JTextField izenaBerriaTestua;
-    private JTextField postaBerriaTestua;
-    private JTextField ifzBerriaTestua;
-
-    private JTextField produktuIzenaTestua;
-    private JTextField markaTestua;
-    private JComboBox<KategoriaElementua> kategoriaHautatzailea;
-    private JComboBox<String> motaHautatzailea;
-    private JComboBox<BiltegiElementua> biltegiHautatzaileaSarrera;
-    private JTextField kantitateTestua;
-    private JTextField deskribapenaTestua;
-    private JTextField irudiaUrlTestua;
-    private JTextField egoeraOharraTestua;
-
-    private JTable lerroBerriTaula;
-    private DefaultTableModel lerroBerriEredua;
 
     // Iragazkia
     private JComboBox<String> egoeraIragazkia;
@@ -212,8 +189,7 @@ public class MenuLogistika extends JFrame {
         sarreraTabSortu();
         biltegiTabSortu();
         produktuTabSortu();
-        eskaeraTabSortu(); // NEW
-        sarreraBerriaTabSortu();
+        eskaeraTabSortu();
 
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
@@ -226,8 +202,6 @@ public class MenuLogistika extends JFrame {
                 produktuDatuakKargatu();
             else if (index == 3)
                 eskaeraDatuakKargatu();
-            else if (index == 4)
-                sarreraHautatzaileakKargatu();
         });
 
         // Hasierako karga
@@ -235,7 +209,6 @@ public class MenuLogistika extends JFrame {
             sarreraDatuakKargatu();
             biltegiDatuakKargatu();
             produktuDatuakKargatu();
-            sarreraHautatzaileakKargatu();
             eguneratuFitxaketaEgoera();
         }
     }
@@ -248,12 +221,7 @@ public class MenuLogistika extends JFrame {
      */
     private void fitxatu(String mota) {
         try {
-            if ("Sarrera".equals(mota)) {
-                langilea.sarreraFitxaketaEgin();
-            } else {
-                langilea.irteeraFitxaketaEgin();
-            }
-            eguneratuFitxaketaEgoera();
+            langilea.fitxatu(mota);
             eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
@@ -345,6 +313,16 @@ public class MenuLogistika extends JFrame {
         ezabatuBotoia.setBackground(new Color(255, 100, 100));
         ezabatuBotoia.addActionListener(e -> ezabatuSarrera());
         goikoAukeraPanela.add(ezabatuBotoia);
+
+        JButton sarreraBerriaBotoia = new JButton("Sarrera Berria +");
+        sarreraBerriaBotoia.setBackground(new Color(50, 205, 50));
+        sarreraBerriaBotoia.setFont(new Font("SansSerif", Font.BOLD, 12));
+        sarreraBerriaBotoia.addActionListener(e -> {
+            SarreraBerriaDialog dialog = new SarreraBerriaDialog(this, langilea);
+            dialog.setVisible(true);
+            sarreraDatuakKargatu(); // Freskatu
+        });
+        goikoAukeraPanela.add(sarreraBerriaBotoia);
 
         sarreraPanela.add(goikoAukeraPanela, BorderLayout.NORTH);
 
@@ -460,391 +438,6 @@ public class MenuLogistika extends JFrame {
     /**
      * Sarrera berria egiteko fitxa sortu.
      */
-    private void sarreraBerriaTabSortu() {
-        JPanel sarreraBerriaPanela = new JPanel(new BorderLayout());
-        sarreraBerriaPanela.setOpaque(false);
-
-        JPanel formularioPanela = new JPanel(new BorderLayout()) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(new Color(255, 255, 255, 230));
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        formularioPanela.setOpaque(false);
-        formularioPanela.setBorder(BorderFactory.createTitledBorder("Sarrera eta Produktu Berriaren Datuak"));
-
-        JPanel hornitzailePanela = new JPanel(new GridLayout(2, 1));
-        hornitzailePanela.setOpaque(false);
-
-        JPanel hornAukeratuPanela = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        hornAukeratuPanela.setOpaque(false);
-        hornitzaileHautatzailea = new JComboBox<>();
-        hornitzaileBerriaAukera = new JCheckBox("Hornitzaile Berria Sortu?");
-        hornitzaileBerriaAukera.setOpaque(false);
-        hornitzaileBerriaAukera.addActionListener(e -> hornitzaileModuaAldatu());
-
-        hornAukeratuPanela.add(new JLabel("Hornitzailea Aukeratu: "));
-        hornAukeratuPanela.add(hornitzaileHautatzailea);
-        hornAukeratuPanela.add(hornitzaileBerriaAukera);
-
-        JPanel hornBerriaPanela = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        hornBerriaPanela.setOpaque(false);
-        izenaBerriaTestua = new JTextField(15);
-        postaBerriaTestua = new JTextField(15);
-        ifzBerriaTestua = new JTextField(10);
-
-        hornBerriaPanela.add(new JLabel("Izena:"));
-        hornBerriaPanela.add(izenaBerriaTestua);
-        hornBerriaPanela.add(new JLabel("Emaila:"));
-        hornBerriaPanela.add(postaBerriaTestua);
-        hornBerriaPanela.add(new JLabel("IFZ:"));
-        hornBerriaPanela.add(ifzBerriaTestua);
-
-        hornitzaileBerriaGaitu(false);
-
-        hornitzailePanela.add(hornAukeratuPanela);
-        hornitzailePanela.add(hornBerriaPanela);
-        formularioPanela.add(hornitzailePanela, BorderLayout.NORTH);
-
-        JPanel formPanela = new JPanel(new GridBagLayout());
-        formPanela.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        produktuIzenaTestua = new JTextField(15);
-        markaTestua = new JTextField(15);
-        kategoriaHautatzailea = new JComboBox<>();
-        motaHautatzailea = new JComboBox<>();
-        biltegiHautatzaileaSarrera = new JComboBox<>();
-        kantitateTestua = new JTextField(5);
-        deskribapenaTestua = new JTextField(30);
-        irudiaUrlTestua = new JTextField(20);
-        egoeraOharraTestua = new JTextField(20);
-
-        motaHautatzailea.addItem("Eramangarria");
-        motaHautatzailea.addItem("Mahai-gainekoa");
-        motaHautatzailea.addItem("Mugikorra");
-        motaHautatzailea.addItem("Tableta");
-        motaHautatzailea.addItem("Zerbitzaria");
-        motaHautatzailea.addItem("Pantaila");
-        motaHautatzailea.addItem("Softwarea");
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanela.add(new JLabel("Prod. Izena:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        formPanela.add(produktuIzenaTestua, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Marka:"), gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        formPanela.add(markaTestua, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Kategoria:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        formPanela.add(kategoriaHautatzailea, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Mota:"), gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        formPanela.add(motaHautatzailea, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Biltegia:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        formPanela.add(biltegiHautatzaileaSarrera, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Kantitatea:"), gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        formPanela.add(kantitateTestua, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Deskribapena:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1.0;
-        formPanela.add(deskribapenaTestua, gbc);
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Irudia URL:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-
-        JPanel irudiPanela = new JPanel(new BorderLayout());
-        irudiPanela.setOpaque(false);
-        irudiPanela.add(irudiaUrlTestua, BorderLayout.CENTER);
-        JButton igoBotoia = new JButton("Igo");
-        igoBotoia.addActionListener(e -> igoIrudia());
-        irudiPanela.add(igoBotoia, BorderLayout.EAST);
-
-        formPanela.add(irudiPanela, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 4;
-        gbc.weightx = 0.0;
-        formPanela.add(new JLabel("Oharra:"), gbc);
-        gbc.gridx = 3;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        formPanela.add(egoeraOharraTestua, gbc);
-
-        JButton gehituBotoia = new JButton("Gehitu Zerrendara +");
-        gehituBotoia.addActionListener(e -> gehituLerroaTaulara());
-
-        JPanel erdikoFormPanela = new JPanel(new BorderLayout());
-        erdikoFormPanela.setOpaque(false);
-        erdikoFormPanela.add(formPanela, BorderLayout.CENTER);
-
-        JPanel botoiHustuPanela = new JPanel();
-        botoiHustuPanela.setOpaque(false);
-        botoiHustuPanela.add(gehituBotoia);
-        erdikoFormPanela.add(botoiHustuPanela, BorderLayout.SOUTH);
-
-        formularioPanela.add(erdikoFormPanela, BorderLayout.CENTER);
-        sarreraBerriaPanela.add(formularioPanela, BorderLayout.NORTH);
-
-        String[] zutabeIzenak = { "Izena", "Marka", "Kategoria", "Mota", "Biltegia", "Kantitatea", "Deskribapena",
-                "Irudia", "Oharra" };
-        lerroBerriEredua = new DefaultTableModel(zutabeIzenak, 0);
-        lerroBerriTaula = new JTable(lerroBerriEredua);
-        sarreraBerriaPanela.add(new JScrollPane(lerroBerriTaula), BorderLayout.CENTER);
-
-        JButton gordeBotoia = new JButton("GORDE SARRERA ETA SORTU PRODUKTUAK");
-        gordeBotoia.setBackground(new Color(0, 128, 0));
-        gordeBotoia.setForeground(Color.WHITE);
-        gordeBotoia.setFont(new Font("Arial", Font.BOLD, 14));
-        gordeBotoia.addActionListener(e -> gordeSarreraOsoa());
-        sarreraBerriaPanela.add(gordeBotoia, BorderLayout.SOUTH);
-
-        pestainaPanela.addTab("Sarrera Berria", null, sarreraBerriaPanela, null);
-    }
-
-    // --- LAGUNTZAILEAK ---
-    /**
-     * Hornitzaile modua aldatu (lehendik dagoena edo berria).
-     */
-    private void hornitzaileModuaAldatu() {
-        boolean berriaDa = hornitzaileBerriaAukera.isSelected();
-        hornitzaileBerriaGaitu(berriaDa);
-        hornitzaileHautatzailea.setEnabled(!berriaDa);
-    }
-
-    /**
-     * Hornitzaile berriaren eremuak gaitu edo desgaitu.
-     * 
-     * @param gaitu True gaitzeko.
-     */
-    private void hornitzaileBerriaGaitu(boolean gaitu) {
-        izenaBerriaTestua.setEnabled(gaitu);
-        postaBerriaTestua.setEnabled(gaitu);
-        ifzBerriaTestua.setEnabled(gaitu);
-        if (!gaitu) {
-            izenaBerriaTestua.setText("");
-            postaBerriaTestua.setText("");
-            ifzBerriaTestua.setText("");
-        }
-    }
-
-    /**
-     * Sarrera berrirako hautatzaileak (ComboBox) kargatu datu-basetik.
-     */
-    private void sarreraHautatzaileakKargatu() {
-        hornitzaileHautatzailea.removeAllItems();
-        kategoriaHautatzailea.removeAllItems();
-        biltegiHautatzaileaSarrera.removeAllItems();
-        try (Connection konexioa = DB_Konexioa.konektatu()) {
-            Statement sententzia = konexioa.createStatement();
-            ResultSet rsH = sententzia.executeQuery("SELECT id_hornitzailea, izena_soziala FROM hornitzaileak");
-            while (rsH.next())
-                hornitzaileHautatzailea.addItem(new HornitzaileElementua(rsH.getInt(1), rsH.getString(2)));
-            ResultSet rsK = sententzia.executeQuery("SELECT id_kategoria, izena FROM produktu_kategoriak");
-            while (rsK.next())
-                kategoriaHautatzailea.addItem(new KategoriaElementua(rsK.getInt(1), rsK.getString(2)));
-            ResultSet rsB = sententzia.executeQuery("SELECT id_biltegia, izena FROM biltegiak");
-            while (rsB.next())
-                biltegiHautatzaileaSarrera.addItem(new BiltegiElementua(rsB.getInt(1), rsB.getString(2)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Produktu lerro berria gehitu sarrera berriaren taulara.
-     */
-    private void gehituLerroaTaulara() {
-        String izena = produktuIzenaTestua.getText();
-        String marka = markaTestua.getText();
-        KategoriaElementua kat = (KategoriaElementua) kategoriaHautatzailea.getSelectedItem();
-        String mota = (String) motaHautatzailea.getSelectedItem();
-        BiltegiElementua bilt = (BiltegiElementua) biltegiHautatzaileaSarrera.getSelectedItem();
-        String kantiStr = kantitateTestua.getText();
-        if (izena.isEmpty() || marka.isEmpty() || kantiStr.isEmpty() || kat == null || bilt == null) {
-            JOptionPane.showMessageDialog(this, "Mesedez, bete produktuaren eremu guztiak.");
-            return;
-        }
-        try {
-            int kanti = Integer.parseInt(kantiStr);
-            if (kanti <= 0)
-                throw new NumberFormatException();
-
-            String desk = deskribapenaTestua.getText();
-            String url = irudiaUrlTestua.getText();
-            String oharra = egoeraOharraTestua.getText();
-
-            lerroBerriEredua.addRow(new Object[] { izena, marka, kat, mota, bilt, kanti, desk, url, oharra });
-            produktuIzenaTestua.setText("");
-            markaTestua.setText("");
-            kantitateTestua.setText("");
-            deskribapenaTestua.setText("");
-            irudiaUrlTestua.setText("");
-            egoeraOharraTestua.setText("");
-            produktuIzenaTestua.requestFocus();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Kantitateak zenbakia izan behar du.");
-        }
-    }
-
-    /**
-     * Irudia igo eta proiektuan kopiatu.
-     */
-    private void igoIrudia() {
-        if (fitxategiHautatzailea == null) {
-            fitxategiHautatzailea = new JFileChooser();
-            javax.swing.filechooser.FileNameExtensionFilter filter = new javax.swing.filechooser.FileNameExtensionFilter(
-                    "Irudiak (JPG, PNG)", "jpg", "jpeg", "png");
-            fitxategiHautatzailea.setFileFilter(filter);
-        }
-
-        int result = fitxategiHautatzailea.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fitxategiHautatzailea.getSelectedFile();
-            try {
-                // Karpetaren bidea lortu
-                String baseDir = "src/birtek_interfaze_grafikoa/irudiak/";
-                File destDir = new File(baseDir);
-                if (!destDir.exists()) {
-                    destDir.mkdirs();
-                }
-
-                // Izena mantendu (edo garbitu espazioak)
-                String fileName = selectedFile.getName().replaceAll("\\s+", "_");
-                File destFile = new File(destDir, fileName);
-
-                // Kopiatu
-                Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                // Testu-eremuan bidea jarri
-                irudiaUrlTestua.setText("irudiak/" + fileName);
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Errorea irudia igotzean: " + ex.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Sarrera osoa (eta produktuak/lerroak) datu-basean gorde.
-     */
-    private void gordeSarreraOsoa() {
-        if (lerroBerriEredua.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Ez dago produkturik zerrendan.");
-            return;
-        }
-
-        try {
-            int hornitzaileaId = -1;
-            if (hornitzaileBerriaAukera.isSelected()) {
-                String izena = izenaBerriaTestua.getText().trim();
-                String email = postaBerriaTestua.getText().trim();
-                String ifz = ifzBerriaTestua.getText().trim();
-                if (izena.isEmpty() || email.isEmpty() || ifz.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Bete hornitzaile berriaren datuak.");
-                    return;
-                }
-                hornitzaileaId = langilea.hornitzaileBerriaSortu(izena, ifz, email);
-            } else {
-                HornitzaileElementua item = (HornitzaileElementua) hornitzaileHautatzailea.getSelectedItem();
-                if (item != null)
-                    hornitzaileaId = item.id;
-                else {
-                    JOptionPane.showMessageDialog(this, "Aukeratu hornitzaile bat.");
-                    return;
-                }
-            }
-
-            java.util.List<Produktua> produktuList = new java.util.ArrayList<>();
-            java.util.List<SarreraLerroa> lerroList = new java.util.ArrayList<>();
-
-            for (int i = 0; i < lerroBerriEredua.getRowCount(); i++) {
-                String izena = (String) lerroBerriEredua.getValueAt(i, 0);
-                String marka = (String) lerroBerriEredua.getValueAt(i, 1);
-                KategoriaElementua kat = (KategoriaElementua) lerroBerriEredua.getValueAt(i, 2);
-                String mota = (String) lerroBerriEredua.getValueAt(i, 3);
-                BiltegiElementua bilt = (BiltegiElementua) lerroBerriEredua.getValueAt(i, 4);
-                int kanti = (Integer) lerroBerriEredua.getValueAt(i, 5);
-                String desk = (String) lerroBerriEredua.getValueAt(i, 6);
-                String imgUrl = (String) lerroBerriEredua.getValueAt(i, 7);
-                String oharra = (String) lerroBerriEredua.getValueAt(i, 8);
-
-                Produktua p = new Eramangarria(0, hornitzaileaId, kat.id, izena, marka, mota, desk, imgUrl, bilt.id,
-                        "Zehazteko", oharra, false, java.math.BigDecimal.ZERO, kanti, java.math.BigDecimal.ZERO,
-                        java.math.BigDecimal.ZERO, null, null, "", 0, 0, java.math.BigDecimal.ZERO, 0, "",
-                        java.math.BigDecimal.ZERO);
-                produktuList.add(p);
-
-                // Temp SarreraLerroa
-                SarreraLerroa l = new SarreraLerroa(0, 0, 0, kanti, "Bidean");
-                lerroList.add(l);
-            }
-
-            langilea.produktuSarreraBerriaSortu(hornitzaileaId, produktuList, lerroList);
-
-            lerroBerriEredua.setRowCount(0);
-            izenaBerriaTestua.setText("");
-            postaBerriaTestua.setText("");
-            ifzBerriaTestua.setText("");
-            hornitzaileBerriaAukera.setSelected(false);
-            hornitzaileModuaAldatu();
-            sarreraHautatzaileakKargatu();
-            JOptionPane.showMessageDialog(this, "Sarrera eta produktuak ondo sortu dira.");
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Errorea prozesuan: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Sarreren datuak taulan kargatu.

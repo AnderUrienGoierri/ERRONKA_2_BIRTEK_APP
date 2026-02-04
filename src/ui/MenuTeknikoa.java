@@ -228,11 +228,7 @@ public class MenuTeknikoa extends JFrame {
      */
     private void fitxatu(String mota) {
         try {
-            if ("Sarrera".equals(mota)) {
-                langilea.sarreraFitxaketaEgin();
-            } else {
-                langilea.irteeraFitxaketaEgin();
-            }
+            langilea.fitxatu(mota);
             eguneratuFitxaketaEgoera();
             datuakKargatu(); // Refrescar tableros
         } catch (SQLException e) {

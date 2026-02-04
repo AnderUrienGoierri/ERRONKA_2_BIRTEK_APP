@@ -7,23 +7,24 @@ Proiektu hau Birtek enpresaren barne kudeaketarako Java aplikazioa da. Langileen
 Aplikazioa exekutatzeko, jarraitu urrats hauek:
 
 1. **Datu-basea prestatu**:
+
    - Sartu `sql` karpetara eta `birtek_db.sql` fitxategia bilatu.
    - Inportatu fitxategi hau zure MySQL/MariaDB zerbitzarian datu-basea eta taulak sortzeko.
    - _Oharra: Datu-basearen izena `birtek_db` da._
-
 2. **Konexioa konfiguratu**:
+
    - Ireki `src/db/DB_Konexioa.java` fitxategia.
    - Ziurtatu databaseko kredentzialak zuzenak direla (erabiltzailea eta pasahitza).
      - URL: `jdbc:mysql://localhost:3306/birtek_db`
      - Erabiltzailea: `root`
      - Pasahitza: `1MG32025`
-
 3. **Liburutegiak gehitu**:
+
    - Ziurtatu `lib` karpetako `.jar` fitxategiak Build Path-ean daudela:
      - `mysql-connector-j-9.1.0.jar`
      - `itextpdf-5.5.9.jar`
-
 4. **Exekutatu**:
+
    - `src/main/Main.java` abiarazi.
 
 ## Proiektuaren Egitura
@@ -55,6 +56,7 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 #### Langile Hierarkia
 
 - **`Langilea`** (Gurasoa): Langile guztien oinarrizko atributuak eta metodoak.
+
   - `fitxatu(String mota)`: Sarrera edo Irteera fitxaketak erregistratzen du DBan.
   - `sarreraFitxaketaEgin()`: "Sarrera" motako fitxaketa laguntzailea.
   - `irteeraFitxaketaEgin()`: "Irteera" motako fitxaketa laguntzailea.
@@ -66,8 +68,8 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `autentifikatu(String pasahitza)`: Pasahitza zuzena den egiaztatzen du.
   - `getNan()` / `setNan()`: NAN/IFZ kudeatzaileak.
   - `getSaltoTxartelaUid()` / `setSaltoTxartelaUid()`: Salto txartelaren identifikadorearen kudeaketa.
-
 - **`AdministrariLangilea`**: Administrazio lanetarako logika gehigarria.
+
   - **Langileak**:
     - `langileaSortu(...)`: Langile berriak sortu DBan.
     - `langileaEditatu(...)`: Langile baten datuak eguneratu.
@@ -94,8 +96,8 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
     - `herriaEzabatu(...)`: Herri bat sistematik ezabatu.
   - **Bestelakoak**:
     - `bezeroaFakturaIkusi(int id)`: Bezero baten faktura espezifiko bat berreskuratu.
-
 - **`SalmentaLangilea`**: Salmenta eta fakturazio logika.
+
   - `fakturaSortu(int idEskaera)`: Emandako eskaera IDarekin PDF faktura bat sortzen du eta diskoan gorde.
   - `bezeroBerriaSortu(Bezeroa b)`: Bezero berri bat DBan erregistratu.
   - `bezeroaEditatu(Bezeroa b)`: Bezero baten datuak eguneratu.
@@ -115,13 +117,13 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `eskaeraLerroaGehitu(int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera bati produktu bat gehitu.
   - `eskaeraLerroakEditatu(int idEskaeraLerroa, int idEskaera, int idProduktua, int kantitatea, BigDecimal prezioa)`: Eskaera lerro bat aldatu.
   - `eskaeraLerroaEzabatu(int idEskaeraLerroa)`: Eskaera lerro bat ezabatu.
-
 - **`BiltegiLangilea`**: Logistika lanak.
+
   - `biltegiaSortu(String izena, String sku)`: Biltegi berria erregistratu.
   - `biltegiaEzabatu(int idBiltegia)`: Biltegi bat DBtik kendu.
   - `biltegiaEditatu(int idBiltegia, String izena, String sku)`: Biltegi datuak eguneratu.
   - `hornitzaileBerriaSortu(String izena, String ifz, String emaila)`: Hornitzaile berria sortu.
-  - `c(...)`: Sarrera osoa (hornitzailea, produktuak, lerroak) transakzio bakarrean kudeatu.
+  - `produktuSarreraBerriaSortu(...)`: Sarrera osoa (hornitzailea, produktuak, lerroak) transakzio bakarrean kudeatu.
   - `produktuEgoeraOharraJarri(int idProduktua, String oharra)`: Produktuaren egoerari buruzko oharra gehitu.
   - `produktuarenBiltegiaAldatu(int idProduktua, int idBiltegia)`: Produktu bat biltegi batetik bestera mugitu.
   - `produktuSarrerakIkusi(String egoeraIragazkia)`: Sarreren zerrenda lortu iragazki bidez.
@@ -133,8 +135,8 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
   - `produktuEskaeraLerroakIkusi(int idEskaera)`: Eskaera baten lerro guztiak ikusi.
   - `produktuEskaeraEgoeraAldatu(int idEskaera, String egoera)`: Eskaera baten egoera eguneratu. Aldaketak lerro guztietara hedatzen dira.
   - `produktuEskaeraLerroEgoeraAldatu(int idEskaeraLerroa, String egoera, int idEskaera)`: Eskaera lerro bat eguneratu. Lerro bat "Prestatzen" badago, eskaera osoa "Prestatzen" jartzen da.
-
 - **`TeknikariLangilea`**: Konponketa lanak eta produktu teknikoen kudeaketa.
+
   - `produktuakIkusi()`: Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez daudenak).
   - `produktuBatSortu(Produktua p)`: Produktu berri bat sisteman sartu.
   - `produktuaEditatu(int id, boolean salgai, String egoera)`: Produktuaren egoera eta salgai-marka aldatu.
@@ -163,40 +165,38 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 
 - **`SaioaHastekoPanela`**:
-  - Erabiltzailea identifikatu eta dagokion menua irekitzen du bere rolaren (Saila) arabera.
 
+  - Erabiltzailea identifikatu eta dagokion menua irekitzen du bere rolaren (Saila) arabera.
 - **`MenuSalmentak`**: Salmenta sailaren interfazea.
+
   - `eskaeraGehitu()`, `eskaeraEditatu()`, `eskaeraEzabatu()`: Eskaeren CRUD osoa.
   - `fakturaSortu()`: Hautatutako eskaeraren faktura sortu eta ireki.
   - `garbituEskaeraFiltroa()`: Eskaeren fitxan bilatzailea eta filtroak garbitzen ditu.
   - `fitxatu(...)`: Langilearen sarrera/irteera botoiak.
-
 - **`MenuLogistika`**: Biltegi sailaren interfazea.
-  - `sarreraTabSortu()`: Sarrerak ikusteko eta kudeatzeko (editatu/ezabatu) fitxa.
-  - `biltegiTabSortu()`: Biltegiak kudeatzeko fitxa.
-  - `produktuTabSortu()`: Produktuen inbentarioa, kokapenak eta oharrak kudeatzeko fitxa.
-  - `eskaeraTabSortu()`: Bezeroen eskaerak eta beraien lerroak kudeatzeko fitxa.
-  - `sarreraBerriaTabSortu()`: Sarrera berriak (hornitzailea + produktuak) sortzeko inprimakia.
+
+  - `sarreraTabSortu()`: Sarrerak ikusteko eta kudeatzeko fitxa. "Sarrera Berria +" botoia daukan elkarrizketa-leihoa irekitzeko.
   - `ikusiSarreraLerroak()`: Sarrera baten xehetasunak erakusten dituen lehioa ireki.
   - `editatuSarrera()`: Sarreraren egoera aldatzeko lehioa ireki.
   - `ezabatuSarrera()`: Sarrera bat ezabatu.
   - `ikusiEskaeraLerroak()`: Eskaera baten lerroak ikusi eta kudeatzeko lehioa.
   - `editatuProduktuOharra()`: Produktu bati oharra gehitu/aldatu.
   - `igoIrudia()`: Produktuei irudiak esleitzeko fitxategi-hautatzailea.
-
 - **`MenuTeknikoa`**: SAT / Konponketa sailaren interfazea.
-  - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
 
+  - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
 - **`MenuAdministrazioa`**: Kudeaketa orokorra.
+
   - `datuakKargatuOsoa()`: Langileak, sailak eta datu-maisuak kudeatzeko taulak (CRUD eragiketekin).
   - `gehituElementua(...)`, `editatuElementua(...)`, `ezabatuElementua(...)`: Datu orokorren kudeaketa.
-
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
-  - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).
 
-- **`BezeroaDialog` & `NireDatuakDialog`**:
+  - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).
+- **`BezeroaDialog` & `NireDatuakDialog` & `SarreraBerriaDialog`**:
+
   - `BezeroaDialog`: Bezeroen datuak kudeatzeko (gehitu, editatu, ikusi). Herriak gehitzeko aukera barne.
   - `NireDatuakDialog`: Langilearen profil datuak modu estandarrean editatzeko lehioa.
-
+  - `SarreraBerriaDialog`: Produktu sarrera berriak eta produktuak sortzeko formularioa.
 - **`TaulaModelatzailea`**:
+
   - `ereduaEraiki(ResultSet rs)`: SQL emaitzak automatikoki JTable bateragarria den `DefaultTableModel` bihurtzen du.

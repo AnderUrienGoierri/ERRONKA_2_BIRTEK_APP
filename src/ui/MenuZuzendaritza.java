@@ -148,44 +148,11 @@ public class MenuZuzendaritza extends JFrame {
      * @param mota Fitxaketa mota.
      */
     private void fitxatu(String mota) {
-        String egiaztatuGaldera = "SELECT mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC LIMIT 1";
-        try (Connection konexioa = DB_Konexioa.konektatu()) {
-            try (PreparedStatement pstEgiaztatu = konexioa.prepareStatement(egiaztatuGaldera)) {
-                pstEgiaztatu.setInt(1, langilea.getIdLangilea());
-                try (ResultSet rs = pstEgiaztatu.executeQuery()) {
-                    String azkenMota = null;
-                    if (rs.next())
-                        azkenMota = rs.getString("mota");
-                    if ("Sarrera".equals(mota) && "Sarrera".equals(azkenMota)) {
-                        JOptionPane.showMessageDialog(this, "Jada barruan zaude.", "Errorea",
-                                JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    if ("Irteera".equals(mota) && "Irteera".equals(azkenMota)) {
-                        JOptionPane.showMessageDialog(this, "Jada kanpoan zaude.", "Errorea",
-                                JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    if ("Irteera".equals(mota) && azkenMota == null) {
-                        JOptionPane.showMessageDialog(this, "Ezin duzu irten sartu gabe.", "Errorea",
-                                JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                }
-            }
-            String sartuGaldera = "INSERT INTO fitxaketak (langilea_id, mota) VALUES (?, ?)";
-            try (PreparedStatement pstSartu = konexioa.prepareStatement(sartuGaldera)) {
-                pstSartu.setInt(1, langilea.getIdLangilea());
-                pstSartu.setString(2, mota);
-                if (pstSartu.executeUpdate() > 0) {
-                    // JOptionPane.showMessageDialog(this, mota + " erregistratuta.", "Ongi",
-                    // JOptionPane.INFORMATION_MESSAGE);
-                    eguneratuFitxaketaEgoera();
-                }
-            }
+        try {
+            langilea.fitxatu(mota);
+            eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
     }
 

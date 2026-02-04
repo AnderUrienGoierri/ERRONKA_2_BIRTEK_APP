@@ -440,14 +440,14 @@ public class BiltegiLangilea extends Langilea {
         String sql = "UPDATE sarrera_lerroak SET sarrera_lerro_egoera = ? WHERE id_sarrera_lerroa = ?";
 
         try (Connection kon = DB_Konexioa.konektatu()) {
-            // 1. Update line
+            // 1. Lerroaren egoera aldatu
             try (PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setString(1, egoera);
                 pst.setInt(2, idSarreraLerroa);
                 pst.executeUpdate();
             }
 
-            // 2. Get Parent ID
+            // 2. Gurasoaren ID-a lortu
             int idSarrera = -1;
             try (PreparedStatement pstGetId = kon
                     .prepareStatement("SELECT sarrera_id FROM sarrera_lerroak WHERE id_sarrera_lerroa = ?")) {
@@ -458,7 +458,7 @@ public class BiltegiLangilea extends Langilea {
             }
 
             if (idSarrera != -1) {
-                // 3. Check peers - IGNORE 'Ezabatua' lines
+                // 3. Egiaztatu gainerako lerroak - 'Ezabatua' lerroak ez kontuan hartu
                 boolean allJasota = true;
                 try (PreparedStatement pstCheck = kon.prepareStatement(
                         "SELECT COUNT(*) FROM sarrera_lerroak WHERE sarrera_id = ? AND sarrera_lerro_egoera != 'Jasota' AND sarrera_lerro_egoera != 'Ezabatua'")) {
@@ -469,7 +469,7 @@ public class BiltegiLangilea extends Langilea {
                     }
                 }
 
-                // 4. Update Parent internally (Prevent infinite cascade)
+                // 4. Gurasoaren egoera aldatu (Infinitu kaskada saihesteko)
                 String newStatus = allJasota ? "Jasota" : "Bidean";
                 try (PreparedStatement pstUpdateParent = kon
                         .prepareStatement("UPDATE sarrerak SET sarrera_egoera = ? WHERE id_sarrera = ?")) {
