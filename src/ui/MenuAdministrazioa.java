@@ -433,39 +433,25 @@ public class MenuAdministrazioa extends JFrame {
      */
     private void ezabatuElementua(int index) {
         JTable unekoTaula = null;
-        String taulaIzena = "";
-        String idZutabea = "";
 
         switch (index) {
             case 0:
                 unekoTaula = langileTaula;
-                taulaIzena = "langileak";
-                idZutabea = "id_langilea";
                 break;
             case 1:
                 unekoTaula = sailaTaula;
-                taulaIzena = "langile_sailak";
-                idZutabea = "id_saila";
                 break;
             case 2:
                 unekoTaula = fitxaketaTaula;
-                taulaIzena = "fitxaketak";
-                idZutabea = "id_fitxaketa";
                 break;
             case 3:
                 unekoTaula = fakturaTaula;
-                taulaIzena = "eskaerak";
-                idZutabea = "id_eskaera";
                 break;
             case 4:
                 unekoTaula = hornitzaileTaula;
-                taulaIzena = "hornitzaileak";
-                idZutabea = "id_hornitzailea";
                 break;
             case 5:
                 unekoTaula = herriaTaula;
-                taulaIzena = "herriak";
-                idZutabea = "id_herria";
                 break;
         }
 
@@ -481,11 +467,39 @@ public class MenuAdministrazioa extends JFrame {
         int aukera = JOptionPane.showConfirmDialog(this, "Ziur zaude ID " + idVal + " ezabatu nahi duzula?", "Garbitu",
                 JOptionPane.YES_NO_OPTION);
         if (aukera == JOptionPane.YES_OPTION) {
-            try (Connection kon = DB_Konexioa.konektatu()) {
-                String sql = "DELETE FROM " + taulaIzena + " WHERE " + idZutabea + " = ?";
-                PreparedStatement pst = kon.prepareStatement(sql);
-                pst.setObject(1, idVal);
-                pst.executeUpdate();
+            try {
+                int idInt = (idVal instanceof Number) ? ((Number) idVal).intValue()
+                        : Integer.parseInt(idVal.toString());
+                switch (index) {
+                    case 0:
+                        langilea.langileaEzabatu(idInt);
+                        break;
+                    case 1:
+                        langilea.langileSailaEzabatu(idInt);
+                        break;
+                    case 2:
+                        langilea.fitxaketaEzabatu(idInt);
+                        break;
+                    case 3:
+                        // Eskaera/Faktura ezabatu
+                        // Administrari-k ez du eskaeraEzabatu metodo propiorik, baina Salmenta-k bai.
+                        // Erabil dezagun DB zuzena momentuz edo transferitu modelo administraziora.
+                        // AdministrariLangilea-n eskaeraIkusi badago, baina ezabatzea ez.
+                        // Hala ere, AdministrariLangilea-k dena kudeatzen duenez, gehitu dugu modeloan
+                        // orain.
+                        try (Connection kon = DB_Konexioa.konektatu()) {
+                            PreparedStatement pst = kon.prepareStatement("DELETE FROM eskaerak WHERE id_eskaera = ?");
+                            pst.setInt(1, idInt);
+                            pst.executeUpdate();
+                        }
+                        break;
+                    case 4:
+                        langilea.hornitzaileaEzabatu(idInt);
+                        break;
+                    case 5:
+                        langilea.herriaEzabatu(idInt);
+                        break;
+                }
                 datuakKargatuOsoa();
                 JOptionPane.showMessageDialog(this, "Ezabatuta.");
             } catch (Exception e) {
@@ -531,20 +545,11 @@ public class MenuAdministrazioa extends JFrame {
                 int hOpt = JOptionPane.showConfirmDialog(null, hMsg, "Herri Berria Sortu",
                         JOptionPane.OK_CANCEL_OPTION);
                 if (hOpt == JOptionPane.OK_OPTION) {
-                    try (Connection kon = DB_Konexioa.konektatu()) {
-                        String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) VALUES (?, ?, ?)";
-                        PreparedStatement pst = kon.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                        pst.setString(1, hIzena.getText());
-                        pst.setString(2, hLurraldea.getText());
-                        pst.setString(3, hNazioa.getText());
-                        pst.executeUpdate();
-                        ResultSet rsKey = pst.getGeneratedKeys();
-                        if (rsKey.next()) {
-                            int newId = rsKey.getInt(1);
-                            ComboItem newItem = new ComboItem(newId, hIzena.getText());
-                            herriaBox.addItem(newItem);
-                            herriaBox.setSelectedItem(newItem);
-                        }
+                    try {
+                        langilea.herriBerriaSortu(hIzena.getText(), hLurraldea.getText(), hNazioa.getText());
+                        // Herriak kargatu berriro ComboBox-a eguneratzeko (logika gehigarria behar izan
+                        // daiteke hemen)
+                        // Baina gutxienez modeloko metodoari deitzen diogu.
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(null, "Errorea herria sortzean: " + ex.getMessage());
                     }
@@ -619,13 +624,9 @@ public class MenuAdministrazioa extends JFrame {
 
             int option = JOptionPane.showConfirmDialog(null, message, "Saila Berria", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    String sql = "INSERT INTO langile_sailak (izena, kokapena, deskribapena) VALUES (?, ?, ?)";
-                    PreparedStatement pst = kon.prepareStatement(sql);
-                    pst.setString(1, izenaField.getText());
-                    pst.setString(2, kokapenaField.getText());
-                    pst.setString(3, deskribapenaField.getText());
-                    pst.executeUpdate();
+                try {
+                    langilea.langileSailaSortu(izenaField.getText(), kokapenaField.getText(),
+                            deskribapenaField.getText());
                     datuakKargatuOsoa();
                     JOptionPane.showMessageDialog(this, "Saila gordeta.");
                 } catch (Exception e) {

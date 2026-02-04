@@ -330,14 +330,23 @@ public class MenuSalmentak extends JFrame {
             int idEskaera = (idObj instanceof Number) ? ((Number) idObj).intValue()
                     : Integer.parseInt(idObj.toString());
 
-            try (Connection konexioa = DB_Konexioa.konektatu()) {
-                String sql = "SELECT p.izena, el.kantitatea, el.unitate_prezioa, (el.kantitatea * el.unitate_prezioa) as guztira, el.eskaera_lerro_egoera "
-                        +
-                        "FROM eskaera_lerroak el JOIN produktuak p ON el.produktua_id = p.id_produktua " +
-                        "WHERE el.eskaera_id = ?";
-                PreparedStatement pst = konexioa.prepareStatement(sql);
-                pst.setInt(1, idEskaera);
-                eskaeraLerroTaula.setModel(TaulaModelatzailea.ereduaEraiki(pst.executeQuery()));
+            try {
+                java.util.List<EskaeraLerroa> lerroak = langilea.eskaeraLerroakIkusi(idEskaera);
+                String[] zutabeak = { "Produktua", "Kantitatea", "P.Unit.", "Guztira", "Egoera" };
+                DefaultTableModel model = new DefaultTableModel(zutabeak, 0);
+
+                for (EskaeraLerroa l : lerroak) {
+                    Produktua p = langilea.produktuaIkusi(l.getProduktuaId());
+                    String pIzena = (p != null) ? p.getIzena() : "ID: " + l.getProduktuaId();
+                    model.addRow(new Object[] {
+                            pIzena,
+                            l.getKantitatea(),
+                            l.getUnitatePrezioa(),
+                            l.getUnitatePrezioa().multiply(new java.math.BigDecimal(l.getKantitatea())),
+                            l.getEskaeraLerroEgoera()
+                    });
+                }
+                eskaeraLerroTaula.setModel(model);
             } catch (Exception e) {
                 e.printStackTrace();
             }

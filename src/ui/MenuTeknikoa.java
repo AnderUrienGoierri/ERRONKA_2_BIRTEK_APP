@@ -337,19 +337,12 @@ public class MenuTeknikoa extends JFrame {
         if (JOptionPane.showConfirmDialog(this, "Ziur ID " + id + " ezabatu nahi duzula?", "Ezabatu",
                 JOptionPane.YES_NO_OPTION) == 0) {
             try {
-                if (index == 2) { // Akatsak
+                if (index == 0) { // Konponketak
+                    langilea.konponketaEzabatu(id);
+                } else if (index == 1) { // Produktuak
+                    langilea.produktuaBorratu(id);
+                } else if (index == 2) { // Akatsak
                     langilea.akatsaEzabatu(id);
-                } else {
-                    // Besteetarako oraindik SQL zuzena mantentzen dugu momentuz, edo dagokion
-                    // metodoa sortu beharko litzateke
-                    String taula = (index == 0) ? "konponketak" : "produktuak";
-                    String idCol = (index == 0) ? "id_konponketa" : "id_produktua";
-                    try (Connection kon = DB_Konexioa.konektatu()) {
-                        PreparedStatement pst = kon
-                                .prepareStatement("DELETE FROM " + taula + " WHERE " + idCol + " = ?");
-                        pst.setInt(1, id);
-                        pst.executeUpdate();
-                    }
                 }
                 datuakKargatu();
                 JOptionPane.showMessageDialog(this, "Elementua ezabatu da.");
