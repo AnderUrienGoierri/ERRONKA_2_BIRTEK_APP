@@ -9,14 +9,15 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class MenuTeknikoa extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JTable konponketaTaula, produktuTaula, akatsTaula, nireFitxaketaTaula;
+    private JTable konponketaTaula, produktuTaula, akatsTaula;
     private JTextField bilatuTestua;
     private TableRowSorter<DefaultTableModel> konponketaOrdenatzailea, produktuOrdenatzailea, akatsOrdenatzailea,
-            nireFitxaketaOrdenatzailea, unekoOrdenatzailea;
+            unekoOrdenatzailea;
 
     // Fitxaketa
     private JLabel fitxaketaInfoEtiketa;
@@ -154,12 +155,6 @@ public class MenuTeknikoa extends JFrame {
         akatsPanela.add(new JScrollPane(akatsTaula), BorderLayout.CENTER);
         pestainaPanela.addTab("Akatsak", akatsPanela);
 
-        // --- NIRE FITXAKETAK TAB ---
-        JPanel nireFitxaketakPanela = new JPanel(new BorderLayout());
-        nireFitxaketaTaula = new JTable();
-        nireFitxaketakPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
-        pestainaPanela.addTab("Nire Fitxaketak", nireFitxaketakPanela);
-
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
             int index = pestainaPanela.getSelectedIndex();
@@ -169,8 +164,6 @@ public class MenuTeknikoa extends JFrame {
                 unekoOrdenatzailea = produktuOrdenatzailea;
             else if (index == 2)
                 unekoOrdenatzailea = akatsOrdenatzailea;
-            else if (index == 3)
-                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         // CRUD Botoiak
@@ -209,8 +202,6 @@ public class MenuTeknikoa extends JFrame {
                 unekoOrdenatzailea = produktuOrdenatzailea;
             else if (index == 2)
                 unekoOrdenatzailea = akatsOrdenatzailea;
-            else if (index == 3)
-                unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         });
 
         if (!java.beans.Beans.isDesignTime()) {
@@ -300,15 +291,6 @@ public class MenuTeknikoa extends JFrame {
             akatsTaula.setModel(m3);
             akatsOrdenatzailea = new TableRowSorter<>(m3);
             akatsTaula.setRowSorter(akatsOrdenatzailea);
-
-            // Nire Fitxaketak
-            PreparedStatement pstNF = konexioa.prepareStatement(
-                    "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC");
-            pstNF.setInt(1, langilea.getIdLangilea());
-            DefaultTableModel mNF = TaulaModelatzailea.ereduaEraiki(pstNF.executeQuery());
-            nireFitxaketaTaula.setModel(mNF);
-            nireFitxaketaOrdenatzailea = new TableRowSorter<>(mNF);
-            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
 
             if (unekoOrdenatzailea == null)
                 unekoOrdenatzailea = konponketaOrdenatzailea;
@@ -422,6 +404,103 @@ public class MenuTeknikoa extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
 
+        } else if (index == 1) { // Produktuak
+            try (Connection kon = DB_Konexioa.konektatu()) {
+                // 1. Datuak lortu (Kategoriak eta Hornitzaileak)
+                java.util.List<ProduktuKategoria> kategoriak = new ArrayList<>();
+                ResultSet rsK = kon.prepareStatement("SELECT * FROM produktu_kategoriak").executeQuery();
+                while (rsK.next()) {
+                    kategoriak.add(new ProduktuKategoria(rsK.getInt("id_kategoria"), rsK.getString("izena")));
+                }
+
+                java.util.List<Hornitzailea> hornitzaileak = new ArrayList<>();
+                ResultSet rsH = kon.prepareStatement("SELECT id_hornitzailea, izena_soziala FROM hornitzaileak")
+                        .executeQuery();
+                while (rsH.next()) {
+                    hornitzaileak.add(new Hornitzailea(rsH.getInt("id_hornitzailea"), rsH.getString("izena_soziala"),
+                            null, null, null, 1, null, null, null, null, null, true, null));
+                }
+
+                java.util.List<Biltegia> biltegiak = new ArrayList<>();
+                ResultSet rsB = kon.prepareStatement("SELECT id_biltegia, izena FROM biltegiak").executeQuery();
+                while (rsB.next()) {
+                    biltegiak.add(new Biltegia(rsB.getInt("id_biltegia"), rsB.getString("izena"), ""));
+                }
+
+                // 2. UI Konponenteak
+                JTextField izenaField = new JTextField();
+                JTextField markaField = new JTextField();
+                JTextField motaField = new JTextField();
+                JComboBox<ComboItem> kategoriaBox = new JComboBox<>();
+                for (ProduktuKategoria pk : kategoriak) {
+                    kategoriaBox.addItem(new ComboItem(pk.getIdKategoria(), pk.getIzena()));
+                }
+                JComboBox<ComboItem> hornitzaileBox = new JComboBox<>();
+                for (Hornitzailea h : hornitzaileak) {
+                    hornitzaileBox.addItem(new ComboItem(h.getIdHornitzailea(), h.getIzenaSoziala()));
+                }
+                JComboBox<ComboItem> biltegiBox = new JComboBox<>();
+                for (Biltegia b : biltegiak) {
+                    biltegiBox.addItem(new ComboItem(b.getIdBiltegia(), b.getIzena()));
+                }
+
+                JTextField stockField = new JTextField("0");
+                String[] egoerak = { "Berria", "Berritua A", "Berritua B", "Hondatua", "Zehazteko" };
+                JComboBox<String> egoeraBox = new JComboBox<>(egoerak);
+                JTextArea deskribapenaArea = new JTextArea(3, 20);
+                JCheckBox salgaiBox = new JCheckBox("Salgai", true);
+
+                Object[] message = {
+                        "Izena:", izenaField,
+                        "Marka:", markaField,
+                        "Mota:", motaField,
+                        "Kategoria:", kategoriaBox,
+                        "Hornitzailea:", hornitzaileBox,
+                        "Biltegia:", biltegiBox,
+                        "Stock:", stockField,
+                        "Egoera:", egoeraBox,
+                        "Deskribapena:", new JScrollPane(deskribapenaArea),
+                        "Salgai:", salgaiBox
+                };
+
+                int option = JOptionPane.showConfirmDialog(this, message, "Produktu Berria Sortu",
+                        JOptionPane.OK_CANCEL_OPTION);
+
+                if (option == JOptionPane.OK_OPTION) {
+                    ComboItem selKat = (ComboItem) kategoriaBox.getSelectedItem();
+                    ComboItem selHorItem = (ComboItem) hornitzaileBox.getSelectedItem();
+                    ComboItem selBilItem = (ComboItem) biltegiBox.getSelectedItem();
+
+                    Produktua p = new Produktua(
+                            0, // ID
+                            selHorItem != null ? selHorItem.getId() : 0,
+                            selKat != null ? selKat.getId() : 0,
+                            izenaField.getText(),
+                            markaField.getText(),
+                            motaField.getText(),
+                            deskribapenaArea.getText(),
+                            "", // Irudia URL
+                            selBilItem != null ? selBilItem.getId() : null, // Biltegi ID
+                            (String) egoeraBox.getSelectedItem(),
+                            "", // Egoera oharra
+                            salgaiBox.isSelected(),
+                            java.math.BigDecimal.ZERO, // Prezioa
+                            0, // Stock (set below)
+                            java.math.BigDecimal.ZERO, // Eskaintza
+                            new java.math.BigDecimal("21.00"), // Zergak
+                            null, null) {
+                    };
+                    p.setStock(Integer.parseInt(stockField.getText()));
+
+                    langilea.produktuBatSortu(p);
+                    datuakKargatu();
+                    JOptionPane.showMessageDialog(this, "Produktua ondo sortu da!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea produktua sortzean: " + e.getMessage());
+            }
+
         } else if (index == 2) { // Akatsak
             JTextField izenaField = new JTextField();
             JTextArea deskribapenaArea = new JTextArea(5, 20);
@@ -469,27 +548,50 @@ public class MenuTeknikoa extends JFrame {
             if (r == -1)
                 return;
             int rm = produktuTaula.convertRowIndexToModel(r);
-            Object id = produktuTaula.getModel().getValueAt(rm, 0);
-            String izenZ = (String) produktuTaula.getModel().getValueAt(rm, 1);
-            String egoeraZ = (String) produktuTaula.getModel().getValueAt(rm, 2);
+            Object idObj = produktuTaula.getModel().getValueAt(rm, 0);
+            int id = Integer.parseInt(idObj.toString());
 
-            JTextField izenaField = new JTextField(izenZ);
-            JTextField egoeraField = new JTextField(egoeraZ);
-            Object[] message = { "Izena:", izenaField, "Egoera:", egoeraField };
-            int option = JOptionPane.showConfirmDialog(null, message, "Editatu Produktua",
-                    JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                try (Connection kon = DB_Konexioa.konektatu()) {
-                    PreparedStatement pst = kon.prepareStatement(
-                            "UPDATE produktuak SET izena = ?, produktu_egoera = ? WHERE id_produktua = ?");
-                    pst.setString(1, izenaField.getText());
-                    pst.setString(2, egoeraField.getText());
-                    pst.setObject(3, id);
-                    pst.executeUpdate();
-                    datuakKargatu();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Errorea: " + e.getMessage());
+            try (Connection kon = DB_Konexioa.konektatu()) {
+                // Gaur egungo datuak lortu
+                PreparedStatement pst = kon.prepareStatement("SELECT * FROM produktuak WHERE id_produktua = ?");
+                pst.setInt(1, id);
+                ResultSet rs = pst.executeQuery();
+                if (rs.next()) {
+                    JTextField izenaField = new JTextField(rs.getString("izena"));
+                    JTextField markaField = new JTextField(rs.getString("marka"));
+                    JTextField egoeraField = new JTextField(rs.getString("produktu_egoera"));
+                    JCheckBox salgaiBox = new JCheckBox("Salgai", rs.getBoolean("salgai"));
+                    JTextField prezioaField = new JTextField(rs.getString("salmenta_prezioa"));
+
+                    Object[] message = {
+                            "Izena:", izenaField,
+                            "Marka:", markaField,
+                            "Egoera (Berria, Berritua A, Berritua B, Hondatua, Zehazteko):", egoeraField,
+                            "Salgai:", salgaiBox,
+                            "Prezioa (€):", prezioaField
+                    };
+
+                    int option = JOptionPane.showConfirmDialog(null, message, "Editatu Produktua",
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (option == JOptionPane.OK_OPTION) {
+                        // Update basic info
+                        PreparedStatement upst = kon.prepareStatement(
+                                "UPDATE produktuak SET izena = ?, marka = ?, produktu_egoera = ?, salgai = ?, salmenta_prezioa = ? WHERE id_produktua = ?");
+                        upst.setString(1, izenaField.getText());
+                        upst.setString(2, markaField.getText());
+                        upst.setString(3, egoeraField.getText());
+                        upst.setBoolean(4, salgaiBox.isSelected());
+                        upst.setBigDecimal(5, new java.math.BigDecimal(prezioaField.getText().replace(",", ".")));
+                        upst.setInt(6, id);
+                        upst.executeUpdate();
+
+                        datuakKargatu();
+                        JOptionPane.showMessageDialog(this, "Produktua eguneratu da.");
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errorea editatzean: " + e.getMessage());
             }
         } else if (index == 2) { // Akatsak
             int r = akatsTaula.getSelectedRow();
