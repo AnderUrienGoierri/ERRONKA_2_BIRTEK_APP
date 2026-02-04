@@ -15,27 +15,33 @@ public class Eskaera {
     private Timestamp data;
     private Timestamp eguneratzeData;
     private BigDecimal guztiraPrezioa;
+    private String fakturaZenbakia;
+    private String fakturaUrl;
     private String eskaeraEgoera;
 
     /**
      * Eskaera eraikitzailea.
      *
-     * @param idEskaera      Eskaeraren IDa.
-     * @param bezeroaId      Bezeroaren IDa.
-     * @param langileaId     Langilearen IDa (aukerakoa).
-     * @param data           Eskaeraren data.
-     * @param eguneratzeData Azken eguneratze data.
-     * @param guztiraPrezioa Eskaeraren prezio totala.
-     * @param eskaeraEgoera  Eskaeraren egoera.
+     * @param idEskaera       Eskaeraren IDa.
+     * @param bezeroaId       Bezeroaren IDa.
+     * @param langileaId      Langilearen IDa (aukerakoa).
+     * @param data            Eskaeraren data.
+     * @param eguneratzeData  Azken eguneratze data.
+     * @param guztiraPrezioa  Eskaeraren prezio totala.
+     * @param fakturaZenbakia Fakturaren zenbakia (bakarra).
+     * @param fakturaUrl      Fakturaren URL edo bidea.
+     * @param eskaeraEgoera   Eskaeraren egoera.
      */
     public Eskaera(int idEskaera, int bezeroaId, Integer langileaId, Timestamp data, Timestamp eguneratzeData,
-            BigDecimal guztiraPrezioa, String eskaeraEgoera) {
+            BigDecimal guztiraPrezioa, String fakturaZenbakia, String fakturaUrl, String eskaeraEgoera) {
         this.idEskaera = idEskaera;
         this.bezeroaId = bezeroaId;
         this.langileaId = langileaId;
         this.data = data;
         this.eguneratzeData = eguneratzeData;
         this.guztiraPrezioa = guztiraPrezioa;
+        this.fakturaZenbakia = fakturaZenbakia;
+        this.fakturaUrl = fakturaUrl;
         this.eskaeraEgoera = eskaeraEgoera;
     }
 
@@ -85,6 +91,22 @@ public class Eskaera {
 
     public void setGuztiraPrezioa(BigDecimal guztiraPrezioa) {
         this.guztiraPrezioa = guztiraPrezioa;
+    }
+
+    public String getFakturaZenbakia() {
+        return fakturaZenbakia;
+    }
+
+    public void setFakturaZenbakia(String fakturaZenbakia) {
+        this.fakturaZenbakia = fakturaZenbakia;
+    }
+
+    public String getFakturaUrl() {
+        return fakturaUrl;
+    }
+
+    public void setFakturaUrl(String fakturaUrl) {
+        this.fakturaUrl = fakturaUrl;
     }
 
     public String getEskaeraEgoera() {

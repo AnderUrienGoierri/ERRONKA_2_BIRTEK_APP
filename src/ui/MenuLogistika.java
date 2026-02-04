@@ -37,7 +37,6 @@ public class MenuLogistika extends JFrame {
     private JTable sarreraTaula;
     private JTable biltegiTaula;
     private JTable produktuTaula;
-    private JTable nireFitxaketaTaula;
 
     // Sarrera Berria elementuak
     private JComboBox<HornitzaileElementua> hornitzaileHautatzailea;
@@ -69,7 +68,6 @@ public class MenuLogistika extends JFrame {
     private TableRowSorter<DefaultTableModel> sarreraOrdenatzailea;
     private TableRowSorter<DefaultTableModel> biltegiOrdenatzailea;
     private TableRowSorter<DefaultTableModel> produktuOrdenatzailea;
-    private TableRowSorter<DefaultTableModel> nireFitxaketaOrdenatzailea;
 
     // Eskaerak
     private JTable eskaeraTaula;
@@ -224,7 +222,6 @@ public class MenuLogistika extends JFrame {
         produktuTabSortu();
         eskaeraTabSortu(); // NEW
         sarreraBerriaTabSortu();
-        nireFitxaketaTabSortu();
 
         pestainaPanela.addChangeListener(e -> {
             bilatuTestua.setText("");
@@ -239,8 +236,6 @@ public class MenuLogistika extends JFrame {
                 eskaeraDatuakKargatu();
             else if (index == 4)
                 sarreraHautatzaileakKargatu();
-            else if (index == 5)
-                nireFitxaketaDatuakKargatu();
         });
 
         // Hasierako karga
@@ -267,7 +262,7 @@ public class MenuLogistika extends JFrame {
                 langilea.irteeraFitxaketaEgin();
             }
             eguneratuFitxaketaEgoera();
-            nireFitxaketaDatuakKargatu(); // Refresh personal attendance
+            eguneratuFitxaketaEgoera();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errorea", JOptionPane.WARNING_MESSAGE);
         }
@@ -831,22 +826,6 @@ public class MenuLogistika extends JFrame {
                 String imgUrl = (String) lerroBerriEredua.getValueAt(i, 7);
                 String oharra = (String) lerroBerriEredua.getValueAt(i, 8);
 
-                // Using a temporary Produktua object holder. Not all fields are filled.
-                // NOTE: Creating Produktua subclass instances would be cleaner if specific
-                // types are used,
-                // but for now we need a concrete class or use anonymous subclass to hold data.
-                // Assuming Produktua is Abstract, so I can't instantiate it directly unless I
-                // use anonymous class
-                // or a concrete subclass. Since `Mota` is a string, I probably should have a
-                // Factory or similar,
-                // but to keep it simple and given the constraints, I'll create a simple
-                // anonymous subclass holder
-                // or just one of the concrete classes like `Eramangarria`.
-                // Let's use `Eramangarria` as a generic container since we just need the fields
-                // for the method.
-                // IMPORTANT: The `mota` field decides the discrimination in DB usually, but
-                // here we just pass data.
-
                 Produktua p = new Eramangarria(0, hornitzaileaId, kat.id, izena, marka, mota, desk, imgUrl, bilt.id,
                         "Zehazteko", oharra, false, java.math.BigDecimal.ZERO, kanti, java.math.BigDecimal.ZERO,
                         java.math.BigDecimal.ZERO, null, null, "", 0, 0, java.math.BigDecimal.ZERO, 0, "",
@@ -918,10 +897,10 @@ public class MenuLogistika extends JFrame {
      */
     private void produktuDatuakKargatu() {
         String sql = "SELECT p.id_produktua, p.izena AS Produktua, b.izena AS Biltegia, s.id_sarrera AS 'Sarrera ID', sl.sarrera_lerro_egoera AS Egoera, s.data AS 'Sarrera Data', sl.id_sarrera_lerroa, p.produktu_egoera_oharra AS Oharra"
-                + "FROM sarrera_lerroak sl"
-                + "JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera"
-                + "JOIN produktuak p ON sl.produktua_id = p.id_produktua"
-                + "JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
+                + " FROM sarrera_lerroak sl"
+                + " JOIN sarrerak s ON sl.sarrera_id = s.id_sarrera"
+                + " JOIN produktuak p ON sl.produktua_id = p.id_produktua"
+                + " JOIN biltegiak b ON p.biltegi_id = b.id_biltegia ORDER BY s.data DESC";
         try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
             DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
             produktuTaula.setModel(eredua);
@@ -947,8 +926,6 @@ public class MenuLogistika extends JFrame {
             unekoOrdenatzailea = produktuOrdenatzailea;
         else if (index == 3)
             unekoOrdenatzailea = eskaeraOrdenatzailea;
-        else if (index == 5)
-            unekoOrdenatzailea = nireFitxaketaOrdenatzailea;
         if (unekoOrdenatzailea != null) {
             if (testua.trim().length() == 0)
                 unekoOrdenatzailea.setRowFilter(null);
@@ -1375,33 +1352,6 @@ public class MenuLogistika extends JFrame {
 
         public String toString() {
             return izena;
-        }
-    }
-
-    /**
-     * Norberaren fitxaketen fitxa sortu.
-     */
-    private void nireFitxaketaTabSortu() {
-        JPanel nireFitxaketaPanela = new JPanel(new BorderLayout());
-        nireFitxaketaPanela.setOpaque(false);
-        nireFitxaketaTaula = new JTable();
-        nireFitxaketaPanela.add(new JScrollPane(nireFitxaketaTaula), BorderLayout.CENTER);
-        pestainaPanela.addTab("Nire Fitxaketak", null, nireFitxaketaPanela, null);
-    }
-
-    /**
-     * Norberaren fitxaketen datuak kargatu.
-     */
-    private void nireFitxaketaDatuakKargatu() {
-        String sql = "SELECT data, CAST(ordua AS CHAR) AS ordua, mota FROM fitxaketak WHERE langilea_id = ? ORDER BY id_fitxaketa DESC";
-        try (Connection con = DB_Konexioa.konektatu(); PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setInt(1, langilea.getIdLangilea());
-            DefaultTableModel eredua = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
-            nireFitxaketaTaula.setModel(eredua);
-            nireFitxaketaOrdenatzailea = new TableRowSorter<>(eredua);
-            nireFitxaketaTaula.setRowSorter(nireFitxaketaOrdenatzailea);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

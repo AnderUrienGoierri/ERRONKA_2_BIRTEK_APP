@@ -24,6 +24,11 @@ import java.io.FileInputStream;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import db.DB_Konexioa;
 
 /**
  * FakturaPDF klasea.
@@ -34,76 +39,19 @@ import org.apache.commons.net.ftp.FTPClient;
 public class FakturaPDF {
 
     /**
-     * BezeroDatuak barne-klasea.
-     * Fakturan bistaratu beharreko bezeroaren datuak gordetzeko.
-     */
-    public static class BezeroDatuak {
-        public String izena;
-        public String ifz;
-        public String helbidea;
-        public String emaila;
-
-        /**
-         * BezeroDatuak eraikitzailea.
-         *
-         * @param izena    Bezeroaren izena.
-         * @param ifz      Bezeroaren IFZ/NAN.
-         * @param helbidea Bezeroaren helbidea.
-         * @param emaila   Bezeroaren emaila.
-         */
-        public BezeroDatuak(String izena, String ifz, String helbidea, String emaila) {
-            this.izena = izena;
-            this.ifz = ifz;
-            this.helbidea = helbidea;
-            this.emaila = emaila;
-        }
-    }
-
-    /**
-     * LerroDatuak barne-klasea.
-     * Fakturako lerro bakoitzaren datuak gordetzeko.
-     */
-    public static class LerroDatuak {
-        public String produktua;
-        public int kantitatea;
-        public BigDecimal prezioa;
-        public BigDecimal guztira;
-
-        /**
-         * LerroDatuak eraikitzailea.
-         *
-         * @param produktua  Produktuaren izena.
-         * @param kantitatea Produktu kantitatea.
-         * @param prezioa    Unitateko prezioa.
-         * @param guztira    Lerroaren prezio totala.
-         */
-        public LerroDatuak(String produktua, int kantitatea, BigDecimal prezioa, BigDecimal guztira) {
-            this.produktua = produktua;
-            this.kantitatea = kantitatea;
-            this.prezioa = prezioa;
-            this.guztira = guztira;
-        }
-    }
-
-    // fakturak C/: karpetan XamPP barruan
-    public static final String FAKTURA_BIDEA = "C:\\Xampp\\htdocs\\fakturak";
-
-    /**
-     * Faktura PDF bat sortzen du emandako datuekin.
+     * Faktura PDF bat sortzen du emandako datuekin (Domain objects).
      *
      * @param fitxategiPath PDF fitxategia gordeko den bidea.
-     * @param idEskaera     Eskaeraren IDa.
-     * @param data          Fakturaren data.
-     * @param bezeroa       Bezeroaren datuak dituen objektua.
-     * @param lerroak       Fakturako lerroen zerrenda.
-     * @param guztira       Fakturaren guztizko zenbatekoa.
+     * @param eskaera       Eskaera objektua.
+     * @param bezeroa       Bezeroa objektua.
+     * @param lerroak       Eskaera lerroen zerrenda.
      * @throws DocumentException PDFa sortzean errorea gertatzen bada.
      * @throws IOException       Fitxategia idaztean errorea gertatzen bada.
      */
-
-    public static void sortu(String fitxategiPath, int idEskaera, Timestamp data, BezeroDatuak bezeroa,
-            List<LerroDatuak> lerroak, BigDecimal guztira)
+    public static void sortu(String fitxategiPath, Eskaera eskaera, Bezeroa bezeroa, List<EskaeraLerroa> lerroak)
             throws DocumentException, IOException {
+
+        // Bezero datuak prestatu
 
         File fitxategia = new File(fitxategiPath);
         if (fitxategia.getParentFile() != null) {
@@ -127,7 +75,6 @@ public class FakturaPDF {
         headerTable.setWidths(new float[] { 1, 1 });
         headerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
-        // LOGOA (Ezkerrean)
         // LOGOA (Ezkerrean)
         try {
             String logoPath = "irudiak/birtek_logo_zuri_borobila.png";
@@ -171,11 +118,11 @@ public class FakturaPDF {
         document.add(Chunk.NEWLINE);
 
         // IZENBURUA
-        Paragraph izenburua = new Paragraph("FAKTURA: " + idEskaera, izenburuaFont);
+        Paragraph izenburua = new Paragraph("FAKTURA: " + eskaera.getIdEskaera(), izenburuaFont);
         izenburua.setAlignment(Element.ALIGN_CENTER);
         document.add(izenburua);
 
-        Paragraph dataPar = new Paragraph("Data: " + data.toString(), arruntaFont);
+        Paragraph dataPar = new Paragraph("Data: " + eskaera.getData().toString(), arruntaFont);
         dataPar.setAlignment(Element.ALIGN_CENTER);
         document.add(dataPar);
 
@@ -183,10 +130,10 @@ public class FakturaPDF {
 
         // BEZEROA
         document.add(new Paragraph("Bezeroa:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
-        document.add(new Paragraph(bezeroa.izena, arruntaFont));
-        document.add(new Paragraph(bezeroa.ifz, arruntaFont));
-        document.add(new Paragraph(bezeroa.helbidea, arruntaFont));
-        document.add(new Paragraph(bezeroa.emaila, arruntaFont));
+        document.add(new Paragraph(bezeroa.getIzenaEdoSoziala(), arruntaFont));
+        document.add(new Paragraph(bezeroa.getIfzNan(), arruntaFont));
+        document.add(new Paragraph(bezeroa.getHelbidea(), arruntaFont));
+        document.add(new Paragraph(bezeroa.getEmaila(), arruntaFont));
 
         document.add(Chunk.NEWLINE);
 
@@ -202,11 +149,16 @@ public class FakturaPDF {
         addHeaderCell(table, "Guztira", taulaGoiburua);
 
         // Datuak
-        for (LerroDatuak lerroa : lerroak) {
-            table.addCell(new Phrase(lerroa.produktua, arruntaFont));
-            table.addCell(new Phrase(String.valueOf(lerroa.kantitatea), arruntaFont));
-            table.addCell(new Phrase(lerroa.prezioa + " \u20AC", arruntaFont));
-            table.addCell(new Phrase(lerroa.guztira + " \u20AC", arruntaFont));
+        BigDecimal calculatedTotal = BigDecimal.ZERO;
+        for (EskaeraLerroa lerroa : lerroak) {
+            String izena = getProduktuaIzena(lerroa.getProduktuaId());
+            BigDecimal guztiraLerroa = lerroa.getUnitatePrezioa().multiply(new BigDecimal(lerroa.getKantitatea()));
+            calculatedTotal = calculatedTotal.add(guztiraLerroa);
+
+            table.addCell(new Phrase(izena, arruntaFont));
+            table.addCell(new Phrase(String.valueOf(lerroa.getKantitatea()), arruntaFont));
+            table.addCell(new Phrase(lerroa.getUnitatePrezioa() + " \u20AC", arruntaFont));
+            table.addCell(new Phrase(guztiraLerroa + " \u20AC", arruntaFont));
         }
 
         document.add(table);
@@ -218,12 +170,29 @@ public class FakturaPDF {
         totalTable.setWidthPercentage(40);
         totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
-        addTotalRow(totalTable, "GUZTIRA (BEZ %21 barne):", guztira + " \u20AC",
+        addTotalRow(totalTable, "GUZTIRA (BEZ %21 barne):", eskaera.getGuztiraPrezioa() + " \u20AC",
                 FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14));
 
         document.add(totalTable);
 
         document.close();
+    }
+
+    private static String getProduktuaIzena(int produktuaId) {
+        String izena = "Produktua " + produktuaId; // Fallback
+        String sql = "SELECT izena FROM produktuak WHERE id_produktua = ?";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setInt(1, produktuaId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    izena = rs.getString("izena");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errorea produktu izena lortzean: " + e.getMessage());
+        }
+        return izena;
     }
 
     private static void addHeaderCell(PdfPTable table, String text, Font font) {

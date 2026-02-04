@@ -334,61 +334,89 @@ public class MenuAdministrazioa extends JFrame {
     private void datuakKargatuOsoa() {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
             // Langileak
-            PreparedStatement pstL = konexioa
-                    .prepareStatement(
-                            "SELECT id_langilea, izena, abizena, nan, jaiotza_data, herria_id, helbidea, posta_kodea, telefonoa, emaila FROM langileak");
-            DefaultTableModel mL = TaulaModelatzailea.ereduaEraiki(pstL.executeQuery());
-            langileTaula.setModel(mL);
-            langileOrdenatzailea = new TableRowSorter<>(mL);
-            langileTaula.setRowSorter(langileOrdenatzailea);
+            try {
+                PreparedStatement pstL = konexioa.prepareStatement(
+                        "SELECT id_langilea, izena, abizena, nan, jaiotza_data, herria_id, helbidea, posta_kodea, telefonoa, emaila FROM langileak");
+                DefaultTableModel mL = TaulaModelatzailea.ereduaEraiki(pstL.executeQuery());
+                langileTaula.setModel(mL);
+                langileOrdenatzailea = new TableRowSorter<>(mL);
+                langileTaula.setRowSorter(langileOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Langileak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             // Sailak
-            PreparedStatement pstS = konexioa.prepareStatement("SELECT * FROM langile_sailak");
-            DefaultTableModel mS = TaulaModelatzailea.ereduaEraiki(pstS.executeQuery());
-            sailaTaula.setModel(mS);
-            sailaOrdenatzailea = new TableRowSorter<>(mS);
-            sailaTaula.setRowSorter(sailaOrdenatzailea);
+            try {
+                PreparedStatement pstS = konexioa.prepareStatement("SELECT * FROM langile_sailak");
+                DefaultTableModel mS = TaulaModelatzailea.ereduaEraiki(pstS.executeQuery());
+                sailaTaula.setModel(mS);
+                sailaOrdenatzailea = new TableRowSorter<>(mS);
+                sailaTaula.setRowSorter(sailaOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Sailak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             // Fitxaketak (Globala)
-            PreparedStatement pstF = konexioa.prepareStatement(
-                    "SELECT f.id_fitxaketa, CONCAT(l.izena, ' ', l.abizena) AS langilea, f.data, CAST(f.ordua AS CHAR) AS ordua, f.mota "
-                            +
-                            "FROM fitxaketak f JOIN langileak l ON f.langilea_id = l.id_langilea ORDER BY f.id_fitxaketa DESC");
-            DefaultTableModel mF = TaulaModelatzailea.ereduaEraiki(pstF.executeQuery());
-            fitxaketaTaula.setModel(mF);
-            fitxaketaOrdenatzailea = new TableRowSorter<>(mF);
-            fitxaketaTaula.setRowSorter(fitxaketaOrdenatzailea);
+            try {
+                PreparedStatement pstF = konexioa.prepareStatement(
+                        "SELECT f.id_fitxaketa, CONCAT(l.izena, ' ', l.abizena) AS langilea, f.data, CAST(f.ordua AS CHAR) AS ordua, f.mota "
+                                +
+                                "FROM fitxaketak f JOIN langileak l ON f.langilea_id = l.id_langilea ORDER BY f.id_fitxaketa DESC");
+                DefaultTableModel mF = TaulaModelatzailea.ereduaEraiki(pstF.executeQuery());
+                fitxaketaTaula.setModel(mF);
+                fitxaketaOrdenatzailea = new TableRowSorter<>(mF);
+                fitxaketaTaula.setRowSorter(fitxaketaOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Fitxaketak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             // Fakturak
-            // Hobekuntza: Bezeroaren izena erakutsi eskaera ID hutsaren ordez
-            String sqlFakturak = "SELECT f.id_faktura, f.faktura_zenbakia, " +
-                    "CONCAT(e.id_eskaera, ' - ', b.izena_edo_soziala) AS eskaera, " +
-                    "f.data, f.fitxategia_url " +
-                    "FROM bezero_fakturak f " +
-                    "JOIN eskaerak e ON f.eskaera_id = e.id_eskaera " +
-                    "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa " +
-                    "ORDER BY f.id_faktura DESC";
-            PreparedStatement pstFa = konexioa.prepareStatement(sqlFakturak);
-            DefaultTableModel mFa = TaulaModelatzailea.ereduaEraiki(pstFa.executeQuery());
-            fakturaTaula.setModel(mFa);
-            fakturaOrdenatzailea = new TableRowSorter<>(mFa);
-            fakturaTaula.setRowSorter(fakturaOrdenatzailea);
+            try {
+                // Hobekuntza: Bezeroaren izena erakutsi eskaera ID hutsaren ordez
+                String sqlFakturak = "SELECT e.id_eskaera AS id_faktura, e.faktura_zenbakia, " +
+                        "CONCAT(e.id_eskaera, ' - ', b.izena_edo_soziala) AS eskaera, " +
+                        "e.data, e.faktura_url AS fitxategia_url " +
+                        "FROM eskaerak e " +
+                        "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa " +
+                        "WHERE e.faktura_zenbakia IS NOT NULL AND e.faktura_zenbakia != '' " +
+                        "ORDER BY e.id_eskaera DESC";
+                PreparedStatement pstFa = konexioa.prepareStatement(sqlFakturak);
+                DefaultTableModel mFa = TaulaModelatzailea.ereduaEraiki(pstFa.executeQuery());
+                fakturaTaula.setModel(mFa);
+                fakturaOrdenatzailea = new TableRowSorter<>(mFa);
+                fakturaTaula.setRowSorter(fakturaOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Fakturak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             // Hornitzaileak
-            PreparedStatement pstH = konexioa
-                    .prepareStatement(
-                            "SELECT id_hornitzailea, izena_soziala, ifz_nan, kontaktu_pertsona, helbidea, herria_id, posta_kodea, telefonoa FROM hornitzaileak");
-            DefaultTableModel mH = TaulaModelatzailea.ereduaEraiki(pstH.executeQuery());
-            hornitzaileTaula.setModel(mH);
-            hornitzaileOrdenatzailea = new TableRowSorter<>(mH);
-            hornitzaileTaula.setRowSorter(hornitzaileOrdenatzailea);
+            try {
+                PreparedStatement pstH = konexioa.prepareStatement(
+                        "SELECT id_hornitzailea, izena_soziala, ifz_nan, kontaktu_pertsona, helbidea, herria_id, posta_kodea, telefonoa FROM hornitzaileak");
+                DefaultTableModel mH = TaulaModelatzailea.ereduaEraiki(pstH.executeQuery());
+                hornitzaileTaula.setModel(mH);
+                hornitzaileOrdenatzailea = new TableRowSorter<>(mH);
+                hornitzaileTaula.setRowSorter(hornitzaileOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Hornitzaileak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             // Herriak
-            PreparedStatement pstHe = konexioa.prepareStatement("SELECT * FROM herriak");
-            DefaultTableModel mHe = TaulaModelatzailea.ereduaEraiki(pstHe.executeQuery());
-            herriaTaula.setModel(mHe);
-            herriaOrdenatzailea = new TableRowSorter<>(mHe);
-            herriaTaula.setRowSorter(herriaOrdenatzailea);
+            try {
+                PreparedStatement pstHe = konexioa.prepareStatement("SELECT * FROM herriak");
+                DefaultTableModel mHe = TaulaModelatzailea.ereduaEraiki(pstHe.executeQuery());
+                herriaTaula.setModel(mHe);
+                herriaOrdenatzailea = new TableRowSorter<>(mHe);
+                herriaTaula.setRowSorter(herriaOrdenatzailea);
+            } catch (Exception e) {
+                System.err.println("Errorea Herriak kargatzean: " + e.getMessage());
+                e.printStackTrace();
+            }
 
             if (unekoOrdenatzailea == null)
                 unekoOrdenatzailea = langileOrdenatzailea;
@@ -439,8 +467,8 @@ public class MenuAdministrazioa extends JFrame {
                 break;
             case 3:
                 unekoTaula = fakturaTaula;
-                taulaIzena = "bezero_fakturak";
-                idZutabea = "id_faktura";
+                taulaIzena = "eskaerak";
+                idZutabea = "id_eskaera";
                 break;
             case 4:
                 unekoTaula = hornitzaileTaula;

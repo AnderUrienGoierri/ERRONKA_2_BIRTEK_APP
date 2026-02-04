@@ -330,6 +330,9 @@ CREATE TABLE IF NOT EXISTS eskaerak (
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     guztira_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     
+    faktura_zenbakia VARCHAR(20) UNIQUE NOT NULL,
+	faktura_url VARCHAR(255),
+    
     eskaera_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
     
     CONSTRAINT fk_eskaera_bezeroa FOREIGN KEY (bezeroa_id) REFERENCES bezeroak(id_bezeroa),
@@ -349,23 +352,9 @@ CREATE TABLE IF NOT EXISTS eskaera_lerroak (
     CONSTRAINT fk_el_produktua FOREIGN KEY (produktua_id) REFERENCES produktuak(id_produktua)
 );
 
--- ========================================================
--- 7. FAKTURAZIOA
--- ========================================================
-
-CREATE TABLE IF NOT EXISTS bezero_fakturak (
-    id_faktura INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    faktura_zenbakia VARCHAR(20) UNIQUE NOT NULL,
-    eskaera_id INT UNSIGNED UNIQUE NOT NULL,
-    data DATE DEFAULT (CURRENT_DATE) NOT NULL,
-    
-    fitxategia_url VARCHAR(255),
-    
-    CONSTRAINT fk_faktura_eskaera FOREIGN KEY (eskaera_id) REFERENCES eskaerak(id_eskaera)
-);
 
 -- ========================================================
--- 8. ERABILTZAILEAK ETA BAIMENAK
+-- 7. ERABILTZAILEAK ETA BAIMENAK
 -- ========================================================
 
 FLUSH PRIVILEGES;
@@ -384,8 +373,8 @@ CREATE USER IF NOT EXISTS 'mikel_admin'@'localhost' IDENTIFIED BY '1234';
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langile_sailak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.fitxaketak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.bezero_fakturak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.hornitzaileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.eskaerak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost'; -- fakturak ikusi behar dituzte
+GRANT SELECT, UPDATE, DELETE ON birtek_db.hornitzaileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.herriak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
 
 -- SALMENTAK
@@ -395,9 +384,8 @@ CREATE USER IF NOT EXISTS 'amaia_sales'@'localhost' IDENTIFIED BY '1234';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.bezeroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
 GRANT SELECT, UPDATE ON birtek_db.produktuak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaerak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaerak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';  -- fakturak orain eskaerak taula kudeatzen dira
 GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaera_lerroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.bezero_fakturak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
 GRANT SELECT, INSERT ON birtek_db.herriak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
 -- SAT
 CREATE USER IF NOT EXISTS 'unai_sat'@'localhost' IDENTIFIED BY '1234';
@@ -865,7 +853,7 @@ INSERT INTO konponketak (produktua_id, langilea_id, hasiera_data, konponketa_ego
 (48, 8, '2023-08-05 13:00:00', 'Konponduta', 25, 'RAM moduluak trukatu dira.'),
 (58, 9, '2023-08-10 15:15:00', 'Prozesuan', 18, 'Pasahitza reset egiten.');
 
--- 6. FITXAKETAK, LOGISTIKA ETA SARRERAK
+-- 6. FITXAKETAK, ETA SARRERAK
 INSERT INTO fitxaketak (id_fitxaketa, langilea_id, data, ordua, mota) VALUES
 (1, 1, '2024-01-08', '08:00:00', 'Sarrera'), (2, 1, '2024-01-08', '16:00:00', 'Irteera'),
 (3, 2, '2024-01-08', '08:05:00', 'Sarrera'), (4, 2, '2024-01-08', '15:00:00', 'Irteera'),
@@ -937,10 +925,10 @@ INSERT INTO sarrera_lerroak (id_sarrera_lerroa, sarrera_id, produktua_id, kantit
 (16, 13, 70, 15, 'Bidean'),
 (17, 14, 75, 4, 'Jasota'),
 (18, 15, 80, 10, 'Jasota'),
-(19, 16, 60, 8, 'Jasota'), -- Zuzenduta: 85 -> 60 (AOC Monitor)
-(20, 17, 55, 50, 'Jasota'), -- Zuzenduta: 90 -> 55 (Asus ProArt)
-(21, 18, 5, 100, 'Bidean'), -- Zuzenduta: 91 -> 5 (Asus ROG)
-(22, 19, 25, 20, 'Ezabatua'), -- Zuzenduta: 95 -> 25 (OnePlus)
+(19, 16, 60, 8, 'Jasota'), 
+(20, 17, 55, 50, 'Jasota'), 
+(21, 18, 5, 100, 'Bidean'), 
+(22, 19, 25, 20, 'Ezabatua'), 
 (23, 20, 5, 10, 'Jasota'),
 (24, 21, 15, 5, 'Jasota'),
 (25, 22, 25, 8, 'Jasota'),
@@ -949,42 +937,61 @@ INSERT INTO sarrera_lerroak (id_sarrera_lerroa, sarrera_id, produktua_id, kantit
 (28, 25, 55, 6, 'Jasota'),
 (29, 26, 65, 5, 'Jasota'),
 (30, 27, 75, 4, 'Jasota'),
-(31, 28, 60, 8, 'Jasota'), -- Zuzenduta: 85 -> 60
-(32, 29, 25, 20, 'Bidean'), -- Zuzenduta: 95 -> 25
+(31, 28, 60, 8, 'Jasota'), 
+(32, 29, 25, 20, 'Bidean'), 
 (33, 30, 5, 10, 'Jasota');
 
+/*
+CREATE TABLE IF NOT EXISTS eskaerak (
+    id_eskaera INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bezeroa_id INT UNSIGNED NOT NULL,
+    langilea_id INT UNSIGNED,
+    data DATETIME DEFAULT CURRENT_TIMESTAMP,
+    eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    guztira_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    
+    faktura_zenbakia VARCHAR(20) UNIQUE NOT NULL,
+	faktura_url VARCHAR(255),
+    
+    eskaera_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
+    
+    CONSTRAINT fk_eskaera_bezeroa FOREIGN KEY (bezeroa_id) REFERENCES bezeroak(id_bezeroa),
+    CONSTRAINT fk_eskaera_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
+);
+*/
+
 -- 7. ESKAERAK ETA FAKTURAK
-INSERT INTO eskaerak (id_eskaera, bezeroa_id, langilea_id, guztira_prezioa, eskaera_egoera, data) VALUES
-(1, 1, 5, 2199.00, 'Osatua/Bidalita', '2024-01-08 10:00:00'),
-(2, 2, 6, 1499.00, 'Osatua/Bidalita', '2024-01-09 11:30:00'),
-(3, 1, 7, 799.00, 'Prestatzen', '2024-01-10 09:15:00'),
-(4, 3, 5, 4500.00, 'Osatua/Bidalita', '2024-01-11 14:00:00'),
-(5, 4, 6, 1209.00, 'Prestatzen', '2024-01-12 16:45:00'),
-(6, 2, 7, 299.00, 'Osatua/Bidalita', '2024-01-14 08:30:00'),
-(7, 5, 5, 150.00, 'Ezabatua', '2024-01-15 10:00:00'),
-(8, 1, 6, 99.00, 'Osatua/Bidalita', '2024-01-18 13:20:00'),
-(9, 3, 7, 3800.00, 'Osatua/Bidalita', '2024-01-22 09:10:00'),
-(10, 4, 5, 600.00, 'Osatua/Bidalita', '2024-01-25 15:40:00'),
-(11, 2, 6, 135.00, 'Prestatzen', '2024-01-28 11:00:00'),
-(12, 1, 7, 450.00, 'Osatua/Bidalita', '2024-02-01 10:30:00'),
-(13, 3, 5, 2500.00, 'Osatua/Bidalita', '2024-02-05 14:15:00'),
-(14, 5, 6, 89.00, 'Prestatzen', '2024-02-08 09:00:00'),
-(15, 2, 7, 120.00, 'Osatua/Bidalita', '2024-02-12 16:20:00'),
-(16, 4, 5, 2499.00, 'Osatua/Bidalita', '2024-02-15 11:00:00'),
-(17, 1, 6, 1400.00, 'Prestatzen', '2024-02-18 13:45:00'),
-(18, 3, 7, 550.00, 'Osatua/Bidalita', '2024-02-22 10:15:00'),
-(19, 2, 5, 15.00, 'Osatua/Bidalita', '2024-02-25 09:30:00'),
-(20, 5, 6, 45.00, 'Ezabatua', '2024-03-01 15:00:00'),
-(21, 1, 7, 1250.00, 'Osatua/Bidalita', '2024-03-05 14:30:00'),
-(22, 4, 5, 900.00, 'Prestatzen', '2024-03-08 11:20:00'),
-(23, 2, 6, 320.00, 'Osatua/Bidalita', '2024-03-12 09:45:00'),
-(24, 3, 7, 1800.00, 'Osatua/Bidalita', '2024-03-15 16:10:00'),
-(25, 1, 5, 650.00, 'Prestatzen', '2024-03-18 10:00:00'),
-(26, 5, 6, 75.00, 'Osatua/Bidalita', '2024-03-22 13:50:00'),
-(27, 2, 7, 1500.00, 'Osatua/Bidalita', '2024-03-25 11:15:00'),
-(28, 3, 5, 2200.00, 'Prestatzen', '2024-03-28 15:30:00'),
-(29, 4, 6, 60.00, 'Osatua/Bidalita', '2024-04-01 09:20:00'),
-(30, 1, 7, 1200.00, 'Osatua/Bidalita', '2024-04-05 14:00:00');
+INSERT INTO eskaerak (id_eskaera, bezeroa_id, langilea_id, guztira_prezioa, faktura_zenbakia, eskaera_egoera, data) VALUES
+(1, 1, 5, 2199.00, 'FAK-2024-001', 'Osatua/Bidalita', '2024-01-08 10:00:00'),
+(2, 2, 6, 1499.00, 'FAK-2024-002', 'Osatua/Bidalita', '2024-01-09 11:30:00'),
+(3, 1, 7, 799.00, 'FAK-2024-003', 'Prestatzen', '2024-01-10 09:15:00'),
+(4, 3, 5, 4500.00, 'FAK-2024-004',  'Osatua/Bidalita', '2024-01-11 14:00:00'),
+(5, 4, 6, 1209.00, 'FAK-2024-005', 'Prestatzen', '2024-01-12 16:45:00'),
+(6, 2, 7, 299.00, 'FAK-2024-006', 'Osatua/Bidalita', '2024-01-14 08:30:00'),
+(7, 5, 5, 150.00, 'FAK-2024-007', 'Ezabatua', '2024-01-15 10:00:00'),
+(8, 1, 6, 99.00, 'FAK-2024-008', 'Osatua/Bidalita', '2024-01-18 13:20:00'),
+(9, 3, 7, 3800.00, 'FAK-2024-009', 'Osatua/Bidalita', '2024-01-22 09:10:00'),
+(10, 4, 5, 600.00, 'FAK-2024-010', 'Osatua/Bidalita', '2024-01-25 15:40:00'),
+(11, 2, 6, 135.00, 'FAK-2024-011', 'Prestatzen', '2024-01-28 11:00:00'),
+(12, 1, 7, 450.00, 'FAK-2024-012', 'Osatua/Bidalita', '2024-02-01 10:30:00'),
+(13, 3, 5, 2500.00,'FAK-2024-013', 'Osatua/Bidalita', '2024-02-05 14:15:00'),
+(14, 5, 6, 89.00, 'FAK-2024-014','Prestatzen', '2024-02-08 09:00:00'),
+(15, 2, 7, 120.00, 'FAK-2024-015', 'Osatua/Bidalita', '2024-02-12 16:20:00'),
+(16, 4, 5, 2499.00, 'FAK-2024-016',  'Osatua/Bidalita', '2024-02-15 11:00:00'),
+(17, 1, 6, 1400.00, 'FAK-2024-017', 'Prestatzen', '2024-02-18 13:45:00'),
+(18, 3, 7, 550.00, 'FAK-2024-018', 'Osatua/Bidalita', '2024-02-22 10:15:00'),
+(19, 2, 5, 15.00, 'FAK-2024-019', 'Osatua/Bidalita', '2024-02-25 09:30:00'),
+(20, 5, 6, 45.00, 'FAK-2024-020', 'Ezabatua', '2024-03-01 15:00:00'),
+(21, 1, 7, 1250.00, 'FAK-2024-021', 'Osatua/Bidalita', '2024-03-05 14:30:00'),
+(22, 4, 5, 900.00, 'FAK-2024-022', 'Prestatzen', '2024-03-08 11:20:00'),
+(23, 2, 6, 320.00, 'FAK-2024-023', 'Osatua/Bidalita', '2024-03-12 09:45:00'),
+(24, 3, 7, 1800.00, 'FAK-2024-024', 'Osatua/Bidalita', '2024-03-15 16:10:00'),
+(25, 1, 5, 650.00, 'FAK-2024-025', 'Prestatzen', '2024-03-18 10:00:00'),
+(26, 5, 6, 75.00, 'FAK-2024-026', 'Osatua/Bidalita', '2024-03-22 13:50:00'),
+(27, 2, 7, 1500.00, 'FAK-2024-027', 'Osatua/Bidalita', '2024-03-25 11:15:00'),
+(28, 3, 5, 2200.00, 'FAK-2024-028', 'Prestatzen', '2024-03-28 15:30:00'),
+(29, 4, 6, 60.00, 'FAK-2024-029', 'Osatua/Bidalita', '2024-04-01 09:20:00'),
+(30, 1, 7, 1200.00, 'FAK-2024-030', 'Osatua/Bidalita', '2024-04-05 14:00:00');
 
 INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES
 (1, 1, 1, 1, 2199.00, 'Osatua/Bidalita'),
@@ -993,11 +1000,11 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (4, 4, 46, 1, 4500.00, 'Osatua/Bidalita'),
 (5, 5, 21, 1, 1209.00, 'Prestatzen'),
 (6, 6, 51, 1, 299.00, 'Osatua/Bidalita'),
-(7, 7, 57, 1, 150.00, 'Ezabatua'), -- Zuzenduta: 87 -> 57 (MSI Monitor)
+(7, 7, 57, 1, 150.00, 'Ezabatua'), 
 (8, 8, 76, 1, 99.00, 'Osatua/Bidalita'),
 (9, 9, 47, 1, 3800.00, 'Osatua/Bidalita'),
 (10, 10, 32, 1, 600.00, 'Osatua/Bidalita'),
-(11, 11, 58, 1, 135.00, 'Prestatzen'), -- Zuzenduta: 88 -> 58 (Apple Studio Display)
+(11, 11, 58, 1, 135.00, 'Prestatzen'), 
 (12, 12, 29, 1, 450.00, 'Osatua/Bidalita'),
 (13, 13, 11, 1, 2499.00, 'Osatua/Bidalita'),
 (14, 14, 77, 1, 89.00, 'Prestatzen'),
@@ -1005,9 +1012,9 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (16, 16, 11, 1, 2499.00, 'Osatua/Bidalita'),
 (17, 17, 2, 1, 1400.00, 'Prestatzen'),
 (18, 18, 61, 1, 550.00, 'Osatua/Bidalita'),
-(19, 19, 66, 1, 15.00, 'Osatua/Bidalita'), -- Zuzenduta: 91 -> 66 (Windows 11)
-(20, 20, 70, 1, 25.00, 'Ezabatua'), -- Zuzenduta: 95 -> 70 (Win Server)
-(21, 20, 71, 2, 10.00, 'Ezabatua'), -- Zuzenduta: 92 -> 71 (NordVPN)
+(19, 19, 66, 1, 15.00, 'Osatua/Bidalita'),
+(20, 20, 70, 1, 25.00, 'Ezabatua'), 
+(21, 20, 71, 2, 10.00, 'Ezabatua'), 
 (22, 21, 4, 1, 950.00, 'Osatua/Bidalita'),
 (23, 21, 54, 1, 300.00, 'Osatua/Bidalita'),
 (24, 22, 34, 1, 900.00, 'Prestatzen'),
@@ -1017,28 +1024,7 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (28, 26, 79, 1, 75.00, 'Osatua/Bidalita'),
 (29, 27, 49, 1, 1500.00, 'Osatua/Bidalita'),
 (30, 28, 48, 1, 2200.00, 'Prestatzen'),
-(31, 29, 54, 1, 60.00, 'Osatua/Bidalita'), -- Zuzenduta: 90 -> 54 (BenQ Monitor)
+(31, 29, 54, 1, 60.00, 'Osatua/Bidalita'), 
 (32, 30, 50, 1, 1200.00, 'Osatua/Bidalita');
 
-INSERT INTO bezero_fakturak (id_faktura, faktura_zenbakia, eskaera_id, data) VALUES
-(1, 'FAK-2024-001', 1, '2024-01-10'),
-(2, 'FAK-2024-002', 2, '2024-01-11'),
-(3, 'FAK-2024-003', 4, '2024-01-12'),
-(4, 'FAK-2024-004', 6, '2024-01-15'),
-(5, 'FAK-2024-005', 8, '2024-01-20'),
-(6, 'FAK-2024-006', 9, '2024-01-25'),
-(7, 'FAK-2024-007', 10, '2024-02-01'),
-(8, 'FAK-2024-008', 12, '2024-02-05'),
-(9, 'FAK-2024-009', 13, '2024-02-10'),
-(10, 'FAK-2024-010', 15, '2024-02-15'),
-(11, 'FAK-2024-011', 16, '2024-02-20'),
-(12, 'FAK-2024-012', 18, '2024-03-01'),
-(13, 'FAK-2024-013', 19, '2024-03-05'),
-(14, 'FAK-2024-014', 21, '2024-03-10'),
-(15, 'FAK-2024-015', 23, '2024-03-15'),
-(16, 'FAK-2024-016', 24, '2024-03-20'),
-(17, 'FAK-2024-017', 26, '2024-04-01'),
-(18, 'FAK-2024-018', 27, '2024-04-05'),
-(19, 'FAK-2024-019', 29, '2024-04-10'),
-(20, 'FAK-2024-020', 30, '2024-04-15');
 

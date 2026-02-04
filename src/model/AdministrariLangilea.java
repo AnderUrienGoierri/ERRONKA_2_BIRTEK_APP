@@ -185,24 +185,35 @@ public class AdministrariLangilea extends Langilea {
      * @return BezeroFaktura objektua, datuekin.
      * @throws SQLException Datu-basean errorea gertatzen bada.
      */
-    public BezeroFaktura bezeroaFakturaIkusi(int idFaktura) throws SQLException {
-        BezeroFaktura faktura = null;
-        try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "SELECT * FROM bezero_fakturak WHERE id_faktura = ?";
-            PreparedStatement pst = kon.prepareStatement(sql);
-            pst.setInt(1, idFaktura);
-            java.sql.ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                faktura = new BezeroFaktura(
-                        rs.getInt("id_faktura"),
-                        rs.getString("faktura_zenbakia"),
-                        rs.getInt("eskaera_id"),
-                        rs.getDate("data"),
-                        rs.getBigDecimal("zergak_ehunekoa"),
-                        rs.getString("fitxategia_url"));
+    /**
+     * Eskaera bat ikusteko metodoa (fakturaren datuekin).
+     *
+     * @param idEskaera Eskaeraren IDa.
+     * @return Eskaera objektua (faktura zenbakia eta URL barne).
+     * @throws SQLException Datu-basean errorea gertatzen bada.
+     */
+    public Eskaera eskaeraIkusi(int idEskaera) throws SQLException {
+        Eskaera eskaera = null;
+        String sql = "SELECT * FROM eskaerak WHERE id_eskaera = ?";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setInt(1, idEskaera);
+            try (java.sql.ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    eskaera = new Eskaera(
+                            rs.getInt("id_eskaera"),
+                            rs.getInt("bezeroa_id"),
+                            (Integer) rs.getObject("langilea_id"),
+                            rs.getTimestamp("data"),
+                            rs.getTimestamp("eguneratze_data"),
+                            rs.getBigDecimal("guztira_prezioa"),
+                            rs.getString("faktura_zenbakia"),
+                            rs.getString("faktura_url"),
+                            rs.getString("eskaera_egoera"));
+                }
             }
         }
-        return faktura;
+        return eskaera;
     }
 
     /**
