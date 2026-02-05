@@ -26,7 +26,6 @@ public class EskaeraDialog extends JDialog {
     // Produktuak gehitzeko elementuak
     private JComboBox<ProduktuaItem> produktuKomboa;
     private JSpinner kantitateSpinner;
-    private JTextField deskontuaField;
     private JButton gehituLerroaBotoia;
     private JButton kenduLerroaBotoia;
 
@@ -57,12 +56,14 @@ public class EskaeraDialog extends JDialog {
         String izena;
         BigDecimal prezioa;
         int stock;
+        BigDecimal eskaintza;
 
-        public ProduktuaItem(int id, String izena, BigDecimal prezioa, int stock) {
+        public ProduktuaItem(int id, String izena, BigDecimal prezioa, int stock, BigDecimal eskaintza) {
             this.id = id;
             this.izena = izena;
             this.prezioa = prezioa;
             this.stock = stock;
+            this.eskaintza = eskaintza;
         }
 
         @Override
@@ -120,10 +121,6 @@ public class EskaeraDialog extends JDialog {
         kantitateSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1000, 1));
         produktuPanela.add(new JLabel("Kantitatea:"));
         produktuPanela.add(kantitateSpinner);
-
-        deskontuaField = new JTextField("0", 3);
-        produktuPanela.add(new JLabel("Deskontua (%):"));
-        produktuPanela.add(deskontuaField);
 
         gehituLerroaBotoia = new JButton("Gehitu");
         gehituLerroaBotoia.addActionListener(e -> lerroaGehitu());
@@ -198,10 +195,10 @@ public class EskaeraDialog extends JDialog {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 Statement stmt = konexioa.createStatement();
                 ResultSet rs = stmt.executeQuery(
-                        "SELECT id_produktua, izena, salmenta_prezioa, stock FROM produktuak WHERE salgai = 1")) {
+                        "SELECT id_produktua, izena, salmenta_prezioa, stock, eskaintza FROM produktuak WHERE salgai = 1")) {
             while (rs.next()) {
                 produktuKomboa.addItem(new ProduktuaItem(rs.getInt("id_produktua"), rs.getString("izena"),
-                        rs.getBigDecimal("salmenta_prezioa"), rs.getInt("stock")));
+                        rs.getBigDecimal("salmenta_prezioa"), rs.getInt("stock"), rs.getBigDecimal("eskaintza")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -235,16 +232,10 @@ public class EskaeraDialog extends JDialog {
             return;
         }
 
-        double deskontua = 0;
-        try {
-            deskontua = Double.parseDouble(deskontuaField.getText());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Deskontu baliogabea.");
-            return;
-        }
+        BigDecimal deskontua = p.eskaintza != null ? p.eskaintza : BigDecimal.ZERO;
 
         BigDecimal prezioOsoa = p.prezioa.multiply(new BigDecimal(kantitatea));
-        BigDecimal deskontuZenbatekoa = prezioOsoa.multiply(new BigDecimal(deskontua)).divide(new BigDecimal(100));
+        BigDecimal deskontuZenbatekoa = prezioOsoa.multiply(deskontua).divide(new BigDecimal(100));
         BigDecimal finala = prezioOsoa.subtract(deskontuZenbatekoa);
 
         lerroakModel.addRow(new Object[] { p.id, p.izena, p.prezioa, kantitatea, deskontua, finala });
