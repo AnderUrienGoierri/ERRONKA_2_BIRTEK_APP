@@ -165,12 +165,16 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 - **`SaioaHastekoPanela`**:
   - Erabiltzailea identifikatu eta dagokion menua irekitzen du bere rolaren (Saila) arabera.
 
+- **`MenuZuzendaritza`**: Zuzendaritza edo Super Admin erabiltzaileen interfazea.
+  - Beste menu guztietara (`Administrazioa`, `Teknikoa`, `Salmentak`, `Logistika`) sartzeko aukera ematen du.
+  - **Tresna Orokorrak**: Sarrera/Irteera erregistratu (`fitxatu`), historial ikusi eta datu pertsonalak aldatu.
+
 - **`MenuSalmentak`**: Salmenta sailaren interfazea.
   - `eskaeraGehitu()`, `eskaeraEditatu()`, `eskaeraEzabatu()`: Eskaeren CRUD kudeaketa, modeloko logikari deituz (**delegazioa**).
   - `fakturaSortu()`: Hautatutako eskaeraren faktura sortu eta ireki.
   - `bilatzailePanela`: **"Eguneratu"** botoia dauka datu guztiak freskatzeko.
   - `garbituEskaeraFiltroa()`: Eskaeren fitxan bilatzailea eta filtroak garbitzen ditu.
-  - `fitxatu(...)`: Langilearen sarrera/irteera botoiak.
+  - **Tresna Orokorrak**: Sarrera/Irteera (`fitxatu`), historiala eta profil kudeaketa (**langile guztientzat eskuragarri**, `Langilea` eredura delegatuz).
 
 - **`MenuLogistika`**: Biltegi sailaren interfazea.
   - `bilatzailePanela`: **"Eguneratu"** botoia dauka sarrerak, biltegiak eta eskaerak freskatzeko.
@@ -181,16 +185,19 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
   - `ikusiEskaeraLerroak()`: Eskaera baten lerroak ikusi eta kudeatzeko lehioa.
   - `editatuProduktuOharra()`: Produktu bati oharra gehitu/aldatu.
   - `igoIrudia()`: Produktuei irudiak esleitzeko fitxategi-hautatzailea.
+  - **Tresna Orokorrak**: `fitxatu`, historiala eta profil kudeaketa (OOP bidez delegatua).
 
 - **`MenuTeknikoa`**: SAT / Konponketa sailaren interfazea.
   - `bilatzailePanela`: **"Eguneratu"** botoia dauka konponketak eta akatsak freskatzeko.
   - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
   - `ezabatuElementua()`: Konponketak eta produktuak ezabatu, **modelora delegatuz**.
+  - **Tresna Orokorrak**: `fitxatu`, historiala eta profil kudeaketa (delegatua).
 
 - **`MenuAdministrazioa`**: Kudeaketa orokorra.
   - `datuakKargatuOsoa()`: Langileak, sailak eta datu-maisuak kudeatzeko taulak (CRUD eragiketekin).
   - `bilatzailePanela`: **"Eguneratu"** botoia dauka datu-maisu guztiak freskatzeko.
   - `gehituElementua(...)`, `editatuElementua(...)`, `ezabatuElementua(...)`: Datu orokorren kudeaketa, **modeloko metodoen bidez**.
+  - **Tresna Orokorrak**: `fitxatu`, historiala eta profil kudeaketa (delegatua).
 
 - **`KonponketaXehetasunaElkarrizketa` & `EskaeraDialog`**:
   - Datu espezifikoak editatzeko lehio laguntzaileak (Pop-up).

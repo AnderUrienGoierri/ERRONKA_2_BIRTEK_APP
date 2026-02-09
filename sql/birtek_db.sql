@@ -38,30 +38,30 @@ CREATE TABLE IF NOT EXISTS langileak (
     abizena VARCHAR(100) NOT NULL,
     nan VARCHAR(9) UNIQUE,
     jaiotza_data DATE,
-    
+
     -- Kokapena
     herria_id INT unsigned,
     helbidea VARCHAR(150),
     posta_kodea VARCHAR(5),
     telefonoa VARCHAR(20),
-    
+
     -- Login datuak eta Hizkuntza
     emaila VARCHAR(100) UNIQUE NOT NULL,
     hizkuntza ENUM('Euskara', 'Gaztelania', 'Frantsesa', 'Ingelesa') DEFAULT 'Euskara',
     pasahitza VARCHAR(255),
     salto_txartela_uid VARCHAR(50) UNIQUE, -- Langilea identifikatzeko
-    
+
     -- Lan datuak
     alta_data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     aktibo BOOLEAN NOT NULL DEFAULT 0,
-    
-    
+
+
     saila_id INT unsigned,
     iban VARCHAR(34)UNIQUE,
-    
+
     kurrikuluma MEDIUMBLOB, -- pdf gordetzeko
-    
+
     CONSTRAINT fk_langilea_saila FOREIGN KEY (saila_id) REFERENCES langile_sailak(id_saila),
     CONSTRAINT fk_langilea_herria FOREIGN KEY (herria_id) REFERENCES herriak(id_herria)
 );
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS fitxaketak (
     ordua TIME NOT NULL DEFAULT (CURRENT_TIME),
     mota ENUM('Sarrera', 'Irteera') NOT NULL DEFAULT 'Sarrera',
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_fitxaketa_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
 );
 
@@ -84,25 +84,25 @@ CREATE TABLE IF NOT EXISTS bezeroak (
     ifz_nan VARCHAR(9) UNIQUE NOT NULL,
     jaiotza_data DATE,
     sexua ENUM('gizona', 'emakumea', 'ez-binarioa'),
-    
+
     -- Ordaintzeko
     bezero_ordainketa_txartela VARCHAR(255),
-    
+
     -- Bidalketarako
     helbidea VARCHAR(150) NOT NULL,
     herria_id INT UNSIGNED NOT NULL,
     posta_kodea VARCHAR(5) NOT NULL,
     telefonoa VARCHAR(15),
-    
+
     -- Login eta Hizkuntza
     emaila VARCHAR(255) UNIQUE NOT NULL, -- NVARCHAR ordez VARCHAR erabilita bateragarritasunerako
     hizkuntza ENUM('Euskara', 'Gaztelania', 'Frantsesa', 'Ingelesa') NOT NULL DEFAULT 'Euskara',
     pasahitza VARCHAR(255) NOT NULL,
-    
+
     alta_data DATETIME DEFAULT CURRENT_TIMESTAMP,
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     aktibo BOOLEAN NOT NULL DEFAULT 1,
-    
+
     CONSTRAINT fk_bezeroa_herria FOREIGN KEY (herria_id) REFERENCES herriak(id_herria)
 );
 
@@ -110,22 +110,22 @@ CREATE TABLE IF NOT EXISTS hornitzaileak (
     id_hornitzailea INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     izena_soziala VARCHAR(100) NOT NULL,
     ifz_nan VARCHAR(9) UNIQUE NOT NULL,
-    
+
     -- Kontaktu datuak
     kontaktu_pertsona VARCHAR(100),
     helbidea VARCHAR(150) NOT NULL,
     herria_id INT UNSIGNED NOT NULL,
     posta_kodea VARCHAR(5) NOT NULL,
     telefonoa VARCHAR(15),
-    
+
     -- Login
     emaila VARCHAR(255) UNIQUE NOT NULL,
     hizkuntza ENUM('Euskara', 'Gaztelania', 'Frantsesa', 'Ingelesa') NOT NULL DEFAULT 'Gaztelania',
     pasahitza VARCHAR(255) NOT NULL,
     aktibo BOOLEAN NOT NULL DEFAULT 1,
-    
+
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_hornitzailea_herria FOREIGN KEY (herria_id) REFERENCES herriak(id_herria)
 );
 
@@ -151,22 +151,22 @@ CREATE TABLE IF NOT EXISTS produktuak (
     izena VARCHAR(255) NOT NULL,
     marka VARCHAR(50) NOT NULL,
     mota ENUM('Eramangarria', 'Mahai-gainekoa', 'Mugikorra', 'Tableta', 'Zerbitzaria', 'Pantaila', 'Softwarea') NOT NULL,
-    
+
     deskribapena TEXT,
     irudia_url VARCHAR(255),
-    
+
     -- Egoera
     biltegi_id INT UNSIGNED NOT NULL,
     produktu_egoera ENUM('Berria', 'Berritua A', 'Berritua B', 'Hondatua', 'Zehazteko') NOT NULL DEFAULT 'Zehazteko',
     produktu_egoera_oharra TEXT,
     salgai BOOLEAN DEFAULT FALSE,
-    
+
     -- Datu Ekonomikoak
     salmenta_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     stock INT UNSIGNED DEFAULT 0,
     eskaintza DECIMAL(5, 2) DEFAULT NULL,
     zergak_ehunekoa DECIMAL(5, 2) NOT NULL DEFAULT 21.00,
-    
+
     sortze_data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -287,9 +287,10 @@ CREATE TABLE IF NOT EXISTS konponketak (
     akatsa_id INT UNSIGNED NOT NULL,
     oharrak TEXT,
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_konponketa_produktua FOREIGN KEY (produktua_id) REFERENCES produktuak(id_produktua),
-    CONSTRAINT fk_konponketa_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
+    CONSTRAINT fk_konponketa_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea),
+    CONSTRAINT fk_konponketa_akatsa FOREIGN KEY (akatsa_id) REFERENCES akatsak(id_akatsa)
 );
 
 -- ========================================================
@@ -303,7 +304,7 @@ CREATE TABLE IF NOT EXISTS sarrerak (
     hornitzailea_id INT UNSIGNED NOT NULL,
     langilea_id INT UNSIGNED NOT NULL,
     sarrera_egoera ENUM('Bidean', 'Jasota', 'Ezabatua') NOT NULL DEFAULT 'Bidean',
-    
+
     CONSTRAINT fk_sarrera_hornitzailea FOREIGN KEY (hornitzailea_id) REFERENCES hornitzaileak(id_hornitzailea),
     CONSTRAINT fk_sarrera_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
 );
@@ -326,15 +327,16 @@ CREATE TABLE IF NOT EXISTS eskaerak (
     id_eskaera INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     bezeroa_id INT UNSIGNED NOT NULL,
     langilea_id INT UNSIGNED,
-    data DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	data DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     guztira_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    
     faktura_zenbakia VARCHAR(20) UNIQUE,
 	faktura_url VARCHAR(255),
-    
+
     eskaera_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
-    
+
     CONSTRAINT fk_eskaera_bezeroa FOREIGN KEY (bezeroa_id) REFERENCES bezeroak(id_bezeroa),
     CONSTRAINT fk_eskaera_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
 );
@@ -345,9 +347,9 @@ CREATE TABLE IF NOT EXISTS eskaera_lerroak (
     produktua_id INT UNSIGNED NOT NULL,
     kantitatea INT UNSIGNED NOT NULL,
     unitate_prezioa DECIMAL(10, 2) NOT NULL,
-    
+
     eskaera_lerro_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
-    
+
     CONSTRAINT fk_el_eskaera FOREIGN KEY (eskaera_id) REFERENCES eskaerak(id_eskaera),
     CONSTRAINT fk_el_produktua FOREIGN KEY (produktua_id) REFERENCES produktuak(id_produktua)
 );
@@ -357,80 +359,6 @@ CREATE TABLE IF NOT EXISTS eskaera_lerroak (
 -- 7. ERABILTZAILEAK ETA BAIMENAK
 -- ========================================================
 
-FLUSH PRIVILEGES;
-
--- ZUZENDARITZA (SysAdmin) 
-CREATE USER IF NOT EXISTS 'ander_sysadmin'@'localhost' IDENTIFIED BY '1234';
-GRANT ALL PRIVILEGES ON *.* TO 'ander_sysadmin'@'localhost' WITH GRANT OPTION;
-
-CREATE USER IF NOT EXISTS 'lander_sysadmin'@'localhost' IDENTIFIED BY '1234';
-GRANT ALL PRIVILEGES ON *.* TO 'lander_sysadmin'@'localhost' WITH GRANT OPTION;
-
--- ADMINISTRAZIOA
-CREATE USER IF NOT EXISTS 'ane_admin'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'mikel_admin'@'localhost' IDENTIFIED BY '1234';
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langile_sailak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.fitxaketak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON birtek_db.eskaerak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost'; -- fakturak ikusi behar dituzte
-GRANT SELECT, UPDATE, DELETE ON birtek_db.hornitzaileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.herriak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
-
--- SALMENTAK
-CREATE USER IF NOT EXISTS 'leire_sales'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'iker_sales'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'amaia_sales'@'localhost' IDENTIFIED BY '1234';
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.bezeroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
-GRANT SELECT, UPDATE ON birtek_db.produktuak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaerak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';  -- fakturak orain eskaerak taula kudeatzen dira
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaera_lerroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
--- TEKNIKOAK SAT
-CREATE USER IF NOT EXISTS 'unai_sat'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'maite_sat'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'aitor_sat'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'nerea_sat'@'localhost' IDENTIFIED BY '1234';
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.produktuak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.konponketak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.akatsak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
-
--- LOGISTIKA
-CREATE USER IF NOT EXISTS 'gorka_biltegia'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'oihane_biltegia'@'localhost' IDENTIFIED BY '1234';
-CREATE USER IF NOT EXISTS 'xabier_biltegia'@'localhost' IDENTIFIED BY '1234';
-
-GRANT SELECT, INSERT, UPDATE ON birtek_db.produktuak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON birtek_db.hornitzaileak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.biltegiak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.sarrera_lerroak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.sarrerak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, UPDATE ON birtek_db.eskaera_lerroak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
-
--- FITXAKETAK (Langile guztieenak)
-GRANT SELECT, INSERT ON birtek_db.fitxaketak TO 
-
--- 'lander_sysadmin'            IADA BADUTE crud osoa
--- 'ander_sysadmin'@'localhost' IADA BADUTE crud osoa
--- 'ane_admin'@'localhost',     IADA BADUTE crud osoa
--- 'mikel_admin'@'localhost';   IADA BADUTE crud osoa
-    'leire_sales'@'localhost', 
-    'iker_sales'@'localhost', 
-    'amaia_sales'@'localhost', 
-    'unai_sat'@'localhost', 
-    'maite_sat'@'localhost', 
-    'aitor_sat'@'localhost', 
-    'nerea_sat'@'localhost', 
-    'gorka_biltegia'@'localhost', 
-    'oihane_biltegia'@'localhost', 
-    'xabier_biltegia'@'localhost';
-
-FLUSH PRIVILEGES;
-
 
 -- ========================================================================================================================================
 
@@ -439,12 +367,12 @@ FLUSH PRIVILEGES;
 -- ========================================================================================================================
 
 -- 1. OINARRIZKO DATUAK
-INSERT INTO biltegiak (id_biltegia, izena, biltegi_sku) VALUES 
+INSERT INTO biltegiak (id_biltegia, izena, biltegi_sku) VALUES
 (1, 'Harrera Biltegia', 'HAR_BIL'),
 (2, 'Biltegi Nagusia', 'BIL_NAG'),
 (3, 'Irteera Biltegia', 'IRT_BIL');
 
-INSERT INTO produktu_kategoriak (id_kategoria, izena) VALUES 
+INSERT INTO produktu_kategoriak (id_kategoria, izena) VALUES
 (1, 'Ordenagailuak'),
 (2, 'Telefonia'),
 (3, 'Irudia'),
@@ -926,10 +854,10 @@ INSERT INTO sarrera_lerroak (id_sarrera_lerroa, sarrera_id, produktua_id, kantit
 (16, 13, 70, 15, 'Bidean'),
 (17, 14, 75, 4, 'Jasota'),
 (18, 15, 80, 10, 'Jasota'),
-(19, 16, 60, 8, 'Jasota'), 
-(20, 17, 55, 50, 'Jasota'), 
-(21, 18, 5, 100, 'Bidean'), 
-(22, 19, 25, 20, 'Ezabatua'), 
+(19, 16, 60, 8, 'Jasota'),
+(20, 17, 55, 50, 'Jasota'),
+(21, 18, 5, 100, 'Bidean'),
+(22, 19, 25, 20, 'Ezabatua'),
 (23, 20, 5, 10, 'Jasota'),
 (24, 21, 15, 5, 'Jasota'),
 (25, 22, 25, 8, 'Jasota'),
@@ -938,8 +866,8 @@ INSERT INTO sarrera_lerroak (id_sarrera_lerroa, sarrera_id, produktua_id, kantit
 (28, 25, 55, 6, 'Jasota'),
 (29, 26, 65, 5, 'Jasota'),
 (30, 27, 75, 4, 'Jasota'),
-(31, 28, 60, 8, 'Jasota'), 
-(32, 29, 25, 20, 'Bidean'), 
+(31, 28, 60, 8, 'Jasota'),
+(32, 29, 25, 20, 'Bidean'),
 (33, 30, 5, 10, 'Jasota');
 
 /*
@@ -950,12 +878,12 @@ CREATE TABLE IF NOT EXISTS eskaerak (
     data DATETIME DEFAULT CURRENT_TIMESTAMP,
     eguneratze_data DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     guztira_prezioa DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    
+
     faktura_zenbakia VARCHAR(20) UNIQUE NOT NULL,
 	faktura_url VARCHAR(255),
-    
+
     eskaera_egoera ENUM('Prestatzen', 'Osatua/Bidalita', 'Ezabatua') NOT NULL DEFAULT 'Prestatzen',
-    
+
     CONSTRAINT fk_eskaera_bezeroa FOREIGN KEY (bezeroa_id) REFERENCES bezeroak(id_bezeroa),
     CONSTRAINT fk_eskaera_langilea FOREIGN KEY (langilea_id) REFERENCES langileak(id_langilea)
 );
@@ -1001,11 +929,11 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (4, 4, 46, 1, 4500.00, 'Osatua/Bidalita'),
 (5, 5, 21, 1, 1209.00, 'Prestatzen'),
 (6, 6, 51, 1, 299.00, 'Osatua/Bidalita'),
-(7, 7, 57, 1, 150.00, 'Ezabatua'), 
+(7, 7, 57, 1, 150.00, 'Ezabatua'),
 (8, 8, 76, 1, 99.00, 'Osatua/Bidalita'),
 (9, 9, 47, 1, 3800.00, 'Osatua/Bidalita'),
 (10, 10, 32, 1, 600.00, 'Osatua/Bidalita'),
-(11, 11, 58, 1, 135.00, 'Prestatzen'), 
+(11, 11, 58, 1, 135.00, 'Prestatzen'),
 (12, 12, 29, 1, 450.00, 'Osatua/Bidalita'),
 (13, 13, 11, 1, 2499.00, 'Osatua/Bidalita'),
 (14, 14, 77, 1, 89.00, 'Prestatzen'),
@@ -1014,8 +942,8 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (17, 17, 2, 1, 1400.00, 'Prestatzen'),
 (18, 18, 61, 1, 550.00, 'Osatua/Bidalita'),
 (19, 19, 66, 1, 15.00, 'Osatua/Bidalita'),
-(20, 20, 70, 1, 25.00, 'Ezabatua'), 
-(21, 20, 71, 2, 10.00, 'Ezabatua'), 
+(20, 20, 70, 1, 25.00, 'Ezabatua'),
+(21, 20, 71, 2, 10.00, 'Ezabatua'),
 (22, 21, 4, 1, 950.00, 'Osatua/Bidalita'),
 (23, 21, 54, 1, 300.00, 'Osatua/Bidalita'),
 (24, 22, 34, 1, 900.00, 'Prestatzen'),
@@ -1025,7 +953,87 @@ INSERT INTO eskaera_lerroak (id_eskaera_lerroa, eskaera_id, produktua_id, kantit
 (28, 26, 79, 1, 75.00, 'Osatua/Bidalita'),
 (29, 27, 49, 1, 1500.00, 'Osatua/Bidalita'),
 (30, 28, 48, 1, 2200.00, 'Prestatzen'),
-(31, 29, 54, 1, 60.00, 'Osatua/Bidalita'), 
+(31, 29, 54, 1, 60.00, 'Osatua/Bidalita'),
 (32, 30, 50, 1, 1200.00, 'Osatua/Bidalita');
 
+-- ========================================================
+--  ERABILTZAILEAK ETA BAIMENAK
+-- ========================================================
+
+FLUSH PRIVILEGES;
+-- ZUZENDARITZA (SysAdmin)
+CREATE USER IF NOT EXISTS 'ander_sysadmin'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON *.* TO 'ander_sysadmin'@'localhost' WITH GRANT OPTION;
+
+CREATE USER IF NOT EXISTS 'lander_sysadmin'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON *.* TO 'lander_sysadmin'@'localhost' WITH GRANT OPTION;
+
+CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON birtek_db.* TO 'admin'@'%';
+FLUSH PRIVILEGES;
+-- =======================================================================================
+-- ADMINISTRAZIOA
+CREATE USER IF NOT EXISTS 'ane_admin'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'mikel_admin'@'localhost' IDENTIFIED BY '1234';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.langile_sailak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.fitxaketak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.eskaerak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost'; -- fakturak ikusi behar dituzte
+GRANT SELECT, UPDATE, DELETE ON birtek_db.hornitzaileak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.herriak TO 'ane_admin'@'localhost', 'mikel_admin'@'localhost';
+
+-- SALMENTAK
+CREATE USER IF NOT EXISTS 'leire_sales'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'iker_sales'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'amaia_sales'@'localhost' IDENTIFIED BY '1234';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.bezeroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
+GRANT SELECT, UPDATE ON birtek_db.produktuak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaerak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';  -- fakturak orain eskaerak taula kudeatzen dira
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.eskaera_lerroak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'leire_sales'@'localhost', 'iker_sales'@'localhost', 'amaia_sales'@'localhost';
+-- TEKNIKOAK SAT
+CREATE USER IF NOT EXISTS 'unai_sat'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'maite_sat'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'aitor_sat'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'nerea_sat'@'localhost' IDENTIFIED BY '1234';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.produktuak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.konponketak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.akatsak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'unai_sat'@'localhost', 'maite_sat'@'localhost', 'aitor_sat'@'localhost', 'nerea_sat'@'localhost';
+
+-- LOGISTIKA
+CREATE USER IF NOT EXISTS 'gorka_biltegia'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'oihane_biltegia'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'xabier_biltegia'@'localhost' IDENTIFIED BY '1234';
+
+GRANT SELECT, INSERT, UPDATE ON birtek_db.produktuak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.hornitzaileak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.biltegiak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.sarrera_lerroak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON birtek_db.sarrerak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, UPDATE ON birtek_db.eskaera_lerroak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON birtek_db.herriak TO 'gorka_biltegia'@'localhost', 'oihane_biltegia'@'localhost', 'xabier_biltegia'@'localhost';
+
+-- FITXAKETAK (Langile guztieenak)
+GRANT SELECT, INSERT ON birtek_db.fitxaketak TO
+
+-- 'lander_sysadmin'            IADA BADUTE crud osoa
+-- 'ander_sysadmin'@'localhost' IADA BADUTE crud osoa
+-- 'ane_admin'@'localhost',     IADA BADUTE crud osoa
+-- 'mikel_admin'@'localhost';   IADA BADUTE crud osoa
+    'leire_sales'@'localhost',
+    'iker_sales'@'localhost',
+    'amaia_sales'@'localhost',
+    'unai_sat'@'localhost',
+    'maite_sat'@'localhost',
+    'aitor_sat'@'localhost',
+    'nerea_sat'@'localhost',
+    'gorka_biltegia'@'localhost',
+    'oihane_biltegia'@'localhost',
+    'xabier_biltegia'@'localhost';
+
+FLUSH PRIVILEGES;
 

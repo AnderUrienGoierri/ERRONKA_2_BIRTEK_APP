@@ -316,7 +316,8 @@ public class Langilea extends Pertsona {
     public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId, String telefonoa,
             String helbidea)
             throws java.sql.SQLException {
-        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, telefonoa = ?, helbidea = ?, eguneratze_data = NOW() WHERE id_langilea = ?";
+        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, telefonoa = ?, helbidea = ?, eguneratze_data = NOW() "
+        		+ "WHERE id_langilea = ?";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
                 java.sql.PreparedStatement sententzia = konexioa.prepareStatement(sql)) {
             sententzia.setString(1, pasahitza);
@@ -336,8 +337,9 @@ public class Langilea extends Pertsona {
         }
     }
 
+    
     // langile batek bere fitxaketak historiala ikusteko metodoa:
-    // langile batek bere fitxaketak historiala ikusteko metodoa:
+    
     /**
      * Langilearen azken fitxaketa egoera lortzen du.
      *
