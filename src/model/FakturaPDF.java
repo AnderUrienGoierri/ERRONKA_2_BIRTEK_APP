@@ -221,17 +221,23 @@ public class FakturaPDF {
      * @param fitxategiIzena Fitxategiak zerbitzarian izango duen izena.
      */
     public static void fakturaIgoZerbitzarira(String fitxategiPath, String fitxategiIzena) {
-        String server = "localhost";
+        String server = "192.168.115.155";
         int port = 21;
-        String user = "root"; // FTP erabiltzailea
-        String pass = "1MG32025"; // FTP pasahitza
+        String user = "salmenta_faktura"; // FTP erabiltzailea
+        String pass = ""; // FTP pasahitza
 
         FTPClient ftpClient = new FTPClient();
         try {
             ftpClient.connect(server, port);
-            ftpClient.login(user, pass);
-            ftpClient.enterLocalPassiveMode();
+            boolean loginSuccess = ftpClient.login(user, pass);
 
+            if (!loginSuccess) {
+                System.out.println("Errorea: Ezin izan da FTP saioa hasi (" + user + "). Erantzuna: "
+                        + ftpClient.getReplyString());
+                return;
+            }
+
+            ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
             // "htdocs/fakturak" karpetara joan
@@ -241,31 +247,28 @@ public class FakturaPDF {
             // Hemen suposatzen dugu "htdocs/fakturak" existitzen dela edo sortu behar dela.
             // Baina erabiltzaileak esan du "htdocs/fakturak" karpetan gorde nahi duela.
 
-            // Saiatu direktorioa aldatzen, bestela sortu
-            if (!ftpClient.changeWorkingDirectory("htdocs/fakturak")) {
-                if (ftpClient.makeDirectory("htdocs")) {
-                    ftpClient.changeWorkingDirectory("htdocs");
-                    ftpClient.makeDirectory("fakturak");
-                    ftpClient.changeWorkingDirectory("fakturak");
-                } else {
-                    // Agian zuzenean fakturak karpeta erroan dago edo beste egitura bat du
-                    ftpClient.makeDirectory("fakturak");
-                    ftpClient.changeWorkingDirectory("fakturak");
-                }
-            }
+            // Direktorioa ziurtatu: "fakturak" bakarrik erabiliko dugu,
+            // gehienetan FTP erabiltzailea htdocs barruan hasten baita.
+            // Direktorioa ziurtatu: Erabiltzaileak htdocs barruan 'fakturak' karpeta nahi
+            // du.
+            // FTP erabiltzailea (salmenta_faktura) dagoeneko 'fakturak' karpetara zuzenduta
+            // dagoenez,
+            // ez dugu direktorio aldaketarik egin behar, bestela 'fakturak/fakturak'
+            // sortuko luke.
+            System.out.println("Uneko FTP direktorioa: " + ftpClient.printWorkingDirectory());
 
             File firstLocalFile = new File(fitxategiPath);
-
             String firstRemoteFile = fitxategiIzena;
             FileInputStream inputStream = new FileInputStream(firstLocalFile);
 
-            System.out.println("Fitxategia igotzen hasten...");
+            System.out.println("Fitxategia igotzen hasten: " + firstRemoteFile);
             boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
             inputStream.close();
+
             if (done) {
                 System.out.println("Fitxategia ondo igo da.");
             } else {
-                System.out.println("Errorea fitxategia igotzean.");
+                System.out.println("Errorea fitxategia igotzean. Erantzuna: " + ftpClient.getReplyString());
             }
 
         } catch (IOException ex) {

@@ -48,7 +48,7 @@ public class SalmentaLangilea extends Langilea {
      * @return Sortutako PDF fitxategia, edo null errorea gertatu bada.
      * @throws Exception Errorea prozesuan.
      */
-    private static final String FAKTURA_BIDEA = "C:\\Xampp\\htdocs\\fakturak";
+    private static final String FAKTURA_BIDEA = "./fakturak";
 
     public File fakturaSortu(int idEskaera) throws Exception {
         // Faktura karpeta ziurtatu
@@ -82,10 +82,17 @@ public class SalmentaLangilea extends Langilea {
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement pstUpdate = konexioa.prepareStatement(sqlUpdate)) {
             pstUpdate.setString(1, fakturaZenbakia);
-            pstUpdate.setString(2, fakturaFitxategia.getAbsolutePath());
+
+            // HTTP URL-a gorde (lehen path lokala zen)
+            String fakturaUrl = "http://192.168.115.155/fakturak/" + fakturaFitxategia.getName();
+            pstUpdate.setString(2, fakturaUrl);
+
             pstUpdate.setInt(3, idEskaera);
             pstUpdate.executeUpdate();
         }
+
+        // Faktura zerbitzarira igo FTP bidez
+        FakturaPDF.fakturaIgoZerbitzarira(fakturaFitxategia.getAbsolutePath(), fakturaFitxategia.getName());
 
         return fakturaFitxategia;
     }
