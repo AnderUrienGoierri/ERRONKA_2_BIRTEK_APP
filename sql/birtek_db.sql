@@ -316,8 +316,8 @@ CREATE TABLE IF NOT EXISTS sarrera_lerroak (
     -- Nul izan daiteke oraindik ez dagoelako katalogoan
     kantitatea INT UNSIGNED NOT NULL,
     sarrera_lerro_egoera ENUM('Bidean', 'Jasota', 'Ezabatua') NOT NULL DEFAULT 'Bidean',
-    produktu_berria_datuak TEXT NULL,
-    -- JSON datuak gordetzeko
+    produktu_berria_datuak LONGTEXT NULL,   -- JSON datuak gordetzeko
+    
     CONSTRAINT fk_sl_sarrera FOREIGN KEY (sarrera_id) REFERENCES sarrerak(id_sarrera),
     CONSTRAINT fk_sl_produktua FOREIGN KEY (produktua_id) REFERENCES produktuak(id_produktua)
 );
