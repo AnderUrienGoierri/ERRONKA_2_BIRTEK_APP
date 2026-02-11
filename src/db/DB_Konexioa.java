@@ -11,9 +11,17 @@ import java.sql.SQLException;
 public class DB_Konexioa {
 
     // Konfigurazio datuak
+    /* kode exektagarria etxean badago */
+	private static final String URLEA = "jdbc:mysql://localhost:3306/birtek_db";
+    private static final String ERABILTZAILEA = "root";
+    private static final String PASAHITZA = "1MG32025";
+	
+    /* kode exektagarria ikastetxean badago */
+    /*
     private static final String URLEA = "jdbc:mysql://192.168.115.155:3306/birtek_db";
     private static final String ERABILTZAILEA = "admin";
     private static final String PASAHITZA = "1234";
+    */
 
     /**
      * Connection instantzia estatikoa (Singleton).
@@ -22,7 +30,7 @@ public class DB_Konexioa {
 
     /**
      * Datu-basera konektatzeko metodoa (Singleton Eredua).
-     * 
+     *
      * @return Connection objektua edo null errore bat egonez gero.
      */
     public static Connection konektatu() {

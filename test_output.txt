@@ -1,0 +1,28 @@
+TEST HASIERA: Katalogatzea
+Sortutako Sarrera ID: 34
+Sortutako SarreraLerroa ID: 37
+Katalogatu gabeko lerro kopurua: 1
+Lerroa aurkitu da. JSON: {"izena":"Test Laptop JSON", "marka":"TestBrand", "mota":"Eramangarria", "kategoria_id":"1", "biltegi_id":"1", "hornitzaile_id":"1", "stock":"5", "salmenta_prezioa":"999.99", "deskribapena":"Test desc", "irudia_url":"test.jpg", "prozesadorea":"Intel Test", "ram_gb":"16", "diskoa_gb":"512", "pantaila_tamaina":"14.0", "bateria_wh":"50", "sistema_eragilea":"Win11", "pisua_kg":"1.5"}
+Produktua katalogatu da.
+java.sql.SQLNonTransientConnectionException: No operations allowed after connection closed.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:89)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:81)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:55)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:65)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64)
+	at com.mysql.cj.jdbc.ConnectionImpl.prepareStatement(ConnectionImpl.java:1684)
+	at com.mysql.cj.jdbc.ConnectionImpl.prepareStatement(ConnectionImpl.java:1574)
+	at main.TestKatalogatzea.main(TestKatalogatzea.java:79)
+Caused by: com.mysql.cj.exceptions.ConnectionIsClosedException: No operations allowed after connection closed.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140)
+	at com.mysql.cj.NativeSession.checkClosed(NativeSession.java:929)
+	at com.mysql.cj.jdbc.ConnectionImpl.checkClosed(ConnectionImpl.java:558)
+	at com.mysql.cj.jdbc.ConnectionImpl.prepareStatement(ConnectionImpl.java:1591)
+	... 2 more

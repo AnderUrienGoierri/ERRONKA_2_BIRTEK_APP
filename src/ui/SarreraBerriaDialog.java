@@ -285,7 +285,7 @@ public class SarreraBerriaDialog extends JDialog {
                         kanti, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, null, null) {
                 };
                 produktuList.add(p);
-                lerroList.add(new SarreraLerroa(0, 0, 0, kanti, "Bidean"));
+                lerroList.add(new SarreraLerroa(0, 0, 0, kanti, "Bidean", null));
             }
             langilea.produktuSarreraBerriaSortu(hornitzaileaId, produktuList, lerroList);
             JOptionPane.showMessageDialog(this, "Sarrera ondo sortu da.");

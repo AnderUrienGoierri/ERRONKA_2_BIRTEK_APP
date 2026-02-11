@@ -137,7 +137,7 @@ Pakete honek entitateak eta negozio-logika biltzen ditu. Langileen hierarkia eta
 - **`TeknikariLangilea`**: Konponketa lanak eta produktu teknikoen kudeaketa.
   - `produktuakIkusi()`: Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez daudenak).
   - `produktuBatSortu(Produktua p)`: Produktu berri bat sisteman sartu.
-  - `produktuaEditatu(int id, boolean salgai, String egoera)`: Produktuaren egoera eta salgai-marka aldatu.
+  - `produktuaOsorikEditatu(int id, Map<String, String> datuak)`: [BERRIA] Produktu baten atributu guztiak (oinarrizkoak eta teknikoak) editatzeko gaitasuna, baita mota aldatzeko aukera ere.
   - `produktuariIrudiaGehitu(int id, String irudiaUrl)`: Produktu bati irudia esleitu.
   - `prezioaEzarri(int id, BigDecimal prezioa, BigDecimal eskaintza)`: Produktuaren salmenta prezioa eta eskaintza eguneratu.
   - `produktuaBorratu(int id)`: Produktu bat sistematik ezabatu.
@@ -189,6 +189,7 @@ Erabiltzailearekin interakzioa kudeatzen duten `JFrame` eta `JDialog` klaseak.
 
 - **`MenuTeknikoa`**: SAT / Konponketa sailaren interfazea.
   - `bilatzailePanela`: **"Eguneratu"** botoia dauka konponketak eta akatsak freskatzeko.
+  - `ProduktuOsoaEditatuDialog`: [BERRIA] Produktu baten xehetasun guztiak modu dinamikoan editatzeko elkarrizketa-koadroa.
   - `irekiKonponketaXehetasuna()`: Konponketa baten egoera eta oharrak ikusteko/editatzeko elkarrizketa-koadroa.
   - `ezabatuElementua()`: Konponketak eta produktuak ezabatu, **modelora delegatuz**.
   - **Tresna Orokorrak**: `fitxatu`, historiala eta profil kudeaketa (delegatua).

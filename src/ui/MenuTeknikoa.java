@@ -583,48 +583,10 @@ public class MenuTeknikoa extends JFrame {
             Object idObj = produktuTaula.getModel().getValueAt(rm, 0);
             int id = Integer.parseInt(idObj.toString());
 
-            try (Connection kon = DB_Konexioa.konektatu()) {
-                // Gaur egungo datuak lortu
-                PreparedStatement pst = kon.prepareStatement("SELECT * FROM produktuak WHERE id_produktua = ?");
-                pst.setInt(1, id);
-                ResultSet rs = pst.executeQuery();
-                if (rs.next()) {
-                    JTextField izenaField = new JTextField(rs.getString("izena"));
-                    JTextField markaField = new JTextField(rs.getString("marka"));
-                    JTextField egoeraField = new JTextField(rs.getString("produktu_egoera"));
-                    JCheckBox salgaiBox = new JCheckBox("Salgai", rs.getBoolean("salgai"));
-                    JTextField prezioaField = new JTextField(rs.getString("salmenta_prezioa"));
-
-                    Object[] message = {
-                            "Izena:", izenaField,
-                            "Marka:", markaField,
-                            "Egoera (Berria, Berritua A, Berritua B, Hondatua, Zehazteko):", egoeraField,
-                            "Salgai:", salgaiBox,
-                            "Prezioa (€):", prezioaField
-                    };
-
-                    int option = JOptionPane.showConfirmDialog(null, message, "Editatu Produktua",
-                            JOptionPane.OK_CANCEL_OPTION);
-                    if (option == JOptionPane.OK_OPTION) {
-                        // Update basic info
-                        PreparedStatement upst = kon.prepareStatement(
-                                "UPDATE produktuak SET izena = ?, marka = ?, produktu_egoera = ?, salgai = ?, salmenta_prezioa = ? WHERE id_produktua = ?");
-                        upst.setString(1, izenaField.getText());
-                        upst.setString(2, markaField.getText());
-                        upst.setString(3, egoeraField.getText());
-                        upst.setBoolean(4, salgaiBox.isSelected());
-                        upst.setBigDecimal(5, new java.math.BigDecimal(prezioaField.getText().replace(",", ".")));
-                        upst.setInt(6, id);
-                        upst.executeUpdate();
-
-                        datuakKargatu();
-                        JOptionPane.showMessageDialog(this, "Produktua eguneratu da.");
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Errorea editatzean: " + e.getMessage());
-            }
+            // Erabili elkarrizketa leiho berria atributu guztiak editatzeko
+            ProduktuOsoaEditatuDialog dialog = new ProduktuOsoaEditatuDialog(this, langilea, id);
+            dialog.setVisible(true);
+            datuakKargatu();
         } else if (index == 2) { // Akatsak
             int r = akatsTaula.getSelectedRow();
             if (r == -1) {

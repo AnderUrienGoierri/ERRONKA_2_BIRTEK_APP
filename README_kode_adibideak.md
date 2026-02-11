@@ -130,7 +130,7 @@ Salmenta menu nagusiaren logika.
 **Eskaera Sortu (Modelora delegatuz):**
 
 ```java
-private void eskaeraGehitu() {
+aprivate void eskaeraGehitu() {
     EskaeraDialog dialog = new EskaeraDialog(this, "Gehitu Eskaera", null, "Prestatzen");
     dialog.setVisible(true);
     if (dialog.isOnartua()) {

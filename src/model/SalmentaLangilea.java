@@ -92,7 +92,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Faktura ezabatu eskaera IDa erabiliz.
-     * 
+     *
      * @param idEskaera Eskaeraren IDa
      */
     /**
@@ -535,6 +535,23 @@ public class SalmentaLangilea extends Langilea {
     }
 
     /**
+     * Produktu bat salgai dagoen edo ez ezartzen du.
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @param salgai      True salgai jartzeko, false kentzeko.
+     * @throws Exception Errorea datu-basean.
+     */
+    public void produktuSalgaiEzarri(int idProduktua, boolean salgai) throws Exception {
+        String sql = "UPDATE produktuak SET salgai = ? WHERE id_produktua = ?";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setBoolean(1, salgai);
+            pst.setInt(2, idProduktua);
+            pst.executeUpdate();
+        }
+    }
+
+    /**
      * Produktuari prezioa jarri.
      * 
      * @param idProduktua Produktuaren IDa
@@ -603,15 +620,6 @@ public class SalmentaLangilea extends Langilea {
     }
 
     /**
-     * Eskaera lerro bat editatu.
-     * 
-     * @param idEskaeraLerroa Lerroaren IDa
-     * @param idEskaera       Eskaeraren IDa
-     * @param idProduktua     Produktuaren IDa
-     * @param kantitatea      Kantitatea
-     * @param prezioa         Unitateko prezioa
-     */
-    /**
      * Eskaera lerro bat editatzen du.
      *
      * @param idEskaeraLerroa Lerroaren IDa.
@@ -630,7 +638,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera lerro bat ezabatu.
-     * 
+     *
      * @param idEskaeraLerroa Lerroaren IDa
      */
     /**

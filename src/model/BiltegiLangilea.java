@@ -5,6 +5,7 @@ import db.DB_Konexioa;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 /**
  * BiltegiLangilea klasea.
@@ -313,6 +314,19 @@ public class BiltegiLangilea extends Langilea {
                 pstLerroak.executeUpdate();
             }
 
+            // AUTO-KATALOGATZEA: Sarrera osoa "Jasota" bada, lerro guztiak egiaztatu
+            if ("Jasota".equals(egoera)) {
+                String sqlGetLines = "SELECT id_sarrera_lerroa FROM sarrera_lerroak WHERE sarrera_id = ?";
+                try (PreparedStatement pstGet = kon.prepareStatement(sqlGetLines)) {
+                    pstGet.setInt(1, idSarrera);
+                    try (ResultSet rs = pstGet.executeQuery()) {
+                        while (rs.next()) {
+                            egiaztatuKatalogazioa(kon, rs.getInt(1), egoera);
+                        }
+                    }
+                }
+            }
+
             kon.commit();
         } catch (SQLException e) {
             if (kon != null)
@@ -405,9 +419,12 @@ public class BiltegiLangilea extends Langilea {
      * @throws SQLException Datu-basean errorea gertatzen bada.
      */
     public List<Object[]> produktuSarreraLerroakIkusi(int idSarrera) throws SQLException {
-        String sql = "SELECT sl.id_sarrera_lerroa, p.izena, p.marka, sl.kantitatea, sl.sarrera_lerro_egoera " +
+        // LEFT JOIN erabiltzen dugu produktu IDrik ez duten lerroak (Sarrera berriak
+        // JSON bidez) ere ekartzeko
+        String sql = "SELECT sl.id_sarrera_lerroa, p.izena, p.marka, sl.kantitatea, sl.sarrera_lerro_egoera, sl.produktu_berria_datuak "
+                +
                 "FROM sarrera_lerroak sl " +
-                "JOIN produktuak p ON sl.produktua_id = p.id_produktua " +
+                "LEFT JOIN produktuak p ON sl.produktua_id = p.id_produktua " +
                 "WHERE sl.sarrera_id = ?";
         List<Object[]> emaitza = new ArrayList<>();
         try (Connection kon = DB_Konexioa.konektatu();
@@ -415,16 +432,51 @@ public class BiltegiLangilea extends Langilea {
             pst.setInt(1, idSarrera);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
+                String izena = rs.getString(2);
+                String marka = rs.getString(3);
+                String json = rs.getString(6);
+
+                // Produktua oraindik ez badago katalogoan (NULL), JSONetik atera datuak
+                if (izena == null && json != null && !json.isEmpty()) {
+                    izena = "[BERRIA] " + jsonBalioaAtera(json, "izena");
+                    marka = jsonBalioaAtera(json, "marka");
+                }
+
+                // Oraindik null bada (JSON hutsa edo gaizki), "Ezezaguna" jarri
+                if (izena == null)
+                    izena = "Ezezaguna";
+                if (marka == null)
+                    marka = "";
+
                 emaitza.add(new Object[] {
                         rs.getInt(1),
-                        rs.getString(2),
-                        rs.getString(3),
+                        izena,
+                        marka,
                         rs.getInt(4),
                         rs.getString(5)
                 });
             }
         }
         return emaitza;
+    }
+
+    /**
+     * JSON string batetik gako baten balioa ateratzeko metodo laguntzailea.
+     * Ez da liburutegirik erabiltzen, String manipulazioa baizik.
+     */
+    private String jsonBalioaAtera(String json, String key) {
+        try {
+            // "key":"value" edo "key": "value" bilatzen dugu
+            String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]+)\"";
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+            java.util.regex.Matcher m = p.matcher(json);
+            if (m.find()) {
+                return m.group(1);
+            }
+        } catch (Exception e) {
+            // Ignoratu errorea parsing-ean
+        }
+        return "?";
     }
 
     /**
@@ -436,16 +488,19 @@ public class BiltegiLangilea extends Langilea {
      * @throws SQLException Datu-basean errorea gertatzen bada.
      */
     public void produktuSarreraLerroEgoeraAldatu(int idSarreraLerroa, String egoera) throws SQLException {
-        // Update Line -> Check Peers -> Update Parent (Internal - No Cascade)
+
         String sql = "UPDATE sarrera_lerroak SET sarrera_lerro_egoera = ? WHERE id_sarrera_lerroa = ?";
 
         try (Connection kon = DB_Konexioa.konektatu()) {
-            // 1. Lerroaren egoera aldatu
+            // Lerroaren egoera aldatu
             try (PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setString(1, egoera);
                 pst.setInt(2, idSarreraLerroa);
                 pst.executeUpdate();
             }
+
+            // AUTO-KATALOGATZEA:
+            egiaztatuKatalogazioa(kon, idSarreraLerroa, egoera);
 
             // 2. Gurasoaren ID-a lortu
             int idSarrera = -1;
@@ -640,6 +695,301 @@ public class BiltegiLangilea extends Langilea {
                     pstUpd.setString(1, "Osatua/Bidalita");
                     pstUpd.setInt(2, idEskaera);
                     pstUpd.executeUpdate();
+                }
+            }
+        }
+    }
+
+    /**
+     * Sarrera lerro baten JSON datuak erabiliz produktua automatikoki sortu eta
+     * katalogatu.
+     * 
+     * @param sarreraLerroaId Sarrera lerroaren IDa.
+     * @param jsonDatuak      Produktuaren datuak JSON formatuan.
+     * @throws SQLException Errorea sortzean.
+     */
+    private void produktuaKatalogatuAutomotikoki(Connection kon, int sarreraLerroaId, String jsonDatuak)
+            throws SQLException {
+        if (jsonDatuak == null || jsonDatuak.isEmpty()) {
+            return; // Ez dago daturik
+        }
+
+        boolean originalAutoCommit = kon.getAutoCommit();
+        try {
+            // 1. JSON parseatu
+            java.util.Map<String, String> datuak = parseJson(jsonDatuak);
+
+            // 2. Datuak atera
+            String mota = datuak.get("mota");
+            String izena = datuak.get("izena");
+            String marka = datuak.get("marka");
+
+            // Zenbakiak parseatu (erroreak kudeatu behar dira)
+            int kIdRaw = parseIntSafe(datuak.get("kategoria_id"));
+            int kategoriaId = lortuKategoriaIdBalidoa(kon, kIdRaw, mota);
+
+            // HORNITZAILEA: Sarrera taulatik lortu (JSONekoa baztertu)
+            int hornitzaileId = 1;
+            String sqlGetHornitzailea = "SELECT s.hornitzailea_id FROM sarrerak s JOIN sarrera_lerroak sl ON s.id_sarrera = sl.sarrera_id WHERE sl.id_sarrera_lerroa = ?";
+            try (PreparedStatement pstH = kon.prepareStatement(sqlGetHornitzailea)) {
+                pstH.setInt(1, sarreraLerroaId);
+                try (ResultSet rsH = pstH.executeQuery()) {
+                    if (rsH.next()) {
+                        hornitzaileId = rsH.getInt(1);
+                    }
+                }
+            }
+
+            // STOCK-A: Sarrera lerrotik lortu (JSONekoa baztertu)
+            int stock = 0;
+            String sqlGetStock = "SELECT kantitatea FROM sarrera_lerroak WHERE id_sarrera_lerroa = ?";
+            try (PreparedStatement pstS = kon.prepareStatement(sqlGetStock)) {
+                pstS.setInt(1, sarreraLerroaId);
+                try (ResultSet rsS = pstS.executeQuery()) {
+                    if (rsS.next()) {
+                        stock = rsS.getInt(1);
+                    }
+                }
+            }
+
+            // BILTEGIA: 1 (Harrera Biltegia) default gisa
+            int biltegiId = 1;
+
+            BigDecimal prezioa = parseBigDecimalSafe(datuak.get("salmenta_prezioa"));
+            String deskribapena = datuak.get("deskribapena");
+            String irudiaUrl = datuak.get("irudia_url");
+
+            // 3. Produktua sortu DBan
+            kon.setAutoCommit(false);
+
+            // A. Txertatu produktuak taulan
+            String sqlProd = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, salgai, salmenta_prezioa, zergak_ehunekoa) VALUES (?, ?, ?, ?, ?, ?, ?, 'Berria', ?, ?, ?, ?, ?)";
+            PreparedStatement pstProd = kon.prepareStatement(sqlProd, Statement.RETURN_GENERATED_KEYS);
+            pstProd.setString(1, izena);
+            pstProd.setString(2, marka);
+            pstProd.setInt(3, kategoriaId);
+            pstProd.setString(4, mota);
+            if (biltegiId > 0)
+                pstProd.setInt(5, biltegiId);
+            else
+                pstProd.setNull(5, java.sql.Types.INTEGER);
+            pstProd.setInt(6, hornitzaileId);
+            pstProd.setInt(7, stock);
+            pstProd.setString(8, deskribapena);
+            pstProd.setString(9, irudiaUrl);
+            pstProd.setBoolean(10, false); // Hasieran EZ dago salgai (Salmentak jarriko du)
+            pstProd.setBigDecimal(11, prezioa);
+            pstProd.setBigDecimal(12, new BigDecimal("21.00")); // BEZ default
+
+            pstProd.executeUpdate();
+            ResultSet rsKeys = pstProd.getGeneratedKeys();
+            int idProduktua = -1;
+            if (rsKeys.next()) {
+                idProduktua = rsKeys.getInt(1);
+            } else {
+                throw new SQLException("Ez da produktuaren IDa sortu.");
+            }
+
+            // B. Txertatu azpiklase taulan
+            katalogatuAzpiklasea(kon, idProduktua, mota, datuak);
+
+            // C. Eguneratu SarreraLerroa
+            String sqlUpdLerroa = "UPDATE sarrera_lerroak SET produktua_id = ? WHERE id_sarrera_lerroa = ?";
+            PreparedStatement pstLerroa = kon.prepareStatement(sqlUpdLerroa);
+            pstLerroa.setInt(1, idProduktua);
+            pstLerroa.setInt(2, sarreraLerroaId);
+            pstLerroa.executeUpdate();
+
+            kon.commit();
+
+        } catch (Exception e) {
+            kon.rollback();
+            e.printStackTrace();
+            throw new SQLException("Errorea auto-katalogatzean: " + e.getMessage());
+        } finally {
+            kon.setAutoCommit(originalAutoCommit);
+        }
+    }
+
+    private void katalogatuAzpiklasea(Connection kon, int idProduktua, String mota,
+            java.util.Map<String, String> datuak) throws SQLException {
+        String sql = "";
+        PreparedStatement pst = null;
+
+        switch (mota) {
+            case "Eramangarria":
+                sql = "INSERT INTO eramangarriak (id_produktua, prozesadorea, ram_gb, diskoa_gb, pantaila_tamaina, bateria_wh, sistema_eragilea, pisua_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                pst = kon.prepareStatement(sql);
+                pst.setInt(1, idProduktua);
+                pst.setString(2, datuak.getOrDefault("prozesadorea", ""));
+                pst.setInt(3, parseIntSafe(datuak.get("ram_gb")));
+                pst.setInt(4, parseIntSafe(datuak.get("diskoa_gb")));
+                pst.setBigDecimal(5, parseBigDecimalSafe(datuak.get("pantaila_tamaina")));
+                pst.setInt(6, parseIntSafe(datuak.get("bateria_wh")));
+                pst.setString(7, datuak.getOrDefault("sistema_eragilea", ""));
+                pst.setBigDecimal(8, parseBigDecimalSafe(datuak.get("pisua_kg")));
+                break;
+            case "Mahai-gainekoa":
+                sql = "INSERT INTO mahai_gainekoak (id_produktua, prozesadorea, plaka_basea, ram_gb, diskoa_gb, txartel_grafikoa, elikatze_iturria_w, kaxa_formatua) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                pst = kon.prepareStatement(sql);
+                pst.setInt(1, idProduktua);
+                pst.setString(2, datuak.getOrDefault("prozesadorea", ""));
+                pst.setString(3, datuak.getOrDefault("plaka_basea", ""));
+                pst.setInt(4, parseIntSafe(datuak.get("ram_gb")));
+                pst.setInt(5, parseIntSafe(datuak.get("diskoa_gb")));
+                pst.setString(6, datuak.getOrDefault("txartel_grafikoa", ""));
+                pst.setInt(7, parseIntSafe(datuak.get("elikatze_iturria_w")));
+                pst.setString(8, datuak.getOrDefault("kaxa_formatua", "ATX"));
+                break;
+            case "Mugikorra":
+                sql = "INSERT INTO mugikorrak (id_produktua, pantaila_teknologia, pantaila_hazbeteak, biltegiratzea_gb, ram_gb, kamera_nagusa_mp, bateria_mah, sistema_eragilea, sareak) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                pst = kon.prepareStatement(sql);
+                pst.setInt(1, idProduktua);
+                pst.setString(2, datuak.getOrDefault("pantaila_teknologia", ""));
+                pst.setBigDecimal(3, parseBigDecimalSafe(datuak.get("pantaila_hazbeteak")));
+                pst.setInt(4, parseIntSafe(datuak.get("biltegiratzea_gb")));
+                pst.setInt(5, parseIntSafe(datuak.get("ram_gb")));
+                pst.setInt(6, parseIntSafe(datuak.get("kamera_nagusa_mp")));
+                pst.setInt(7, parseIntSafe(datuak.get("bateria_mah")));
+                pst.setString(8, datuak.getOrDefault("sistema_eragilea", ""));
+                pst.setString(9, datuak.getOrDefault("sareak", "4G"));
+                break;
+
+        }
+
+        if (pst != null) {
+            pst.executeUpdate();
+            pst.close();
+        }
+    }
+
+    private java.util.Map<String, String> parseJson(String json) {
+        java.util.Map<String, String> map = new java.util.HashMap<>();
+        String content = json.trim();
+        if (content.startsWith("{"))
+            content = content.substring(1);
+        if (content.endsWith("}"))
+            content = content.substring(0, content.length() - 1);
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\"([^\"]+)\"\\s*:\\s*(\"[^\"]*\"|[^,]+)");
+        java.util.regex.Matcher matcher = pattern.matcher(content);
+
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            String value = matcher.group(2).trim();
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                value = value.substring(1, value.length() - 1);
+            }
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    /**
+     * Kategoria IDa balioztatu eta existitzen ez bada motaren arabera mapatu.
+     * 
+     * @param kon  Datu-base konexioa.
+     * @param kId  JSONetik datorren kategoria IDa.
+     * @param mota Produktu mota.
+     * @return Kategoria ID balidoa.
+     */
+    private int lortuKategoriaIdBalidoa(Connection kon, int kId, String mota) {
+        String sql = "SELECT 1 FROM produktu_kategoriak WHERE id_kategoria = ?";
+        try (PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setInt(1, kId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return kId; // Existitzen bada, itzuli
+                }
+            }
+        } catch (SQLException e) {
+            // Segurtasun kopia
+        }
+
+        if (mota == null)
+            return 4;
+        switch (mota) {
+            case "Eramangarria":
+            case "Mahai-gainekoa":
+                return 1;
+            case "Mugikorra":
+            case "Tableta":
+                return 2;
+            case "Pantaila":
+                return 3;
+            case "Osagarria":
+                return 4;
+            case "Softwarea":
+                return 5;
+            case "Zerbitzaria":
+                return 6;
+            default:
+                return 4;
+        }
+    }
+
+    private int parseIntSafe(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private BigDecimal parseBigDecimalSafe(String s) {
+        try {
+            return new BigDecimal(s);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * Produktuari prezioa eta eskaintza ezarri (edo aldatu).
+     * 
+     * @param idProduktua Produktuaren IDa.
+     * @param prezioa     Salmenta prezioa.
+     * @throws SQLException Errorea eguneratzean.
+     */
+    public void produktuariPrezioaAldatu(int idProduktua, BigDecimal prezioa) throws SQLException {
+        String sql = "UPDATE produktuak SET salmenta_prezioa = ? WHERE id_produktua = ?";
+        try (Connection kon = DB_Konexioa.konektatu();
+                PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setBigDecimal(1, prezioa);
+            pst.setInt(2, idProduktua);
+            pst.executeUpdate();
+        }
+    }
+
+    /**
+     * Sarrera lerro baten katalogazioa beharrezkoa den egiaztatzen du eta
+     * hala bada, auto-katalogatzea abiarazten du.
+     */
+    private void egiaztatuKatalogazioa(Connection kon, int idSarreraLerroa, String egoera) throws SQLException {
+        if ("Jasota".equals(egoera)) {
+            String sqlCheck = "SELECT produktua_id, produktu_berria_datuak, kantitatea FROM sarrera_lerroak WHERE id_sarrera_lerroa = ?";
+            try (PreparedStatement pstC = kon.prepareStatement(sqlCheck)) {
+                pstC.setInt(1, idSarreraLerroa);
+                try (ResultSet rsC = pstC.executeQuery()) {
+                    if (rsC.next()) {
+                        int pId = rsC.getInt(1);
+                        boolean isNull = rsC.wasNull();
+                        String json = rsC.getString(2);
+                        int kantitatea = rsC.getInt(3);
+
+                        if (isNull && json != null && !json.isEmpty()) {
+                            // Produktu berria sortu!
+                            produktuaKatalogatuAutomotikoki(kon, idSarreraLerroa, json);
+                        } else if (!isNull) {
+                            // Existitzen den produktua: Stock-a gehitu
+                            String sqlAddStock = "UPDATE produktuak SET stock = stock + ? WHERE id_produktua = ?";
+                            try (PreparedStatement pstAdd = kon.prepareStatement(sqlAddStock)) {
+                                pstAdd.setInt(1, kantitatea);
+                                pstAdd.setInt(2, pId);
+                                pstAdd.executeUpdate();
+                            }
+                        }
+                    }
                 }
             }
         }

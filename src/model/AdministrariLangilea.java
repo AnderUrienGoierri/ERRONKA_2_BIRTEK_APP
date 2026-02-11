@@ -57,7 +57,7 @@ public class AdministrariLangilea extends Langilea {
             String hizkuntza, String saltoTxartelaUid, boolean aktibo, String iban)
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
-            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_id, posta_kodea, telefonoa, jaiotza_data, hizkuntza, salto_txartela_uid, aktibo, iban)"
+            String sql = "INSERT INTO langileak (izena, abizena, nan, emaila, pasahitza, saila_id, helbidea, herria_idposta_kodea, telefonoa, jaiotza_data, hizkuntza, salto_txartela_uid, aktibo, iban)"
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);

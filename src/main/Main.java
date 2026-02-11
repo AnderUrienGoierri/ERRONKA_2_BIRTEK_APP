@@ -10,7 +10,7 @@ import java.awt.EventQueue;
 public class Main {
     /**
      * Aplikazioa abiarazten duen metodo nagusia.
-     * 
+     *
      * @param args Komando lerroko argumentuak (ez dira erabiltzen).
      */
     public static void main(String[] args) {
