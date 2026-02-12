@@ -20,10 +20,10 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
     private final int idProduktua;
     private String motaZaharra;
 
-    // UI Components
+    // UI konponenteak
     private final JPanel scrollContent;
-    private final Map<String, JComponent> fields = new HashMap<>();
-    private final JPanel technicalFieldsPanel;
+    private final Map<String, JComponent> xehetasunEremuak = new HashMap<>();
+    private final JPanel xehetasunTeknikoakPanela;
 
     public ProduktuOsoaEditatuDialog(JFrame parent, TeknikariLangilea teknikaria, int idProduktua) {
         super(parent, "Editatu Produktua - ID: " + idProduktua, true);
@@ -41,9 +41,9 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
         JScrollPane scrollPane = new JScrollPane(scrollContent);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-        technicalFieldsPanel = new JPanel();
-        technicalFieldsPanel.setLayout(new GridLayout(0, 2, 5, 5));
-        technicalFieldsPanel.setBorder(BorderFactory.createTitledBorder("Datu Teknikoak"));
+        xehetasunTeknikoakPanela = new JPanel();
+        xehetasunTeknikoakPanela.setLayout(new GridLayout(0, 2, 5, 5));
+        xehetasunTeknikoakPanela.setBorder(BorderFactory.createTitledBorder("Datu Teknikoak"));
 
         // Oinarrizko datuen panela kargatu
         kargatuDatuak();
@@ -74,7 +74,7 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
 
                         // Mota (aldagarria)
                         String[] motak = { "Eramangarria", "Mahai-gainekoa", "Mugikorra", "Tableta", "Zerbitzaria",
-                                "Pantaila", "Softwarea" };
+                                           "Pantaila", "Softwarea" };
                         JComboBox<String> motaBox = new JComboBox<>(motak);
                         motaBox.setSelectedItem(motaZaharra);
                         motaBox.addActionListener(
@@ -98,11 +98,11 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
 
                         JTextArea deskArea = new JTextArea(rs.getString("deskribapena"), 3, 20);
                         gehituEremua("Deskribapena", "deskribapena", new JScrollPane(deskArea));
-                        fields.put("deskribapena_raw", deskArea); // Helper reference
+                        xehetasunEremuak.put("deskribapena_raw", deskArea); 
 
                         gehituEremua("Irudia URL", "irudia_url", rs.getString("irudia_url"));
 
-                        scrollContent.add(technicalFieldsPanel);
+                        scrollContent.add(xehetasunTeknikoakPanela);
                         eguneratuDatuTeknikoenPanela(motaZaharra, false);
                     }
                 }
@@ -113,19 +113,19 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
     }
 
     private void eguneratuDatuTeknikoenPanela(String mota, boolean garbitu) {
-        technicalFieldsPanel.removeAll();
-        // Remove old technical keys from map if clearing
+        xehetasunTeknikoakPanela.removeAll();
+        // Garbitu teknikoen eremuak
         if (garbitu) {
-            // Keep base keys, remove others
-            Map<String, JComponent> newFields = new HashMap<>();
-            String[] baseKeys = { "izena", "marka", "mota", "kategoria_id", "hornitzaile_id", "biltegi_id", "stock",
-                    "salmenta_prezioa", "zergak_ehunekoa", "produktu_egoera", "salgai", "deskribapena",
-                    "deskribapena_raw", "irudia_url" };
-            for (String k : baseKeys)
-                if (fields.containsKey(k))
-                    newFields.put(k, fields.get(k));
-            fields.clear();
-            fields.putAll(newFields);
+            // Mantendu oinarrizko eremuak
+            Map<String, JComponent> eremuBerriak = new HashMap<>();
+            String[] oinarrizkoEremuak = { "izena", "marka", "mota", "kategoria_id", "hornitzaile_id", "biltegi_id", "stock",
+                                           "salmenta_prezioa", "zergak_ehunekoa", "produktu_egoera", "salgai", "deskribapena",
+                                           "deskribapena_raw", "irudia_url" };
+            for (String k : oinarrizkoEremuak)
+                if (xehetasunEremuak.containsKey(k))
+                    eremuBerriak.put(k, xehetasunEremuak.get(k));
+            xehetasunEremuak.clear();
+            xehetasunEremuak.putAll(eremuBerriak);
         }
 
         try (Connection kon = DB_Konexioa.konektatu()) {
@@ -147,13 +147,13 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
                 }
             }
         } catch (SQLException e) {
-            // If table doesn't exist yet for this ID (type change), just show empty fields
-            // based on type
+            // Taula ez bada existitzen dena, hutsaen erakutsi
+            //  motaren arabera
             erakutsiEremuHutsakMotarenArabera(mota);
         }
 
-        technicalFieldsPanel.revalidate();
-        technicalFieldsPanel.repaint();
+        xehetasunTeknikoakPanela.revalidate();
+        xehetasunTeknikoakPanela.repaint();
     }
 
     private void erakutsiEremuHutsakMotarenArabera(String mota) {
@@ -230,19 +230,19 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
         p.add(new JLabel(label + ":"));
         p.add(comp);
         scrollContent.add(p);
-        fields.put(key, comp);
+        xehetasunEremuak.put(key, comp);
     }
 
     private void gehituEremuTeknikoa(String label, String key, String value) {
-        technicalFieldsPanel.add(new JLabel(label + ":"));
+        xehetasunTeknikoakPanela.add(new JLabel(label + ":"));
         JTextField tf = new JTextField(value);
-        technicalFieldsPanel.add(tf);
-        fields.put(key, tf);
+        xehetasunTeknikoakPanela.add(tf);
+        xehetasunEremuak.put(key, tf);
     }
 
     private void gordeDatuak() {
         Map<String, String> datuak = new HashMap<>();
-        for (Map.Entry<String, JComponent> entry : fields.entrySet()) {
+        for (Map.Entry<String, JComponent> entry : xehetasunEremuak.entrySet()) {
             String key = entry.getKey();
             JComponent c = entry.getValue();
             if (c instanceof JTextField)
@@ -252,7 +252,7 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
             else if (c instanceof JCheckBox)
                 datuak.put(key, String.valueOf(((JCheckBox) c).isSelected()));
             else if (key.equals("deskribapena")) {
-                JTextArea ta = (JTextArea) fields.get("deskribapena_raw");
+                JTextArea ta = (JTextArea) xehetasunEremuak.get("deskribapena_raw");
                 datuak.put(key, ta.getText());
             }
         }
