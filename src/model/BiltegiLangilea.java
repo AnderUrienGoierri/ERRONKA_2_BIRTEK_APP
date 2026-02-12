@@ -422,13 +422,12 @@ public class BiltegiLangilea extends Langilea {
         // LEFT JOIN erabiltzen dugu produktu IDrik ez duten lerroak (Sarrera berriak
         // JSON bidez) ere ekartzeko
         String sql = "SELECT sl.id_sarrera_lerroa, p.izena, p.marka, sl.kantitatea, sl.sarrera_lerro_egoera, sl.produktu_berria_datuak "
-                +
-                "FROM sarrera_lerroak sl " +
-                "LEFT JOIN produktuak p ON sl.produktua_id = p.id_produktua " +
-                "WHERE sl.sarrera_id = ?";
+                   + "FROM sarrera_lerroak sl "
+                   + "LEFT JOIN produktuak p ON sl.produktua_id = p.id_produktua "
+                   + "WHERE sl.sarrera_id = ?";
         List<Object[]> emaitza = new ArrayList<>();
         try (Connection kon = DB_Konexioa.konektatu();
-                PreparedStatement pst = kon.prepareStatement(sql)) {
+            PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setInt(1, idSarrera);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
@@ -489,7 +488,9 @@ public class BiltegiLangilea extends Langilea {
      */
     public void produktuSarreraLerroEgoeraAldatu(int idSarreraLerroa, String egoera) throws SQLException {
 
-        String sql = "UPDATE sarrera_lerroak SET sarrera_lerro_egoera = ? WHERE id_sarrera_lerroa = ?";
+        String sql = "UPDATE sarrera_lerroak "
+                   + "SET sarrera_lerro_egoera = ? "
+                   + "WHERE id_sarrera_lerroa = ?";
 
         try (Connection kon = DB_Konexioa.konektatu()) {
             // Lerroaren egoera aldatu
@@ -515,8 +516,11 @@ public class BiltegiLangilea extends Langilea {
             if (idSarrera != -1) {
                 // 3. Egiaztatu gainerako lerroak - 'Ezabatua' lerroak ez kontuan hartu
                 boolean allJasota = true;
-                try (PreparedStatement pstCheck = kon.prepareStatement(
-                        "SELECT COUNT(*) FROM sarrera_lerroak WHERE sarrera_id = ? AND sarrera_lerro_egoera != 'Jasota' AND sarrera_lerro_egoera != 'Ezabatua'")) {
+                try (PreparedStatement pstCheck = kon.prepareStatement("SELECT COUNT(*) "
+                                                                      + "FROM sarrera_lerroak "
+                                                                      + "WHERE sarrera_id = ? "
+                                                                      + "AND sarrera_lerro_egoera != 'Jasota' "
+                                                                      + "AND sarrera_lerro_egoera != 'Ezabatua'")) {
                     pstCheck.setInt(1, idSarrera);
                     ResultSet rs = pstCheck.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
@@ -527,7 +531,9 @@ public class BiltegiLangilea extends Langilea {
                 // 4. Gurasoaren egoera aldatu (Infinitu kaskada saihesteko)
                 String newStatus = allJasota ? "Jasota" : "Bidean";
                 try (PreparedStatement pstUpdateParent = kon
-                        .prepareStatement("UPDATE sarrerak SET sarrera_egoera = ? WHERE id_sarrera = ?")) {
+                        .prepareStatement("UPDATE sarrerak "
+                                         + "SET sarrera_egoera = ? "
+                                         + "WHERE id_sarrera = ?")) {
                     pstUpdateParent.setString(1, newStatus);
                     pstUpdateParent.setInt(2, idSarrera);
                     pstUpdateParent.executeUpdate();
@@ -543,8 +549,11 @@ public class BiltegiLangilea extends Langilea {
      * @throws SQLException Datu-basean errorea gertatzen bada.
      */
     public void produktuSarreraEzabatu(int idSarrera) throws SQLException {
-        String sqlLerroak = "DELETE FROM sarrera_lerroak WHERE sarrera_id = ?";
-        String sqlSarrera = "DELETE FROM sarrerak WHERE id_sarrera = ?";
+        String sqlLerroak = "DELETE FROM sarrera_lerroak "
+                          + "WHERE sarrera_id = ?";
+
+        String sqlSarrera = "DELETE FROM sarrerak "
+                          + "WHERE id_sarrera = ?";
 
         Connection kon = null;
         try {
@@ -622,10 +631,9 @@ public class BiltegiLangilea extends Langilea {
      */
     public List<Object[]> produktuEskaeraLerroakIkusi(int idEskaera) throws SQLException {
         String sql = "SELECT el.id_eskaera_lerroa, p.izena, el.kantitatea, el.unitate_prezioa, el.eskaera_lerro_egoera "
-                +
-                "FROM eskaera_lerroak el " +
-                "JOIN produktuak p ON el.produktua_id = p.id_produktua " +
-                "WHERE el.eskaera_id = ?";
+                   + "FROM eskaera_lerroak el "
+                   + "JOIN produktuak p ON el.produktua_id = p.id_produktua "
+                   + "WHERE el.eskaera_id = ?";
         List<Object[]> emaitza = new ArrayList<>();
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
@@ -657,7 +665,9 @@ public class BiltegiLangilea extends Langilea {
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             // 1. Lerroaren egoera eguneratu
-            String sql = "UPDATE eskaera_lerroak SET eskaera_lerro_egoera = ? WHERE id_eskaera_lerroa = ?";
+            String sql = "UPDATE eskaera_lerroak "
+                       + "SET eskaera_lerro_egoera = ? "
+                       + "WHERE id_eskaera_lerroa = ?";
             try (PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setString(1, egoera);
                 pst.setInt(2, idEskaeraLerroa);
@@ -671,7 +681,10 @@ public class BiltegiLangilea extends Langilea {
             // "Osatua/Bidalita"
 
             boolean dagoPrestatzen = false;
-            String sqlCheck = "SELECT COUNT(*) FROM eskaera_lerroak WHERE eskaera_id = ? AND eskaera_lerro_egoera = 'Prestatzen'";
+            String sqlCheck = "SELECT COUNT(*) "
+                            + "FROM eskaera_lerroak "
+                            + "WHERE eskaera_id = ? "
+                            + "AND eskaera_lerro_egoera = 'Prestatzen'";
             try (PreparedStatement pstABC = kon.prepareStatement(sqlCheck)) {
                 pstABC.setInt(1, idEskaera);
                 ResultSet rs = pstABC.executeQuery();
@@ -683,7 +696,9 @@ public class BiltegiLangilea extends Langilea {
             if (dagoPrestatzen) {
 
                 try (PreparedStatement pstUpd = kon
-                        .prepareStatement("UPDATE eskaerak SET eskaera_egoera = ? WHERE id_eskaera = ?")) {
+                        .prepareStatement("UPDATE eskaerak "
+                                        + "SET eskaera_egoera = ? "
+                                        + "WHERE id_eskaera = ?")) {
                     pstUpd.setString(1, "Prestatzen");
                     pstUpd.setInt(2, idEskaera);
                     pstUpd.executeUpdate();
@@ -691,7 +706,9 @@ public class BiltegiLangilea extends Langilea {
             } else {
 
                 try (PreparedStatement pstUpd = kon
-                        .prepareStatement("UPDATE eskaerak SET eskaera_egoera = ? WHERE id_eskaera = ?")) {
+                        .prepareStatement("UPDATE eskaerak "
+                                        + "SET eskaera_egoera = ? "
+                                        + "WHERE id_eskaera = ?")) {
                     pstUpd.setString(1, "Osatua/Bidalita");
                     pstUpd.setInt(2, idEskaera);
                     pstUpd.executeUpdate();
@@ -730,7 +747,9 @@ public class BiltegiLangilea extends Langilea {
 
             // HORNITZAILEA: Sarrera taulatik lortu (JSONekoa baztertu)
             int hornitzaileId = 1;
-            String sqlGetHornitzailea = "SELECT s.hornitzailea_id FROM sarrerak s JOIN sarrera_lerroak sl ON s.id_sarrera = sl.sarrera_id WHERE sl.id_sarrera_lerroa = ?";
+            String sqlGetHornitzailea = "SELECT s.hornitzailea_id FROM sarrerak s "
+                                    + "JOIN sarrera_lerroak sl ON s.id_sarrera = sl.sarrera_id "
+                                    + "WHERE sl.id_sarrera_lerroa = ?";
             try (PreparedStatement pstH = kon.prepareStatement(sqlGetHornitzailea)) {
                 pstH.setInt(1, sarreraLerroaId);
                 try (ResultSet rsH = pstH.executeQuery()) {
@@ -742,7 +761,9 @@ public class BiltegiLangilea extends Langilea {
 
             // STOCK-A: Sarrera lerrotik lortu (JSONekoa baztertu)
             int stock = 0;
-            String sqlGetStock = "SELECT kantitatea FROM sarrera_lerroak WHERE id_sarrera_lerroa = ?";
+            String sqlGetStock = "SELECT kantitatea "
+                                + "FROM sarrera_lerroak "
+                                + "WHERE id_sarrera_lerroa = ?";
             try (PreparedStatement pstS = kon.prepareStatement(sqlGetStock)) {
                 pstS.setInt(1, sarreraLerroaId);
                 try (ResultSet rsS = pstS.executeQuery()) {
@@ -763,7 +784,8 @@ public class BiltegiLangilea extends Langilea {
             kon.setAutoCommit(false);
 
             // A. Txertatu produktuak taulan
-            String sqlProd = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, salgai, salmenta_prezioa, zergak_ehunekoa) VALUES (?, ?, ?, ?, ?, ?, ?, 'Berria', ?, ?, ?, ?, ?)";
+            String sqlProd = "INSERT INTO produktuak (izena, marka, kategoria_id, mota, biltegi_id, hornitzaile_id, stock, produktu_egoera, deskribapena, irudia_url, salgai, salmenta_prezioa, zergak_ehunekoa) "
+                           + "VALUES (?, ?, ?, ?, ?, ?, ?, 'Berria', ?, ?, ?, ?, ?)";
             PreparedStatement pstProd = kon.prepareStatement(sqlProd, Statement.RETURN_GENERATED_KEYS);
             pstProd.setString(1, izena);
             pstProd.setString(2, marka);
@@ -794,7 +816,9 @@ public class BiltegiLangilea extends Langilea {
             katalogatuAzpiklasea(kon, idProduktua, mota, datuak);
 
             // C. Eguneratu SarreraLerroa
-            String sqlUpdLerroa = "UPDATE sarrera_lerroak SET produktua_id = ? WHERE id_sarrera_lerroa = ?";
+            String sqlUpdLerroa = "UPDATE sarrera_lerroak "
+                                + "SET produktua_id = ? "
+                                + "WHERE id_sarrera_lerroa = ?";
             PreparedStatement pstLerroa = kon.prepareStatement(sqlUpdLerroa);
             pstLerroa.setInt(1, idProduktua);
             pstLerroa.setInt(2, sarreraLerroaId);
@@ -818,7 +842,8 @@ public class BiltegiLangilea extends Langilea {
 
         switch (mota) {
             case "Eramangarria":
-                sql = "INSERT INTO eramangarriak (id_produktua, prozesadorea, ram_gb, diskoa_gb, pantaila_tamaina, bateria_wh, sistema_eragilea, pisua_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                sql = "INSERT INTO eramangarriak (id_produktua, prozesadorea, ram_gb, diskoa_gb, pantaila_tamaina, bateria_wh, sistema_eragilea, pisua_kg) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 pst = kon.prepareStatement(sql);
                 pst.setInt(1, idProduktua);
                 pst.setString(2, datuak.getOrDefault("prozesadorea", ""));
@@ -830,7 +855,8 @@ public class BiltegiLangilea extends Langilea {
                 pst.setBigDecimal(8, parseBigDecimalSafe(datuak.get("pisua_kg")));
                 break;
             case "Mahai-gainekoa":
-                sql = "INSERT INTO mahai_gainekoak (id_produktua, prozesadorea, plaka_basea, ram_gb, diskoa_gb, txartel_grafikoa, elikatze_iturria_w, kaxa_formatua) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                sql = "INSERT INTO mahai_gainekoak (id_produktua, prozesadorea, plaka_basea, ram_gb, diskoa_gb, txartel_grafikoa, elikatze_iturria_w, kaxa_formatua) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 pst = kon.prepareStatement(sql);
                 pst.setInt(1, idProduktua);
                 pst.setString(2, datuak.getOrDefault("prozesadorea", ""));
@@ -842,7 +868,8 @@ public class BiltegiLangilea extends Langilea {
                 pst.setString(8, datuak.getOrDefault("kaxa_formatua", "ATX"));
                 break;
             case "Mugikorra":
-                sql = "INSERT INTO mugikorrak (id_produktua, pantaila_teknologia, pantaila_hazbeteak, biltegiratzea_gb, ram_gb, kamera_nagusa_mp, bateria_mah, sistema_eragilea, sareak) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                sql = "INSERT INTO mugikorrak (id_produktua, pantaila_teknologia, pantaila_hazbeteak, biltegiratzea_gb, ram_gb, kamera_nagusa_mp, bateria_mah, sistema_eragilea, sareak) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 pst = kon.prepareStatement(sql);
                 pst.setInt(1, idProduktua);
                 pst.setString(2, datuak.getOrDefault("pantaila_teknologia", ""));
@@ -894,7 +921,9 @@ public class BiltegiLangilea extends Langilea {
      * @return Kategoria ID balidoa.
      */
     private int lortuKategoriaIdBalidoa(Connection kon, int kId, String mota) {
-        String sql = "SELECT 1 FROM produktu_kategoriak WHERE id_kategoria = ?";
+        String sql = "SELECT 1 "
+                    + "FROM produktu_kategoriak "
+                    + "WHERE id_kategoria = ?";
         try (PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setInt(1, kId);
             try (ResultSet rs = pst.executeQuery()) {
@@ -952,7 +981,9 @@ public class BiltegiLangilea extends Langilea {
      * @throws SQLException Errorea eguneratzean.
      */
     public void produktuariPrezioaAldatu(int idProduktua, BigDecimal prezioa) throws SQLException {
-        String sql = "UPDATE produktuak SET salmenta_prezioa = ? WHERE id_produktua = ?";
+        String sql = "UPDATE produktuak "
+                    + "SET salmenta_prezioa = ? "
+                    + "WHERE id_produktua = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setBigDecimal(1, prezioa);
@@ -967,7 +998,9 @@ public class BiltegiLangilea extends Langilea {
      */
     private void egiaztatuKatalogazioa(Connection kon, int idSarreraLerroa, String egoera) throws SQLException {
         if ("Jasota".equals(egoera)) {
-            String sqlCheck = "SELECT produktua_id, produktu_berria_datuak, kantitatea FROM sarrera_lerroak WHERE id_sarrera_lerroa = ?";
+            String sqlCheck = "SELECT produktua_id, produktu_berria_datuak, kantitatea "
+                            + "FROM sarrera_lerroak "
+                            + "WHERE id_sarrera_lerroa = ?";
             try (PreparedStatement pstC = kon.prepareStatement(sqlCheck)) {
                 pstC.setInt(1, idSarreraLerroa);
                 try (ResultSet rsC = pstC.executeQuery()) {
@@ -982,7 +1015,9 @@ public class BiltegiLangilea extends Langilea {
                             produktuaKatalogatuAutomotikoki(kon, idSarreraLerroa, json);
                         } else if (!isNull) {
                             // Existitzen den produktua: Stock-a gehitu
-                            String sqlAddStock = "UPDATE produktuak SET stock = stock + ? WHERE id_produktua = ?";
+                            String sqlAddStock = "UPDATE produktuak "
+                                               + "SET stock = stock + ? "
+                                               + "WHERE id_produktua = ?";
                             try (PreparedStatement pstAdd = kon.prepareStatement(sqlAddStock)) {
                                 pstAdd.setInt(1, kantitatea);
                                 pstAdd.setInt(2, pId);
