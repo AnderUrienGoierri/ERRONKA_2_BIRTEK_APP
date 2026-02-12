@@ -583,8 +583,8 @@ public class BiltegiLangilea extends Langilea {
      */
     public List<Object[]> produktuEskaerakIkusi(String egoeraIragazkia) throws SQLException {
         String sql = "SELECT e.id_eskaera, b.izena_edo_soziala, e.data, e.guztira_prezioa, e.eskaera_egoera " +
-                "FROM eskaerak e " +
-                "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa ";
+                     "FROM eskaerak e " +
+                     "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa ";
 
         if (egoeraIragazkia != null && !egoeraIragazkia.isEmpty() && !"Denak".equals(egoeraIragazkia)) {
             sql += " WHERE e.eskaera_egoera = ?";

@@ -1139,7 +1139,6 @@ public class MenuAdministrazioa extends JFrame {
         }
     }
 
-    // Helper class for ComboBox items
     /**
      * ComboBox-erako klase laguntzailea.
      */

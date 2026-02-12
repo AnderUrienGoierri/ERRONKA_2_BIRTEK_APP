@@ -40,7 +40,13 @@ public class MenuTeknikoa extends JFrame {
      */
     public MenuTeknikoa(Langilea oinarrizkoLangilea) {
         this.langilea = new TeknikariLangilea(oinarrizkoLangilea);
+        pantailaPrestatu();
+    }
 
+    /**
+     * Pantailaren osagaiak inizializatu eta kokatu.
+     */
+    private void pantailaPrestatu() {
         setTitle("Birtek - TEKNIKOA (SAT)");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1050, 650);
@@ -119,7 +125,7 @@ public class MenuTeknikoa extends JFrame {
         saioaItxiBotoia.setForeground(Color.WHITE);
         saioaItxiBotoia.addActionListener(e -> saioaItxi());
 
-        // Atzera botoia logikoki hemen egon daiteke
+        // Atzera botoia logikoki hexian egon daiteke
 
         eskuinekoPanela.add(erabiltzaileEtiketa);
         eskuinekoPanela.add(fitxaketaPanela);
@@ -756,7 +762,6 @@ public class MenuTeknikoa extends JFrame {
         }
     }
 
-    // Helper class for ComboBox items
     /**
      * ComboBox-erako elementu laguntzailea.
      */

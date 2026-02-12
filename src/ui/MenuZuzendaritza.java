@@ -34,7 +34,13 @@ public class MenuZuzendaritza extends JFrame {
         this.langilea = new Langilea(id, izena, abizena, "", null, 0, "", "", "", "", "ES", "", "", null, null, true,
                 1, "", null);
         this.erabiltzaileSaila = saila;
+        pantailaPrestatu();
+    }
 
+    /**
+     * Pantailaren osagaiak inizializatu eta kokatu.
+     */
+    private void pantailaPrestatu() {
         setTitle("Birtek - SISTEMAK (Super Admin)");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 800, 500);

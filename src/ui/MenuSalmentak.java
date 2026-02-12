@@ -42,7 +42,13 @@ public class MenuSalmentak extends JFrame {
      */
     public MenuSalmentak(Langilea oinarrizkoLangilea) {
         this.langilea = new SalmentaLangilea(oinarrizkoLangilea);
+        pantailaPrestatu();
+    }
 
+    /**
+     * Pantailaren osagaiak inizializatu eta kokatu.
+     */
+    private void pantailaPrestatu() {
         setTitle("Birtek - SALMENTAK");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1050, 650);
