@@ -201,9 +201,9 @@ public class SaioaHastekoPanela extends JFrame {
         String pasahitza = new String(pasahitzaEremua.getPassword());
 
         String galdera = "SELECT l.id_langilea, l.izena, l.abizena, l.saila_id, s.izena AS saila_izena " +
-                          "FROM langileak l " +
-                          "JOIN langile_sailak s ON l.saila_id = s.id_saila " +
-                          "WHERE l.emaila = ? AND l.pasahitza = ?";
+                         "FROM langileak l " +
+                         "JOIN langile_sailak s ON l.saila_id = s.id_saila " +
+                         "WHERE l.emaila = ? AND l.pasahitza = ?";
 
         Connection konexioa = DB_Konexioa.konektatu();
         if (konexioa == null) {
