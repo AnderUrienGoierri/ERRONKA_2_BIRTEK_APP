@@ -47,7 +47,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdBezeroa() {
@@ -56,7 +56,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren IDa ezartzen du.
-     * 
+     *
      * @param idBezeroa ID berria.
      */
     public void setIdBezeroa(int idBezeroa) {
@@ -65,7 +65,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren izena edo izen soziala lortzen du.
-     * 
+     *
      * @return Izena edo Izen Soziala.
      */
     public String getIzenaEdoSoziala() {
@@ -74,7 +74,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren izena edo izen soziala ezartzen du.
-     * 
+     *
      * @param izenaEdoSoziala Izen berria.
      */
     public void setIzenaEdoSoziala(String izenaEdoSoziala) {
@@ -83,7 +83,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * NAN edo IFZ lortzen du.
-     * 
+     *
      * @return NAN edo IFZ.
      */
     public String getIfzNan() {
@@ -92,7 +92,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * NAN edo IFZ ezartzen du.
-     * 
+     *
      * @param ifzNan NAN edo IFZ berria.
      */
     public void setIfzNan(String ifzNan) {
@@ -101,7 +101,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren sexua lortzen du.
-     * 
+     *
      * @return Sexua.
      */
     public String getSexua() {
@@ -110,7 +110,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren sexua ezartzen du.
-     * 
+     *
      * @param sexua Sexu berria.
      */
     public void setSexua(String sexua) {
@@ -119,7 +119,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren ordainketa txartela lortzen du.
-     * 
+     *
      * @return Ordainketa txartela.
      */
     public String getBezeroOrdainketaTxartela() {
@@ -128,7 +128,7 @@ public class Bezeroa extends Pertsona {
 
     /**
      * Bezeroaren ordainketa txartela ezartzen du.
-     * 
+     *
      * @param bezeroOrdainketaTxartela Txartel zenbaki berria.
      */
     public void setBezeroOrdainketaTxartela(String bezeroOrdainketaTxartela) {

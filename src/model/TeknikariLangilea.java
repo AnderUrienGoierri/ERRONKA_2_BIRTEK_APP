@@ -22,7 +22,7 @@ public class TeknikariLangilea extends Langilea {
     /**
      * TeknikariLangilea eraikitzailea.
      * Langilea objektu batetik abiatuta sortzen da.
-     * 
+     *
      * @param l Langilea objektua.
      */
     public TeknikariLangilea(Langilea l) {
@@ -39,13 +39,13 @@ public class TeknikariLangilea extends Langilea {
     /**
      * Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez
      * daudenak).
-     * 
+     *
      * @return Produktu guztien zerrenda.
      */
     /**
      * Biltegira iritsi diren produktu guztiak bistaratu (salgai daudenak eta ez
      * daudenak).
-     * 
+     *
      * @return Produktu guztien zerrenda.
      * @throws SQLException Errorea irakurtzean.
      */
@@ -88,7 +88,7 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Produktu bat editatu (egoera eta salgai).
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param salgai      Salgai dagoen ala ez.
      * @param egoera      Produktuaren egoera ('Berria', 'Berritua A', 'Berritua B',
@@ -96,7 +96,7 @@ public class TeknikariLangilea extends Langilea {
      */
     /**
      * Produktu bat editatu (egoera eta salgai).
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param salgai      Salgai dagoen ala ez.
      * @param egoera      Produktuaren egoera ('Berria', 'Berritua A', 'Berritua B',
@@ -116,7 +116,7 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Produktu baten datu guztiak editatu, oinarrizkoak eta azpiklasekoak barne.
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param datuak      Datu guztiak Map batean.
      * @throws SQLException Errorea editatzean.
@@ -316,13 +316,13 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Produktuari irudia gehitu.
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param irudiaUrl   Irudiaren izena edo bidea (jpg).
      */
     /**
      * Produktuari irudia gehitu.
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param irudiaUrl   Irudiaren izena edo bidea (jpg).
      * @throws SQLException Errorea eguneratzean.
@@ -339,7 +339,7 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Produktuari prezioa eta eskaintza ezarri.
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param prezioa     Salmenta prezioa.
      * @param eskaintza   Eskaintza prezioa (baldin badago).
@@ -543,12 +543,12 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Akatsen informazioa ikusi.
-     * 
+     *
      * @return Akatsen zerrenda.
      */
     /**
      * Akatsen informazioa ikusi.
-     * 
+     *
      * @return Akatsen zerrenda.
      * @throws SQLException Errorea irakurtzean.
      */
@@ -573,12 +573,12 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Akats berri bat sortu.
-     * 
+     *
      * @param a Akatsa objektua.
      */
     /**
      * Akats berri bat sortu.
-     * 
+     *
      * @param a Akatsa objektua.
      * @throws SQLException Errorea sortzean.
      */
@@ -594,12 +594,12 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Akats bat editatu.
-     * 
+     *
      * @param a Akatsa objektua (id-a barne).
      */
     /**
      * Akats bat editatu.
-     * 
+     *
      * @param a Akatsa objektua (id-a barne).
      * @throws SQLException Errorea editatzean.
      */
@@ -616,12 +616,12 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Akats bat ezabatu.
-     * 
+     *
      * @param idAkatsa Akatsaren IDa.
      */
     /**
      * Akats bat ezabatu.
-     * 
+     *
      * @param idAkatsa Akatsaren IDa.
      * @throws SQLException Errorea ezabatzean.
      */
@@ -640,7 +640,7 @@ public class TeknikariLangilea extends Langilea {
     /**
      * Katalogatu gabeko sarrera lerroak lortu (Produktua ID null dutenak eta egoera
      * 'Jasota').
-     * 
+     *
      * @return SarreraLerroa zerrenda.
      * @throws SQLException Errorea datuak irakurtzean.
      */
@@ -674,7 +674,7 @@ public class TeknikariLangilea extends Langilea {
 
     /**
      * Sarrera lerro bateko JSON datuak erabiliz produktua sortu eta katalogatu.
-     * 
+     *
      * @param sarreraLerroaId Sarrera lerroaren IDa.
      * @param jsonDatuak      Produktuaren datuak JSON formatuan.
      * @throws SQLException Errorea sortzean.

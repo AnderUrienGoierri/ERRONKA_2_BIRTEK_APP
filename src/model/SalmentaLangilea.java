@@ -146,7 +146,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Bezero berria sortu.
-     * 
+     *
      * @param b Bezero objektua
      */
     /**
@@ -185,7 +185,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Bezeroaren informazioa editatu.
-     * 
+     *
      * @param b Bezero objektua (id-a barne)
      */
     /**
@@ -224,7 +224,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Bezero bat ezabatu (Order check included)
-     * 
+     *
      * @param idBezeroa Bezeroaren IDa
      */
     /**
@@ -256,7 +256,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Bezeroaren informazioa ikusi.
-     * 
+     *
      * @param idBezeroa Bezeroaren IDa
      * @return Bezero objektua
      */
@@ -304,7 +304,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Bezeroaren faktura ezabatu.
-     * 
+     *
      * @param idFaktura Fakturaren IDa
      */
     /**
@@ -324,7 +324,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktuak ikusi motaren arabera iragaziz.
-     * 
+     *
      * @param mota Produktu mota (adib. 'Eramangarria', 'Mugikorra'...). Null edo
      *             hutsik bada, denak itzuli.
      * @return Produktu zerrenda
@@ -364,7 +364,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktua ikusi.
-     * 
+     *
      * @param idProduktua Produktuaren IDa
      * @return Produktua objektua
      */
@@ -393,7 +393,7 @@ public class SalmentaLangilea extends Langilea {
      * ResultSet-etik 'Produktua' azpiklase egokia sortzen duen metodo pribatua.
      * Oharra: Soilik 'produktuak' taulako datuak erabiltzen dira.
      * Azpiklaseen eremu espezifikoak null/0 balioekin hasieratzen dira.
-     * 
+     *
      * @param rs ResultSet kurtsorea (dagoeneko .next() eginda egon behar du)
      * @return Produktuaren azpiklasearen instantzia (Eramangarria, Mugikorra...)
      * @throws Exception
@@ -478,7 +478,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktuari eskaintza aldatu.
-     * 
+     *
      * @param idProduktua Produktuaren IDa
      * @param eskaintza   Eskaintza berria
      */
@@ -501,7 +501,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktua salgai jarri (soilik prezioa definituta badu).
-     * 
+     *
      * @param idProduktua Produktuaren IDa
      */
     /**
@@ -543,7 +543,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktu bat salgai dagoen edo ez ezartzen du.
-     * 
+     *
      * @param idProduktua Produktuaren IDa.
      * @param salgai      True salgai jartzeko, false kentzeko.
      * @throws Exception Errorea datu-basean.
@@ -560,7 +560,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktuari prezioa jarri.
-     * 
+     *
      * @param idProduktua Produktuaren IDa
      * @param prezioa     Prezio berria
      */
@@ -587,7 +587,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera baten lerroak (produktuak) ikusi.
-     * 
+     *
      * @param idEskaera Eskaeraren IDa
      * @return Eskaera lerroen zerrenda
      */
@@ -604,7 +604,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera bati lerro (produktu) berri bat gehitu.
-     * 
+     *
      * @param idEskaera   Eskaeraren IDa
      * @param idProduktua Produktuaren IDa
      * @param kantitatea  Kantitatea
@@ -660,7 +660,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Produktuari prezioa aldatu (produktuariPrezioaJarri-ren berdina).
-     * 
+     *
      * @param idProduktua Produktuaren IDa
      * @param prezioa     Prezio berria
      */
@@ -681,7 +681,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaeren informazioa ikusi (bezero zehatz batentzako).
-     * 
+     *
      * @param idBezeroa Bezeroaren IDa
      * @return Eskaera zerrenda
      */
@@ -722,7 +722,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera bat ikusi.
-     * 
+     *
      * @param idEskaera Eskaeraren IDa
      * @return Eskaera objektua
      * @throws Exception
@@ -832,7 +832,8 @@ public class SalmentaLangilea extends Langilea {
             konexioa.setAutoCommit(false);
 
             // 1. Eskaera eguneratu
-            String sqlUpdate = "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() WHERE id_eskaera = ?";
+            String sqlUpdate =  "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() "
+                                +"WHERE id_eskaera = ?";
             try (PreparedStatement pst = konexioa.prepareStatement(sqlUpdate)) {
                 pst.setInt(1, e.getBezeroaId());
                 pst.setBigDecimal(2, e.getGuztiraPrezioa());
@@ -849,7 +850,8 @@ public class SalmentaLangilea extends Langilea {
             }
 
             // 3. Lerro berriak sartu
-            String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) VALUES (?, ?, ?, ?, ?)";
+            String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) "
+                                    +"VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlInsertLerroa)) {
                 for (EskaeraLerroa l : lerroak) {
                     pstLerroa.setInt(1, e.getIdEskaera());
@@ -877,7 +879,7 @@ public class SalmentaLangilea extends Langilea {
 
     /**
      * Eskaera ezabatu.
-     * 
+     *
      * @param idEskaera Eskaeraren IDa
      */
     /**

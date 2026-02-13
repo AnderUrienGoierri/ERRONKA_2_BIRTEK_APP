@@ -252,7 +252,7 @@ public class BezeroaDialog extends JDialog {
 
     /**
      * Sartutako datuak balidatzen ditu.
-     * 
+     *
      * @return True datuak zuzenak badira, false bestela.
      */
     private boolean balidatu() {
@@ -271,7 +271,7 @@ public class BezeroaDialog extends JDialog {
 
     /**
      * Erabiltzaileak OK botoia sakatu duen egiaztatzen du.
-     * 
+     *
      * @return True onartu bada.
      */
     public boolean isOnartua() {
@@ -280,7 +280,7 @@ public class BezeroaDialog extends JDialog {
 
     /**
      * Sortu edo editatutako Bezero objektua itzultzen du.
-     * 
+     *
      * @return Bezeroa.
      */
     public Bezeroa getBezeroa() {
@@ -316,7 +316,7 @@ public class BezeroaDialog extends JDialog {
 
     /**
      * Leihoa ikusteko moduan jarri (editagarria ez izateko).
-     * 
+     *
      * @param viewMode True ikusteko bada, false editatzeko.
      */
     public void setViewMode(boolean viewMode) {

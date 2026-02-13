@@ -50,6 +50,7 @@ public class Softwarea extends Produktua {
         super(idProduktua, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl, biltegiId,
                 produktuEgoera, produktuEgoeraOharra, salgai, salmentaPrezioa, stock, eskaintza, zergakEhunekoa,
                 sortzeData, eguneratzeData);
+        // hemen soilik softwarearen ezaugarriak ezartzen dira
         this.softwareMota = softwareMota;
         this.lizentziaMota = lizentziaMota;
         this.bertsioa = bertsioa;
@@ -58,7 +59,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Software mota lortzen du.
-     * 
+     *
      * @return Software mota.
      */
     public String getSoftwareMota() {
@@ -67,7 +68,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Software mota ezartzen du.
-     * 
+     *
      * @param softwareMota Mota berria.
      */
     public void setSoftwareMota(String softwareMota) {
@@ -76,7 +77,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Lizentzia mota lortzen du.
-     * 
+     *
      * @return Lizentzia mota.
      */
     public String getLizentziaMota() {
@@ -85,7 +86,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Lizentzia mota ezartzen du.
-     * 
+     *
      * @param lizentziaMota Lizentzia mota berria.
      */
     public void setLizentziaMota(String lizentziaMota) {
@@ -94,7 +95,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Bertsioa lortzen du.
-     * 
+     *
      * @return Bertsioa.
      */
     public String getBertsioa() {
@@ -103,7 +104,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Bertsioa ezartzen du.
-     * 
+     *
      * @param bertsioa Bertsio berria.
      */
     public void setBertsioa(String bertsioa) {
@@ -112,7 +113,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Garatzailea lortzen du.
-     * 
+     *
      * @return Garatzailea.
      */
     public String getGaratzailea() {
@@ -121,7 +122,7 @@ public class Softwarea extends Produktua {
 
     /**
      * Garatzailea ezartzen du.
-     * 
+     *
      * @param garatzailea Garatzaile berria.
      */
     public void setGaratzailea(String garatzailea) {

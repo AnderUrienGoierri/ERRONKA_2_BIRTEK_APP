@@ -129,7 +129,7 @@ public class FitxaketakKudeatu extends JFrame {
 
 	/**
 	 * Langileen zerrenda lortu ComboBox-ean erakusteko.
-	 * 
+	 *
 	 * @return Langileen ComboBox eredua.
 	 */
 	private DefaultComboBoxModel<Langilea> langileakLortu() {

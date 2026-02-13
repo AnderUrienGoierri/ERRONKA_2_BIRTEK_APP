@@ -59,6 +59,7 @@ public class Eramangarria extends Produktua {
         super(idProduktua, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl, biltegiId,
                 produktuEgoera, produktuEgoeraOharra, salgai, salmentaPrezioa, stock, eskaintza, zergakEhunekoa,
                 sortzeData, eguneratzeData);
+        // hemen soilik eramangarriaren ezaugarriak ezartzen dira
         this.prozesadorea = prozesadorea;
         this.ramGb = ramGb;
         this.diskoaGb = diskoaGb;
@@ -70,7 +71,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Prozesadorea lortzen du.
-     * 
+     *
      * @return Prozesadorea.
      */
     public String getProzesadorea() {
@@ -79,7 +80,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Prozesadorea ezartzen du.
-     * 
+     *
      * @param prozesadorea Prozesadore berria.
      */
     public void setProzesadorea(String prozesadorea) {
@@ -88,7 +89,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * RAM memoria lortzen du.
-     * 
+     *
      * @return RAM memoria GBtan.
      */
     public int getRamGb() {
@@ -97,7 +98,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * RAM memoria ezartzen du.
-     * 
+     *
      * @param ramGb RAM memoria berria GBtan.
      */
     public void setRamGb(int ramGb) {
@@ -106,7 +107,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Diskoaren kapazitatea lortzen du.
-     * 
+     *
      * @return Diskoa GBtan.
      */
     public int getDiskoaGb() {
@@ -115,7 +116,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Diskoaren kapazitatea ezartzen du.
-     * 
+     *
      * @param diskoaGb Disko kapazitate berria GBtan.
      */
     public void setDiskoaGb(int diskoaGb) {
@@ -124,7 +125,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Pantailaren tamaina lortzen du.
-     * 
+     *
      * @return Pantailaren tamaina hazbetetan.
      */
     public BigDecimal getPantailaTamaina() {
@@ -133,7 +134,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Pantailaren tamaina ezartzen du.
-     * 
+     *
      * @param pantailaTamaina Pantailaren tamaina berria.
      */
     public void setPantailaTamaina(BigDecimal pantailaTamaina) {
@@ -142,7 +143,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Bateriaren kapazitatea lortzen du.
-     * 
+     *
      * @return Bateria Wh-tan.
      */
     public int getBateriaWh() {
@@ -151,7 +152,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Bateriaren kapazitatea ezartzen du.
-     * 
+     *
      * @param bateriaWh Bateria kapazitate berria.
      */
     public void setBateriaWh(int bateriaWh) {
@@ -160,7 +161,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Sistema eragilea lortzen du.
-     * 
+     *
      * @return Sistema eragilea.
      */
     public String getSistemaEragilea() {
@@ -169,7 +170,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Sistema eragilea ezartzen du.
-     * 
+     *
      * @param sistemaEragilea Sistema eragile berria.
      */
     public void setSistemaEragilea(String sistemaEragilea) {
@@ -178,7 +179,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Pisua lortzen du.
-     * 
+     *
      * @return Pisua KGtan.
      */
     public BigDecimal getPisuaKg() {
@@ -187,7 +188,7 @@ public class Eramangarria extends Produktua {
 
     /**
      * Pisua ezartzen du.
-     * 
+     *
      * @param pisuaKg Pisu berria.
      */
     public void setPisuaKg(BigDecimal pisuaKg) {

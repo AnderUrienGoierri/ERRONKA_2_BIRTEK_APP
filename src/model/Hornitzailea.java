@@ -37,7 +37,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Hornitzailearen IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdHornitzailea() {
@@ -46,7 +46,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Hornitzailearen IDa ezartzen du.
-     * 
+     *
      * @param idHornitzailea ID berria.
      */
     public void setIdHornitzailea(int idHornitzailea) {
@@ -55,7 +55,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Izen soziala lortzen du.
-     * 
+     *
      * @return Izen soziala.
      */
     public String getIzenaSoziala() {
@@ -64,7 +64,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Izen soziala ezartzen du.
-     * 
+     *
      * @param izenaSoziala Izen sozial berria.
      */
     public void setIzenaSoziala(String izenaSoziala) {
@@ -73,7 +73,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * IFZ edo NAN lortzen du.
-     * 
+     *
      * @return IFZ edo NAN.
      */
     public String getIfzNan() {
@@ -82,7 +82,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * IFZ edo NAN ezartzen du.
-     * 
+     *
      * @param ifzNan IFZ edo NAN berria.
      */
     public void setIfzNan(String ifzNan) {
@@ -91,7 +91,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Kontaktu pertsona lortzen du.
-     * 
+     *
      * @return Kontaktu pertsona.
      */
     public String getKontaktuPertsona() {
@@ -100,7 +100,7 @@ public class Hornitzailea extends Pertsona {
 
     /**
      * Kontaktu pertsona ezartzen du.
-     * 
+     *
      * @param kontaktuPertsona Kontaktu pertsona berria.
      */
     public void setKontaktuPertsona(String kontaktuPertsona) {

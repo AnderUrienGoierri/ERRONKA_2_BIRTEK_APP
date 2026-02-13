@@ -64,7 +64,7 @@ public class Tableta extends Produktua {
 
     /**
      * Pantailaren hazbeteak lortzen ditu.
-     * 
+     *
      * @return Hazbeteak.
      */
     public BigDecimal getPantailaHazbeteak() {
@@ -73,7 +73,7 @@ public class Tableta extends Produktua {
 
     /**
      * Pantailaren hazbeteak ezartzen ditu.
-     * 
+     *
      * @param pantailaHazbeteak Hazbete berriak.
      */
     public void setPantailaHazbeteak(BigDecimal pantailaHazbeteak) {
@@ -82,7 +82,7 @@ public class Tableta extends Produktua {
 
     /**
      * Biltegiratzea lortzen du GBtan.
-     * 
+     *
      * @return Biltegiratzea.
      */
     public int getBiltegiratzeaGb() {
@@ -91,7 +91,7 @@ public class Tableta extends Produktua {
 
     /**
      * Biltegiratzea ezartzen du.
-     * 
+     *
      * @param biltegiratzeaGb Biltegiratze berria.
      */
     public void setBiltegiratzeaGb(int biltegiratzeaGb) {
@@ -100,7 +100,7 @@ public class Tableta extends Produktua {
 
     /**
      * Konektibitatea lortzen du.
-     * 
+     *
      * @return Konektibitatea.
      */
     public String getKonektibitatea() {
@@ -109,7 +109,7 @@ public class Tableta extends Produktua {
 
     /**
      * Konektibitatea ezartzen du.
-     * 
+     *
      * @param konektibitatea Konektibitate berria.
      */
     public void setKonektibitatea(String konektibitatea) {
@@ -118,7 +118,7 @@ public class Tableta extends Produktua {
 
     /**
      * Sistema eragilea lortzen du.
-     * 
+     *
      * @return Sistema eragilea.
      */
     public String getSistemaEragilea() {
@@ -127,7 +127,7 @@ public class Tableta extends Produktua {
 
     /**
      * Sistema eragilea ezartzen du.
-     * 
+     *
      * @param sistemaEragilea Sistema eragile berria.
      */
     public void setSistemaEragilea(String sistemaEragilea) {
@@ -136,7 +136,7 @@ public class Tableta extends Produktua {
 
     /**
      * Bateria edukiera lortzen du mAh-tan.
-     * 
+     *
      * @return Bateria.
      */
     public int getBateriaMah() {
@@ -145,7 +145,7 @@ public class Tableta extends Produktua {
 
     /**
      * Bateria edukiera ezartzen du.
-     * 
+     *
      * @param bateriaMah Bateria berria.
      */
     public void setBateriaMah(int bateriaMah) {
@@ -154,7 +154,7 @@ public class Tableta extends Produktua {
 
     /**
      * Arkatzarekin bateragarria den lortzen du.
-     * 
+     *
      * @return True bateragarria bada.
      */
     public boolean isArkatzarekinBateragarria() {
@@ -163,7 +163,7 @@ public class Tableta extends Produktua {
 
     /**
      * Arkatzarekin bateragarria den ezartzen du.
-     * 
+     *
      * @param arkatzarekinBateragarria Bateragarritasuna.
      */
     public void setArkatzarekinBateragarria(boolean arkatzarekinBateragarria) {

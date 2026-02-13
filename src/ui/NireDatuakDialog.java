@@ -45,7 +45,7 @@ public class NireDatuakDialog extends JDialog {
      */
     /**
      * Eraikitzailea.
-     * 
+     *
      * @param parent   Guraso leihoa.
      * @param langilea Editatu beharreko langile objektua.
      */

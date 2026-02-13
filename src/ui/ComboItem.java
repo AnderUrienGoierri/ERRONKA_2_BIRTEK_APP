@@ -10,7 +10,7 @@ public class ComboItem {
 
     /**
      * ComboItem eraikitzailea.
-     * 
+     *
      * @param id    Identifikatzailea.
      * @param label Testua.
      */
@@ -21,7 +21,7 @@ public class ComboItem {
 
     /**
      * IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getId() {
@@ -30,7 +30,7 @@ public class ComboItem {
 
     /**
      * Objektuaren testu adierazpena itzultzen du (ComboBox-ean agertuko dena).
-     * 
+     *
      * @return Labela.
      */
     @Override

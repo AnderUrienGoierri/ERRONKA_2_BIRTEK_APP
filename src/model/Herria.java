@@ -28,7 +28,7 @@ public class Herria {
 
     /**
      * Herriaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdHerria() {
@@ -37,7 +37,7 @@ public class Herria {
 
     /**
      * Herriaren IDa ezartzen du.
-     * 
+     *
      * @param idHerria ID berria.
      */
     public void setIdHerria(int idHerria) {
@@ -46,7 +46,7 @@ public class Herria {
 
     /**
      * Herriaren izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {
@@ -55,7 +55,7 @@ public class Herria {
 
     /**
      * Herriaren izena ezartzen du.
-     * 
+     *
      * @param izena Izen berria.
      */
     public void setIzena(String izena) {
@@ -64,7 +64,7 @@ public class Herria {
 
     /**
      * Lurraldea lortzen du.
-     * 
+     *
      * @return Lurraldea.
      */
     public String getLurraldea() {
@@ -73,7 +73,7 @@ public class Herria {
 
     /**
      * Lurraldea ezartzen du.
-     * 
+     *
      * @param lurraldea Lurralde berria.
      */
     public void setLurraldea(String lurraldea) {
@@ -82,7 +82,7 @@ public class Herria {
 
     /**
      * Nazioa lortzen du.
-     * 
+     *
      * @return Nazioa.
      */
     public String getNazioa() {
@@ -91,7 +91,7 @@ public class Herria {
 
     /**
      * Nazioa ezartzen du.
-     * 
+     *
      * @param nazioa Nazio berria.
      */
     public void setNazioa(String nazioa) {
@@ -100,7 +100,7 @@ public class Herria {
 
     /**
      * Herriaren izena itzultzen du String bezala.
-     * 
+     *
      * @return Herriaren izena.
      */
     @Override

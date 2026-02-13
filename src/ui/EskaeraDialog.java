@@ -266,7 +266,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Bezero zehatz bat hautatzen du ComboBox-ean (editatzean).
-     * 
+     *
      * @param id Bezeroaren IDa.
      */
     private void hautatuBezeroa(int id) {
@@ -280,7 +280,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Eskaera balidatzen du (bezeroa aukeratuta eta lerroak egotea).
-     * 
+     *
      * @return True baliozkoa bada.
      */
     private boolean balidatu() {
@@ -315,7 +315,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Erabiltzaileak onartu duen egiaztatzen du.
-     * 
+     *
      * @return True onartu bada.
      */
     public boolean isOnartua() {
@@ -324,7 +324,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Aukeratutako bezeroaren IDa itzultzen du.
-     * 
+     *
      * @return Bezero IDa.
      */
     public int getBezeroaId() {
@@ -333,7 +333,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Aukeratutako egoera itzultzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getEgoera() {
@@ -342,7 +342,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Prezio totala itzultzen du.
-     * 
+     *
      * @return Totala.
      */
     public BigDecimal getPrezioTotala() {
@@ -352,7 +352,7 @@ public class EskaeraDialog extends JDialog {
 
     /**
      * Saskiko lerroak itzultzen ditu.
-     * 
+     *
      * @return Objektu array zerrenda: [prodId, kantitatea, unitatePrezioa
      *         (deskontuarekin)].
      */

@@ -25,7 +25,7 @@ public class Biltegia {
 
     /**
      * Biltegiaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdBiltegia() {
@@ -38,7 +38,7 @@ public class Biltegia {
 
     /**
      * Biltegiaren izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {
@@ -51,7 +51,7 @@ public class Biltegia {
 
     /**
      * Biltegiaren SKU kodea lortzen du.
-     * 
+     *
      * @return SKU kodea.
      */
     public String getBiltegiSku() {

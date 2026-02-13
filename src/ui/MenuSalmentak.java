@@ -840,7 +840,7 @@ public class MenuSalmentak extends JFrame {
 
     private void produktuDatuakKargatu() {
         String sql = "SELECT p.id_produktua, pk.izena as kategoria, p.izena, p.marka, p.mota, p.salmenta_prezioa, p.stock, p.salgai, p.eskaintza "
-                   + "FROM produktuak p JOIN produktu_kategoriak pk ON p.kategoria_id = pk.id_kategoria";
+                    + "FROM produktuak p JOIN produktu_kategoriak pk ON p.kategoria_id = pk.id_kategoria";
         try (Connection konexioa = DB_Konexioa.konektatu();
                 PreparedStatement pst = konexioa.prepareStatement(sql)) {
             DefaultTableModel model = TaulaModelatzailea.ereduaEraiki(pst.executeQuery());
@@ -898,9 +898,9 @@ public class MenuSalmentak extends JFrame {
 
         try {
             // Salgai jarri/kendu logika
-            String sql = "UPDATE produktuak "
-                       + "SET salgai = ? "
-                       + "WHERE id_produktua = ?";
+            String sql =  "UPDATE produktuak "
+                        + "SET salgai = ? "
+                        + "WHERE id_produktua = ?";
             try (Connection kon = DB_Konexioa.konektatu();
                     PreparedStatement pst = kon.prepareStatement(sql)) {
                 pst.setBoolean(1, !salgai);

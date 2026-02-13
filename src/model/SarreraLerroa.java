@@ -35,7 +35,7 @@ public class SarreraLerroa {
 
     /**
      * Lerroaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdSarreraLerroa() {
@@ -48,7 +48,7 @@ public class SarreraLerroa {
 
     /**
      * Sarreraren IDa lortzen du.
-     * 
+     *
      * @return Sarreraren IDa.
      */
     public int getSarreraId() {
@@ -61,7 +61,7 @@ public class SarreraLerroa {
 
     /**
      * Produktuaren IDa lortzen du.
-     * 
+     *
      * @return Produktuaren IDa (Integer, null izan daiteke).
      */
     public Integer getProduktuaId() {
@@ -74,7 +74,7 @@ public class SarreraLerroa {
 
     /**
      * Kantitatea lortzen du.
-     * 
+     *
      * @return Kantitatea.
      */
     public int getKantitatea() {
@@ -87,7 +87,7 @@ public class SarreraLerroa {
 
     /**
      * Lerroaren egoera lortzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getSarreraLerroEgoera() {
@@ -100,7 +100,7 @@ public class SarreraLerroa {
 
     /**
      * Produktuaren JSON datuak lortzen du.
-     * 
+     *
      * @return JSON string-a.
      */
     public String getProduktuBerriaDatuak() {

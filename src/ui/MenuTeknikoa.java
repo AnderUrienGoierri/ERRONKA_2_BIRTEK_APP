@@ -35,7 +35,7 @@ public class MenuTeknikoa extends JFrame {
      */
     /**
      * MenuTeknikoa eraikitzailea.
-     * 
+     *
      * @param oinarrizkoLangilea Saioa hasi duen langilea.
      */
     public MenuTeknikoa(Langilea oinarrizkoLangilea) {
@@ -235,7 +235,7 @@ public class MenuTeknikoa extends JFrame {
     // --- FITXAKETA METODOAK ---
     /**
      * Fitxaketa bat egin.
-     * 
+     *
      * @param mota Fitxaketa mota (Sarrera/Irteera).
      */
     private void fitxatu(String mota) {
@@ -366,7 +366,7 @@ public class MenuTeknikoa extends JFrame {
 
     /**
      * Elementu berria gehitu fitxaren arabera.
-     * 
+     *
      * @param index Fitxaren indizea.
      */
     private void gehituElementua(int index) {
@@ -572,7 +572,7 @@ public class MenuTeknikoa extends JFrame {
 
     /**
      * Hautatutako elementua editatu fitxaren arabera.
-     * 
+     *
      * @param index Fitxaren indizea.
      */
     private void editatuElementua(int index) {

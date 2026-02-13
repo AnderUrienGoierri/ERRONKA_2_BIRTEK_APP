@@ -38,7 +38,7 @@ public class Fitxaketa {
 
     /**
      * Fitxaketaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdFitxaketa() {
@@ -51,7 +51,7 @@ public class Fitxaketa {
 
     /**
      * Langilearen IDa lortzen du.
-     * 
+     *
      * @return Langilearen IDa.
      */
     public int getLangileaId() {
@@ -64,7 +64,7 @@ public class Fitxaketa {
 
     /**
      * Data lortzen du.
-     * 
+     *
      * @return Data.
      */
     public Date getData() {
@@ -77,7 +77,7 @@ public class Fitxaketa {
 
     /**
      * Ordua lortzen du.
-     * 
+     *
      * @return Ordua.
      */
     public Time getOrdua() {
@@ -90,7 +90,7 @@ public class Fitxaketa {
 
     /**
      * Fitxaketa mota lortzen du.
-     * 
+     *
      * @return Mota.
      */
     public String getMota() {
@@ -103,7 +103,7 @@ public class Fitxaketa {
 
     /**
      * Eguneratze data lortzen du.
-     * 
+     *
      * @return Eguneratze data.
      */
     public Timestamp getEguneratzeData() {

@@ -74,7 +74,7 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
 
                         // Mota (aldagarria)
                         String[] motak = { "Eramangarria", "Mahai-gainekoa", "Mugikorra", "Tableta", "Zerbitzaria",
-                                           "Pantaila", "Softwarea" };
+                                            "Pantaila", "Softwarea" };
                         JComboBox<String> motaBox = new JComboBox<>(motak);
                         motaBox.setSelectedItem(motaZaharra);
                         motaBox.addActionListener(
@@ -98,7 +98,7 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
 
                         JTextArea deskArea = new JTextArea(rs.getString("deskribapena"), 3, 20);
                         gehituEremua("Deskribapena", "deskribapena", new JScrollPane(deskArea));
-                        xehetasunEremuak.put("deskribapena_raw", deskArea); 
+                        xehetasunEremuak.put("deskribapena_raw", deskArea);
 
                         gehituEremua("Irudia URL", "irudia_url", rs.getString("irudia_url"));
 
@@ -119,8 +119,8 @@ public class ProduktuOsoaEditatuDialog extends JDialog {
             // Mantendu oinarrizko eremuak
             Map<String, JComponent> eremuBerriak = new HashMap<>();
             String[] oinarrizkoEremuak = { "izena", "marka", "mota", "kategoria_id", "hornitzaile_id", "biltegi_id", "stock",
-                                           "salmenta_prezioa", "zergak_ehunekoa", "produktu_egoera", "salgai", "deskribapena",
-                                           "deskribapena_raw", "irudia_url" };
+                                            "salmenta_prezioa", "zergak_ehunekoa", "produktu_egoera", "salgai", "deskribapena",
+                                            "deskribapena_raw", "irudia_url" };
             for (String k : oinarrizkoEremuak)
                 if (xehetasunEremuak.containsKey(k))
                     eremuBerriak.put(k, xehetasunEremuak.get(k));

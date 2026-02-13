@@ -77,7 +77,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdProduktua() {
@@ -86,7 +86,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren IDa ezartzen du.
-     * 
+     *
      * @param idProduktua ID berria.
      */
     public void setIdProduktua(int idProduktua) {
@@ -95,7 +95,7 @@ public abstract class Produktua {
 
     /**
      * Hornitzailearen IDa lortzen du.
-     * 
+     *
      * @return Hornitzailearen IDa.
      */
     public int getHornitzaileId() {
@@ -104,7 +104,7 @@ public abstract class Produktua {
 
     /**
      * Hornitzailearen IDa ezartzen du.
-     * 
+     *
      * @param hornitzaileId Hornitzaile ID berria.
      */
     public void setHornitzaileId(int hornitzaileId) {
@@ -113,7 +113,7 @@ public abstract class Produktua {
 
     /**
      * Kategoriaren IDa lortzen du.
-     * 
+     *
      * @return Kategoriaren IDa.
      */
     public int getKategoriaId() {
@@ -122,7 +122,7 @@ public abstract class Produktua {
 
     /**
      * Kategoriaren IDa ezartzen du.
-     * 
+     *
      * @param kategoriaId Kategoria ID berria.
      */
     public void setKategoriaId(int kategoriaId) {
@@ -131,7 +131,7 @@ public abstract class Produktua {
 
     /**
      * Izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {
@@ -140,7 +140,7 @@ public abstract class Produktua {
 
     /**
      * Izena ezartzen du.
-     * 
+     *
      * @param izena Izen berria.
      */
     public void setIzena(String izena) {
@@ -149,7 +149,7 @@ public abstract class Produktua {
 
     /**
      * Marka lortzen du.
-     * 
+     *
      * @return Marka.
      */
     public String getMarka() {
@@ -158,7 +158,7 @@ public abstract class Produktua {
 
     /**
      * Marka ezartzen du.
-     * 
+     *
      * @param marka Marka berria.
      */
     public void setMarka(String marka) {
@@ -167,7 +167,7 @@ public abstract class Produktua {
 
     /**
      * Mota lortzen du.
-     * 
+     *
      * @return Mota.
      */
     public String getMota() {
@@ -176,7 +176,7 @@ public abstract class Produktua {
 
     /**
      * Mota ezartzen du.
-     * 
+     *
      * @param mota Mota berria.
      */
     public void setMota(String mota) {
@@ -185,7 +185,7 @@ public abstract class Produktua {
 
     /**
      * Deskribapena lortzen du.
-     * 
+     *
      * @return Deskribapena.
      */
     public String getDeskribapena() {
@@ -194,7 +194,7 @@ public abstract class Produktua {
 
     /**
      * Deskribapena ezartzen du.
-     * 
+     *
      * @param deskribapena Deskribapen berria.
      */
     public void setDeskribapena(String deskribapena) {
@@ -203,7 +203,7 @@ public abstract class Produktua {
 
     /**
      * Irudiaren URLa lortzen du.
-     * 
+     *
      * @return Irudiaren URLa.
      */
     public String getIrudiaUrl() {
@@ -212,7 +212,7 @@ public abstract class Produktua {
 
     /**
      * Irudiaren URLa ezartzen du.
-     * 
+     *
      * @param irudiaUrl URL berria.
      */
     public void setIrudiaUrl(String irudiaUrl) {
@@ -221,7 +221,7 @@ public abstract class Produktua {
 
     /**
      * Biltegiaren IDa lortzen du.
-     * 
+     *
      * @return Biltegiaren IDa.
      */
     public Integer getBiltegiId() {
@@ -230,7 +230,7 @@ public abstract class Produktua {
 
     /**
      * Biltegiaren IDa ezartzen du.
-     * 
+     *
      * @param biltegiId Biltegi ID berria.
      */
     public void setBiltegiId(Integer biltegiId) {
@@ -239,7 +239,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren egoera lortzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getProduktuEgoera() {
@@ -248,7 +248,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren egoera ezartzen du.
-     * 
+     *
      * @param produktuEgoera Egoera berria.
      */
     public void setProduktuEgoera(String produktuEgoera) {
@@ -257,7 +257,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren egoeraren oharra lortzen du.
-     * 
+     *
      * @return Oharra.
      */
     public String getProduktuEgoeraOharra() {
@@ -266,7 +266,7 @@ public abstract class Produktua {
 
     /**
      * Produktuaren egoeraren oharra ezartzen du.
-     * 
+     *
      * @param produktuEgoeraOharra Ohar berria.
      */
     public void setProduktuEgoeraOharra(String produktuEgoeraOharra) {
@@ -275,7 +275,7 @@ public abstract class Produktua {
 
     /**
      * Salgai dagoen lortzen du.
-     * 
+     *
      * @return True salgai badago, false bestela.
      */
     public boolean isSalgai() {
@@ -284,7 +284,7 @@ public abstract class Produktua {
 
     /**
      * Salgai egoera ezartzen du.
-     * 
+     *
      * @param salgai Salgai egoera berria.
      */
     public void setSalgai(boolean salgai) {
@@ -293,7 +293,7 @@ public abstract class Produktua {
 
     /**
      * Salmenta prezioa lortzen du.
-     * 
+     *
      * @return Prezioa.
      */
     public BigDecimal getSalmentaPrezioa() {
@@ -302,7 +302,7 @@ public abstract class Produktua {
 
     /**
      * Salmenta prezioa ezartzen du.
-     * 
+     *
      * @param salmentaPrezioa Prezio berria.
      */
     public void setSalmentaPrezioa(BigDecimal salmentaPrezioa) {
@@ -311,7 +311,7 @@ public abstract class Produktua {
 
     /**
      * Stock kopurua lortzen du.
-     * 
+     *
      * @return Stock.
      */
     public int getStock() {
@@ -320,7 +320,7 @@ public abstract class Produktua {
 
     /**
      * Stock kopurua ezartzen du.
-     * 
+     *
      * @param stock Stock berria.
      */
     public void setStock(int stock) {
@@ -329,7 +329,7 @@ public abstract class Produktua {
 
     /**
      * Eskaintza prezioa lortzen du.
-     * 
+     *
      * @return Eskaintza.
      */
     public BigDecimal getEskaintza() {
@@ -338,7 +338,7 @@ public abstract class Produktua {
 
     /**
      * Eskaintza prezioa ezartzen du.
-     * 
+     *
      * @param eskaintza Eskaintza berria.
      */
     public void setEskaintza(BigDecimal eskaintza) {
@@ -347,7 +347,7 @@ public abstract class Produktua {
 
     /**
      * Zergen ehunekoa lortzen du.
-     * 
+     *
      * @return Zergak.
      */
     public BigDecimal getZergakEhunekoa() {
@@ -356,7 +356,7 @@ public abstract class Produktua {
 
     /**
      * Zergen ehunekoa ezartzen du.
-     * 
+     *
      * @param zergakEhunekoa Zerga ehuneko berria.
      */
     public void setZergakEhunekoa(BigDecimal zergakEhunekoa) {
@@ -365,7 +365,7 @@ public abstract class Produktua {
 
     /**
      * Sortze data lortzen du.
-     * 
+     *
      * @return Sortze data.
      */
     public Timestamp getSortzeData() {
@@ -374,7 +374,7 @@ public abstract class Produktua {
 
     /**
      * Sortze data ezartzen du.
-     * 
+     *
      * @param sortzeData Data berria.
      */
     public void setSortzeData(Timestamp sortzeData) {
@@ -383,7 +383,7 @@ public abstract class Produktua {
 
     /**
      * Eguneratze data lortzen du.
-     * 
+     *
      * @return Eguneratze data.
      */
     public Timestamp getEguneratzeData() {
@@ -392,7 +392,7 @@ public abstract class Produktua {
 
     /**
      * Eguneratze data ezartzen du.
-     * 
+     *
      * @param eguneratzeData Data berria.
      */
     public void setEguneratzeData(Timestamp eguneratzeData) {

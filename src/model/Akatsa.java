@@ -25,7 +25,7 @@ public class Akatsa {
 
     /**
      * Akatsaren IDa lortzen du.
-     * 
+     *
      * @return Akatsaren IDa.
      */
     public int getIdAkatsa() {
@@ -34,7 +34,7 @@ public class Akatsa {
 
     /**
      * Akatsaren IDa ezartzen du.
-     * 
+     *
      * @param idAkatsa Akatsaren ID berria.
      */
     public void setIdAkatsa(int idAkatsa) {
@@ -43,7 +43,7 @@ public class Akatsa {
 
     /**
      * Akatsaren izena lortzen du.
-     * 
+     *
      * @return Akatsaren izena.
      */
     public String getIzena() {
@@ -52,7 +52,7 @@ public class Akatsa {
 
     /**
      * Akatsaren izena ezartzen du.
-     * 
+     *
      * @param izena Akatsaren izen berria.
      */
     public void setIzena(String izena) {
@@ -61,7 +61,7 @@ public class Akatsa {
 
     /**
      * Akatsaren deskribapena lortzen du.
-     * 
+     *
      * @return Akatsaren deskribapena.
      */
     public String getDeskribapena() {
@@ -70,7 +70,7 @@ public class Akatsa {
 
     /**
      * Akatsaren deskribapena ezartzen du.
-     * 
+     *
      * @param deskribapena Akatsaren deskribapen berria.
      */
     public void setDeskribapena(String deskribapena) {

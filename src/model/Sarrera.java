@@ -37,7 +37,7 @@ public class Sarrera {
 
     /**
      * Sarreraren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdSarrera() {
@@ -50,7 +50,7 @@ public class Sarrera {
 
     /**
      * Sarrera data lortzen du.
-     * 
+     *
      * @return Data.
      */
     public Timestamp getData() {
@@ -63,7 +63,7 @@ public class Sarrera {
 
     /**
      * Eguneratze data lortzen du.
-     * 
+     *
      * @return Eguneratze data.
      */
     public Timestamp getEguneratzeData() {
@@ -76,7 +76,7 @@ public class Sarrera {
 
     /**
      * Hornitzailearen IDa lortzen du.
-     * 
+     *
      * @return Hornitzailearen IDa.
      */
     public int getHornitzaileaId() {
@@ -89,7 +89,7 @@ public class Sarrera {
 
     /**
      * Langilearen IDa lortzen du.
-     * 
+     *
      * @return Langilearen IDa.
      */
     public int getLangileaId() {
@@ -102,7 +102,7 @@ public class Sarrera {
 
     /**
      * Sarreraren egoera lortzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getSarreraEgoera() {

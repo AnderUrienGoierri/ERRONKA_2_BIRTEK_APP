@@ -24,7 +24,7 @@ public class MenuZuzendaritza extends JFrame {
 
     /**
      * MenuZuzendaritza eraikitzailea.
-     * 
+     *
      * @param id      Erabiltzailearen IDa.
      * @param izena   Izena.
      * @param abizena Abizena.
@@ -150,7 +150,7 @@ public class MenuZuzendaritza extends JFrame {
     // --- FITXAKETA LOGIKA (Berdina) ---
     /**
      * Fitxaketa egin.
-     * 
+     *
      * @param mota Fitxaketa mota.
      */
     private void fitxatu(String mota) {

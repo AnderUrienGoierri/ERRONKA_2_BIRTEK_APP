@@ -11,13 +11,12 @@ import java.sql.SQLException;
 public class DB_Konexioa {
 
     // Konfigurazio datuak
-    
+
     /*kode exektagarria etxean badago*/
-     
+
     private static final String URLEA = "jdbc:mysql://localhost:3306/birtek_db";
     private static final String ERABILTZAILEA = "root";
     private static final String PASAHITZA = "1MG32025";
-    
 
     /* kode exektagarria ikastetxean badago */
     /*

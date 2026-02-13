@@ -37,7 +37,7 @@ public class EskaeraLerroa {
 
     /**
      * Lerroaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdEskaeraLerroa() {
@@ -46,7 +46,7 @@ public class EskaeraLerroa {
 
     /**
      * Lerroaren IDa ezartzen du.
-     * 
+     *
      * @param idEskaeraLerroa ID berria.
      */
     public void setIdEskaeraLerroa(int idEskaeraLerroa) {
@@ -55,7 +55,7 @@ public class EskaeraLerroa {
 
     /**
      * Eskaeraren IDa lortzen du.
-     * 
+     *
      * @return Eskaeraren IDa.
      */
     public int getEskaeraId() {
@@ -64,7 +64,7 @@ public class EskaeraLerroa {
 
     /**
      * Eskaeraren IDa ezartzen du.
-     * 
+     *
      * @param eskaeraId Eskaeraren ID berria.
      */
     public void setEskaeraId(int eskaeraId) {
@@ -73,7 +73,7 @@ public class EskaeraLerroa {
 
     /**
      * Produktuaren IDa lortzen du.
-     * 
+     *
      * @return Produktuaren IDa.
      */
     public int getProduktuaId() {
@@ -82,7 +82,7 @@ public class EskaeraLerroa {
 
     /**
      * Produktuaren IDa ezartzen du.
-     * 
+     *
      * @param produktuaId Produktuaren ID berria.
      */
     public void setProduktuaId(int produktuaId) {
@@ -91,7 +91,7 @@ public class EskaeraLerroa {
 
     /**
      * Kantitatea lortzen du.
-     * 
+     *
      * @return Kantitatea.
      */
     public int getKantitatea() {
@@ -100,7 +100,7 @@ public class EskaeraLerroa {
 
     /**
      * Kantitatea ezartzen du.
-     * 
+     *
      * @param kantitatea Kantitate berria.
      */
     public void setKantitatea(int kantitatea) {
@@ -109,7 +109,7 @@ public class EskaeraLerroa {
 
     /**
      * Unitateko prezioa lortzen du.
-     * 
+     *
      * @return Prezioa.
      */
     public BigDecimal getUnitatePrezioa() {
@@ -118,7 +118,7 @@ public class EskaeraLerroa {
 
     /**
      * Unitateko prezioa ezartzen du.
-     * 
+     *
      * @param unitatePrezioa Prezio berria.
      */
     public void setUnitatePrezioa(BigDecimal unitatePrezioa) {
@@ -127,7 +127,7 @@ public class EskaeraLerroa {
 
     /**
      * Lerroaren egoera lortzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getEskaeraLerroEgoera() {
@@ -136,7 +136,7 @@ public class EskaeraLerroa {
 
     /**
      * Lerroaren egoera ezartzen du.
-     * 
+     *
      * @param eskaeraLerroEgoera Egoera berria.
      */
     public void setEskaeraLerroEgoera(String eskaeraLerroEgoera) {
@@ -149,19 +149,18 @@ public class EskaeraLerroa {
 
     /**
      * Eskaera lerroa sortu.
-     * 
+     *
      * @param el EskaeraLerroa objektua
      */
     /**
      * Eskaera lerroa sortu datu-basean.
-     * 
+     *
      * @param el EskaeraLerroa objektua.
      * @throws java.sql.SQLException Datu-basean errorea gertatzen bada.
      */
     public static void eskaeraLerroaSortu(EskaeraLerroa el) throws java.sql.SQLException {
         String sql = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) "
-                +
-                "VALUES (?, ?, ?, ?, ?)";
+                    +"VALUES (?, ?, ?, ?, ?)";
         try (java.sql.Connection konexioa = db.DB_Konexioa.konektatu();
                 java.sql.PreparedStatement pst = konexioa.prepareStatement(sql)) {
             pst.setInt(1, el.getEskaeraId());
@@ -175,18 +174,19 @@ public class EskaeraLerroa {
 
     /**
      * Eskaera lerroa editatu.
-     * 
+     *
      * @param el EskaeraLerroa objektua (id-a barne)
      */
     /**
      * Eskaera lerroa editatu datu-basean.
-     * 
+     *
      * @param el EskaeraLerroa objektua (id-a barne).
      * @throws java.sql.SQLException Datu-basean errorea gertatzen bada.
      */
     public static void eskaeralerroaEditatu(EskaeraLerroa el) throws java.sql.SQLException {
-        String sql = "UPDATE eskaera_lerroak SET eskaera_id=?, produktua_id=?, kantitatea=?, " +
-                "unitate_prezioa=?, eskaera_lerro_egoera=? WHERE id_eskaera_lerroa=?";
+        String sql = "UPDATE eskaera_lerroak "
+                    +"SET eskaera_id=?, produktua_id=?, kantitatea=?, unitate_prezioa=?, eskaera_lerro_egoera=? "
+                    +"WHERE id_eskaera_lerroa=?";
         try (java.sql.Connection konexioa = db.DB_Konexioa.konektatu();
                 java.sql.PreparedStatement pst = konexioa.prepareStatement(sql)) {
             pst.setInt(1, el.getEskaeraId());
@@ -201,12 +201,12 @@ public class EskaeraLerroa {
 
     /**
      * Eskaera lerroa ezabatu.
-     * 
+     *
      * @param idEskaeraLerroa Eskaera lerroaren IDa
      */
     /**
      * Eskaera lerroa ezabatu datu-basetik.
-     * 
+     *
      * @param idEskaeraLerroa Eskaera lerroaren IDa.
      * @throws java.sql.SQLException Datu-basean errorea gertatzen bada.
      */
@@ -221,13 +221,13 @@ public class EskaeraLerroa {
 
     /**
      * Eskaera lerroen informazioa ikusi (Eskaera batenak).
-     * 
+     *
      * @param idEskaera Eskaeraren IDa
      * @return Lerro zerrenda
      */
     /**
      * Eskaera lerroen informazioa ikusi (Eskaera batenak).
-     * 
+     *
      * @param idEskaera Eskaeraren IDa.
      * @return Eskaera lerro zerrenda.
      * @throws java.sql.SQLException Datu-basean errorea gertatzen bada.

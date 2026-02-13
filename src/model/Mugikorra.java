@@ -59,6 +59,7 @@ public class Mugikorra extends Produktua {
         super(idProduktua, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl, biltegiId,
                 produktuEgoera, produktuEgoeraOharra, salgai, salmentaPrezioa, stock, eskaintza, zergakEhunekoa,
                 sortzeData, eguneratzeData);
+        // hemen soilik mugikorraren ezaugarriak ezartzen dira
         this.pantailaTeknologia = pantailaTeknologia;
         this.pantailaHazbeteak = pantailaHazbeteak;
         this.biltegiratzeaGb = biltegiratzeaGb;
@@ -71,7 +72,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Pantaila teknologia lortzen du.
-     * 
+     *
      * @return Pantaila teknologia.
      */
     public String getPantailaTeknologia() {
@@ -80,7 +81,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Pantaila teknologia ezartzen du.
-     * 
+     *
      * @param pantailaTeknologia Teknologia berria.
      */
     public void setPantailaTeknologia(String pantailaTeknologia) {
@@ -89,7 +90,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Pantaila tamaina lortzen du.
-     * 
+     *
      * @return Tamaina hazbetetan.
      */
     public BigDecimal getPantailaHazbeteak() {
@@ -98,7 +99,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Pantaila tamaina ezartzen du.
-     * 
+     *
      * @param pantailaHazbeteak Tamaina berria.
      */
     public void setPantailaHazbeteak(BigDecimal pantailaHazbeteak) {
@@ -107,7 +108,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Biltegiratze kapazitatea lortzen du.
-     * 
+     *
      * @return Biltegiratzea GBtan.
      */
     public int getBiltegiratzeaGb() {
@@ -116,7 +117,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Biltegiratze kapazitatea ezartzen du.
-     * 
+     *
      * @param biltegiratzeaGb Kapazitate berria.
      */
     public void setBiltegiratzeaGb(int biltegiratzeaGb) {
@@ -125,7 +126,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * RAM memoria lortzen du.
-     * 
+     *
      * @return RAM memoria GBtan.
      */
     public int getRamGb() {
@@ -134,7 +135,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * RAM memoria ezartzen du.
-     * 
+     *
      * @param ramGb RAM memoria berria.
      */
     public void setRamGb(int ramGb) {
@@ -143,7 +144,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Kamera nagusiko megapixelak lortzen du.
-     * 
+     *
      * @return Kamera MP.
      */
     public int getKameraNagusaMp() {
@@ -152,7 +153,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Kamera nagusiko megapixelak ezartzen du.
-     * 
+     *
      * @param kameraNagusaMp Kamera MP berria.
      */
     public void setKameraNagusaMp(int kameraNagusaMp) {
@@ -161,7 +162,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Bateria kapazitatea lortzen du.
-     * 
+     *
      * @return Bateria mAh-tan.
      */
     public int getBateriaMah() {
@@ -170,7 +171,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Bateria kapazitatea ezartzen du.
-     * 
+     *
      * @param bateriaMah Bateria kapazitate berria.
      */
     public void setBateriaMah(int bateriaMah) {
@@ -179,7 +180,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Sistema eragilea lortzen du.
-     * 
+     *
      * @return Sistema eragilea.
      */
     public String getSistemaEragilea() {
@@ -188,7 +189,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Sistema eragilea ezartzen du.
-     * 
+     *
      * @param sistemaEragilea Sistema eragile berria.
      */
     public void setSistemaEragilea(String sistemaEragilea) {
@@ -197,7 +198,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Sare motak lortzen ditu.
-     * 
+     *
      * @return Sareak.
      */
     public String getSareak() {
@@ -206,7 +207,7 @@ public class Mugikorra extends Produktua {
 
     /**
      * Sare motak ezartzen ditu.
-     * 
+     *
      * @param sareak Sarea berria.
      */
     public void setSareak(String sareak) {

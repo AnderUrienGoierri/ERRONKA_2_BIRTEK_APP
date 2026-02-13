@@ -54,6 +54,7 @@ public class Zerbitzaria extends Produktua {
         super(idProduktua, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl, biltegiId,
                 produktuEgoera, produktuEgoeraOharra, salgai, salmentaPrezioa, stock, eskaintza, zergakEhunekoa,
                 sortzeData, eguneratzeData);
+        // hemen soilik zerbitzarien ezaugarriak ezartzen dira
         this.prozesadoreNukleoak = prozesadoreNukleoak;
         this.ramMota = ramMota;
         this.diskoBadiak = diskoBadiak;
@@ -64,7 +65,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Prozesadore nukleo kopurua lortzen du.
-     * 
+     *
      * @return Nukleoak.
      */
     public int getProzesadoreNukleoak() {
@@ -72,8 +73,8 @@ public class Zerbitzaria extends Produktua {
     }
 
     /**
-     * Prozesadore nukleo kopurua ezartzen du.
-     * 
+     * Prozeadore nukleo kopurua ezartzen du.
+     *
      * @param prozesadoreNukleoak Nukleo berriak.
      */
     public void setProzesadoreNukleoak(int prozesadoreNukleoak) {
@@ -82,7 +83,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * RAM mota lortzen du.
-     * 
+     *
      * @return RAM mota.
      */
     public String getRamMota() {
@@ -91,7 +92,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * RAM mota ezartzen du.
-     * 
+     *
      * @param ramMota Mota berria.
      */
     public void setRamMota(String ramMota) {
@@ -100,7 +101,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Disko badiak lortzen ditu.
-     * 
+     *
      * @return Badiak.
      */
     public int getDiskoBadiak() {
@@ -109,7 +110,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Disko badiak ezartzen ditu.
-     * 
+     *
      * @param diskoBadiak Badia berriak.
      */
     public void setDiskoBadiak(int diskoBadiak) {
@@ -118,7 +119,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Rack unitateak lortzen ditu.
-     * 
+     *
      * @return Rack unitateak.
      */
     public int getRackUnitateak() {
@@ -127,7 +128,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Rack unitateak ezartzen ditu.
-     * 
+     *
      * @param rackUnitateak Unitate berriak.
      */
     public void setRackUnitateak(int rackUnitateak) {
@@ -136,7 +137,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Elikatze iturri erredundantea duen lortzen du.
-     * 
+     *
      * @return True badu.
      */
     public boolean isElikatzeIturriErredundantea() {
@@ -145,7 +146,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * Elikatze iturri erredundantearen egoera ezartzen du.
-     * 
+     *
      * @param elikatzeIturriErredundantea Egoera berria.
      */
     public void setElikatzeIturriErredundantea(boolean elikatzeIturriErredundantea) {
@@ -154,7 +155,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * RAID kontroladora lortzen du.
-     * 
+     *
      * @return RAID kontroladora.
      */
     public String getRaidKontroladora() {
@@ -163,7 +164,7 @@ public class Zerbitzaria extends Produktua {
 
     /**
      * RAID kontroladora ezartzen du.
-     * 
+     *
      * @param raidKontroladora Kontroladora berria.
      */
     public void setRaidKontroladora(String raidKontroladora) {

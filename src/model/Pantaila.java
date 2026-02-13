@@ -65,7 +65,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Pantaila tamaina lortzen du.
-     * 
+     *
      * @return Tamaina hazbetetan.
      */
     public BigDecimal getHazbeteak() {
@@ -74,7 +74,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Pantaila tamaina ezartzen du.
-     * 
+     *
      * @param hazbeteak Tamaina berria.
      */
     public void setHazbeteak(BigDecimal hazbeteak) {
@@ -83,7 +83,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Bereizmena lortzen du.
-     * 
+     *
      * @return Bereizmena.
      */
     public String getBereizmena() {
@@ -92,7 +92,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Bereizmena ezartzen du.
-     * 
+     *
      * @param bereizmena Bereizmen berria.
      */
     public void setBereizmena(String bereizmena) {
@@ -101,7 +101,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Panel mota lortzen du.
-     * 
+     *
      * @return Panel mota.
      */
     public String getPanelMota() {
@@ -110,7 +110,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Panel mota ezartzen du.
-     * 
+     *
      * @param panelMota Panel mota berria.
      */
     public void setPanelMota(String panelMota) {
@@ -119,7 +119,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Freskatze tasa lortzen du.
-     * 
+     *
      * @return Freskatze tasa Hz-tan.
      */
     public int getFreskatzeTasaHz() {
@@ -128,7 +128,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Freskatze tasa ezartzen du.
-     * 
+     *
      * @param freskatzeTasaHz Freskatze tasa berria.
      */
     public void setFreskatzeTasaHz(int freskatzeTasaHz) {
@@ -137,7 +137,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Konexioak lortzen ditu.
-     * 
+     *
      * @return Konexioak.
      */
     public String getKonexioak() {
@@ -146,7 +146,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Konexioak ezartzen ditu.
-     * 
+     *
      * @param konexioak Konexio berriak.
      */
     public void setKonexioak(String konexioak) {
@@ -155,7 +155,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Kurbatura lortzen du.
-     * 
+     *
      * @return Kurbatura.
      */
     public String getKurbatura() {
@@ -164,7 +164,7 @@ public class Pantaila extends Produktua {
 
     /**
      * Kurbatura ezartzen du.
-     * 
+     *
      * @param kurbatura Kurbatura berria.
      */
     public void setKurbatura(String kurbatura) {

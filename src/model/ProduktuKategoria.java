@@ -22,7 +22,7 @@ public class ProduktuKategoria {
 
     /**
      * Kategoriaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdKategoria() {
@@ -35,7 +35,7 @@ public class ProduktuKategoria {
 
     /**
      * Kategoriaren izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {

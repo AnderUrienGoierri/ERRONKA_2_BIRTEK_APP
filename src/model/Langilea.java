@@ -59,7 +59,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Langilearen IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdLangilea() {
@@ -68,7 +68,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Langilearen IDa ezartzen du.
-     * 
+     *
      * @param idLangilea ID berria.
      */
     public void setIdLangilea(int idLangilea) {
@@ -77,7 +77,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Langilearen NANa lortzen du.
-     * 
+     *
      * @return NAN zenbakia.
      */
     public String getNan() {
@@ -86,7 +86,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Langilearen NANa ezartzen du.
-     * 
+     *
      * @param nan NAN berria.
      */
     public void setNan(String nan) {
@@ -95,7 +95,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Salto txartelaren UIDa lortzen du.
-     * 
+     *
      * @return UIDa.
      */
     public String getSaltoTxartelaUid() {
@@ -104,7 +104,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Salto txartelaren UIDa ezartzen du.
-     * 
+     *
      * @param saltoTxartelaUid UID berria.
      */
     public void setSaltoTxartelaUid(String saltoTxartelaUid) {
@@ -113,7 +113,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Sailaren IDa lortzen du.
-     * 
+     *
      * @return Sailaren IDa.
      */
     public int getSailaId() {
@@ -122,7 +122,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Sailaren IDa ezartzen du.
-     * 
+     *
      * @param sailaId Sailaren ID berria.
      */
     public void setSailaId(int sailaId) {
@@ -131,7 +131,7 @@ public class Langilea extends Pertsona {
 
     /**
      * IBAN kontu korrontea lortzen du.
-     * 
+     *
      * @return IBANa.
      */
     public String getIban() {
@@ -140,7 +140,7 @@ public class Langilea extends Pertsona {
 
     /**
      * IBAN kontu korrontea ezartzen du.
-     * 
+     *
      * @param iban IBAN berria.
      */
     public void setIban(String iban) {
@@ -149,7 +149,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Kurrikuluma lortzen du.
-     * 
+     *
      * @return Kurrikuluma byte array bezala.
      */
     public byte[] getKurrikuluma() {
@@ -158,7 +158,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Kurrikuluma ezartzen du.
-     * 
+     *
      * @param kurrikuluma Byte array berria.
      */
     public void setKurrikuluma(byte[] kurrikuluma) {
@@ -217,7 +217,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Sarrera fitxaketa bat egiten du.
-     * 
+     *
      * @throws java.sql.SQLException Errorea gertatzen bada.
      */
     public void sarreraFitxaketaEgin() throws java.sql.SQLException {
@@ -226,7 +226,7 @@ public class Langilea extends Pertsona {
 
     /**
      * Irteera fitxaketa bat egiten du.
-     * 
+     *
      * @throws java.sql.SQLException Errorea gertatzen bada.
      */
     public void irteeraFitxaketaEgin() throws java.sql.SQLException {
@@ -316,8 +316,8 @@ public class Langilea extends Pertsona {
     public void nireLangileDatuakEditatu(String pasahitza, String hizkuntza, int herriaId, String telefonoa,
             String helbidea)
             throws java.sql.SQLException {
-        String sql = "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, telefonoa = ?, helbidea = ?, eguneratze_data = NOW() "
-        		+ "WHERE id_langilea = ?";
+        String sql=  "UPDATE langileak SET pasahitza = ?, hizkuntza = ?, herria_id = ?, telefonoa = ?, helbidea = ?, eguneratze_data = NOW() "
+                    +"WHERE id_langilea = ?";
         try (java.sql.Connection konexioa = DB_Konexioa.konektatu();
                 java.sql.PreparedStatement sententzia = konexioa.prepareStatement(sql)) {
             sententzia.setString(1, pasahitza);
@@ -337,9 +337,8 @@ public class Langilea extends Pertsona {
         }
     }
 
-    
     // langile batek bere fitxaketak historiala ikusteko metodoa:
-    
+
     /**
      * Langilearen azken fitxaketa egoera lortzen du.
      *

@@ -46,7 +46,7 @@ public class Konponketa {
 
     /**
      * Konponketaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdKonponketa() {
@@ -59,7 +59,7 @@ public class Konponketa {
 
     /**
      * Produktuaren IDa lortzen du.
-     * 
+     *
      * @return Produktuaren IDa.
      */
     public int getProduktuaId() {
@@ -72,7 +72,7 @@ public class Konponketa {
 
     /**
      * Langilearen IDa lortzen du.
-     * 
+     *
      * @return Langilearen IDa.
      */
     public int getLangileaId() {
@@ -85,7 +85,7 @@ public class Konponketa {
 
     /**
      * Hasiera data lortzen du.
-     * 
+     *
      * @return Hasiera data.
      */
     public Timestamp getHasieraData() {
@@ -98,7 +98,7 @@ public class Konponketa {
 
     /**
      * Amaiera data lortzen du.
-     * 
+     *
      * @return Amaiera data.
      */
     public Timestamp getAmaieraData() {
@@ -111,7 +111,7 @@ public class Konponketa {
 
     /**
      * Konponketaren egoera lortzen du.
-     * 
+     *
      * @return Egoera.
      */
     public String getKonponketaEgoera() {
@@ -124,7 +124,7 @@ public class Konponketa {
 
     /**
      * Akatsaren IDa lortzen du.
-     * 
+     *
      * @return Akatsaren IDa.
      */
     public int getAkatsaId() {
@@ -137,7 +137,7 @@ public class Konponketa {
 
     /**
      * Oharrak lortzen ditu.
-     * 
+     *
      * @return Oharrak.
      */
     public String getOharrak() {
@@ -150,7 +150,7 @@ public class Konponketa {
 
     /**
      * Eguneratze data lortzen du.
-     * 
+     *
      * @return Eguneratze data.
      */
     public Timestamp getEguneratzeData() {

@@ -14,7 +14,7 @@ public class TaulaModelatzailea {
 
     /**
      * ResultSet datuekin TableModel bat eraikitzen du.
-     * 
+     *
      * @param emaitza SQL kontsultaren emaitza (ResultSet).
      * @return Datuak dituen DefaultTableModel objektua.
      * @throws SQLException SQL errorea gertatzen bada.

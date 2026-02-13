@@ -28,7 +28,7 @@ public class LangileSaila {
 
     /**
      * Sailaren IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getIdSaila() {
@@ -41,7 +41,7 @@ public class LangileSaila {
 
     /**
      * Sailaren izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {
@@ -54,7 +54,7 @@ public class LangileSaila {
 
     /**
      * Sailaren kokapena lortzen du.
-     * 
+     *
      * @return Kokapena.
      */
     public String getKokapena() {
@@ -67,7 +67,7 @@ public class LangileSaila {
 
     /**
      * Sailaren deskribapena lortzen du.
-     * 
+     *
      * @return Deskribapena.
      */
     public String getDeskribapena() {

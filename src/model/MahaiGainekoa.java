@@ -57,6 +57,7 @@ public class MahaiGainekoa extends Produktua {
         super(idProduktua, hornitzaileId, kategoriaId, izena, marka, mota, deskribapena, irudiaUrl, biltegiId,
                 produktuEgoera, produktuEgoeraOharra, salgai, salmentaPrezioa, stock, eskaintza, zergakEhunekoa,
                 sortzeData, eguneratzeData);
+        // hemen soilik mahai gaineko ordenagailuen ezaugarriak ezartzen dira
         this.prozesadorea = prozesadorea;
         this.plakaBasea = plakaBasea;
         this.ramGb = ramGb;
@@ -68,7 +69,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Prozesadorea lortzen du.
-     * 
+     *
      * @return Prozesadorea.
      */
     public String getProzesadorea() {
@@ -77,7 +78,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Prozesadorea ezartzen du.
-     * 
+     *
      * @param prozesadorea Prozesadore berria.
      */
     public void setProzesadorea(String prozesadorea) {
@@ -86,7 +87,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Plaka basea lortzen du.
-     * 
+     *
      * @return Plaka basea.
      */
     public String getPlakaBasea() {
@@ -95,7 +96,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Plaka basea ezartzen du.
-     * 
+     *
      * @param plakaBasea Plaka base berria.
      */
     public void setPlakaBasea(String plakaBasea) {
@@ -104,7 +105,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * RAM memoria lortzen du.
-     * 
+     *
      * @return RAM memoria GBtan.
      */
     public int getRamGb() {
@@ -113,7 +114,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * RAM memoria ezartzen du.
-     * 
+     *
      * @param ramGb RAM memoria berria.
      */
     public void setRamGb(int ramGb) {
@@ -122,7 +123,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Diskoaren kapazitatea lortzen du.
-     * 
+     *
      * @return Diskoa GBtan.
      */
     public int getDiskoaGb() {
@@ -131,7 +132,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Diskoaren kapazitatea ezartzen du.
-     * 
+     *
      * @param diskoaGb Disko kapazitate berria.
      */
     public void setDiskoaGb(int diskoaGb) {
@@ -140,7 +141,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Txartel grafikoa lortzen du.
-     * 
+     *
      * @return Txartel grafikoa.
      */
     public String getTxartelGrafikoa() {
@@ -149,7 +150,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Txartel grafikoa ezartzen du.
-     * 
+     *
      * @param txartelGrafikoa Txartel grafiko berria.
      */
     public void setTxartelGrafikoa(String txartelGrafikoa) {
@@ -158,7 +159,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Elikatze iturria lortzen du.
-     * 
+     *
      * @return Elikatze iturria W-tan.
      */
     public int getElikatzeIturriaW() {
@@ -167,7 +168,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Elikatze iturria ezartzen du.
-     * 
+     *
      * @param elikatzeIturriaW Elikatze iturri berria.
      */
     public void setElikatzeIturriaW(int elikatzeIturriaW) {
@@ -176,7 +177,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Kaxa formatua lortzen du.
-     * 
+     *
      * @return Kaxa formatua.
      */
     public String getKaxaFormatua() {
@@ -185,7 +186,7 @@ public class MahaiGainekoa extends Produktua {
 
     /**
      * Kaxa formatua ezartzen du.
-     * 
+     *
      * @param kaxaFormatua Kaxa formatu berria.
      */
     public void setKaxaFormatua(String kaxaFormatua) {

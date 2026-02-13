@@ -56,7 +56,7 @@ public class MenuLogistika extends JFrame {
      */
     /**
      * MenuLogistika eraikitzailea.
-     * 
+     *
      * @param oinarrizkoLangilea Saioa hasi duen langilea.
      */
     public MenuLogistika(Langilea oinarrizkoLangilea) {
@@ -226,7 +226,7 @@ public class MenuLogistika extends JFrame {
     // --- FITXAKETA LOGIKA ---
     /**
      * Fitxaketa bat egin (Sarrera/Irteera).
-     * 
+     *
      * @param mota Fitxaketa mota.
      */
     private void fitxatu(String mota) {
@@ -594,7 +594,7 @@ public class MenuLogistika extends JFrame {
 
     /**
      * Sarrera baten lerroak taulan kargatu.
-     * 
+     *
      * @param idSarrera Sarreraren IDa.
      * @param model     Taula eredua.
      */
@@ -748,7 +748,7 @@ public class MenuLogistika extends JFrame {
 
     /**
      * Eskaera baten lerroak kargatu.
-     * 
+     *
      * @param idEskaera Eskaeraren IDa.
      * @param model     Taula eredua.
      */
@@ -900,7 +900,7 @@ public class MenuLogistika extends JFrame {
 
     /**
      * Produktu sarrera baten lerro egoera aldatu (Helper).
-     * 
+     *
      * @param egoeraBerria Egoera berria.
      */
     private void produktuEgoeraAldatu(String egoeraBerria) {

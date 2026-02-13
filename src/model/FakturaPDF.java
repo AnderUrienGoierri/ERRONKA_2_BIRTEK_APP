@@ -1,4 +1,5 @@
 package model;
+import db.DB_Konexioa;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -23,11 +24,12 @@ import java.io.FileInputStream;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import db.DB_Konexioa;
+
 
 /**
  * FakturaPDF klasea.
@@ -216,7 +218,7 @@ public class FakturaPDF {
 
     /**
      * Faktura FTP bidez zerbitzarira igotzeko metodoa.
-     * 
+     *
      * @param fitxategiPath  Igo nahi den fitxategiaren bide osoa.
      * @param fitxategiIzena Fitxategiak zerbitzarian izango duen izena.
      */

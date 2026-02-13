@@ -65,7 +65,7 @@ public abstract class Pertsona {
     // Getters eta Setters
     /**
      * IDa lortzen du.
-     * 
+     *
      * @return IDa.
      */
     public int getId() {
@@ -74,7 +74,7 @@ public abstract class Pertsona {
 
     /**
      * IDa ezartzen du.
-     * 
+     *
      * @param id ID berria.
      */
     public void setId(int id) {
@@ -83,7 +83,7 @@ public abstract class Pertsona {
 
     /**
      * Izena lortzen du.
-     * 
+     *
      * @return Izena.
      */
     public String getIzena() {
@@ -92,7 +92,7 @@ public abstract class Pertsona {
 
     /**
      * Izena ezartzen du.
-     * 
+     *
      * @param izena Izen berria.
      */
     public void setIzena(String izena) {
@@ -101,7 +101,7 @@ public abstract class Pertsona {
 
     /**
      * Abizena lortzen du.
-     * 
+     *
      * @return Abizena.
      */
     public String getAbizena() {
@@ -110,7 +110,7 @@ public abstract class Pertsona {
 
     /**
      * Abizena ezartzen du.
-     * 
+     *
      * @param abizena Abizen berria.
      */
     public void setAbizena(String abizena) {
@@ -119,7 +119,7 @@ public abstract class Pertsona {
 
     /**
      * NAN edo IFZ lortzen du.
-     * 
+     *
      * @return NAN edo IFZ.
      */
     public String getNanIfz() {
@@ -128,7 +128,7 @@ public abstract class Pertsona {
 
     /**
      * NAN edo IFZ ezartzen du.
-     * 
+     *
      * @param nanIfz NAN edo IFZ berria.
      */
     public void setNanIfz(String nanIfz) {
@@ -137,7 +137,7 @@ public abstract class Pertsona {
 
     /**
      * Jaiotza data lortzen du.
-     * 
+     *
      * @return Jaiotza data.
      */
     public Date getJaiotzaData() {
@@ -146,7 +146,7 @@ public abstract class Pertsona {
 
     /**
      * Jaiotza data ezartzen du.
-     * 
+     *
      * @param jaiotzaData Jaiotza data berria.
      */
     public void setJaiotzaData(Date jaiotzaData) {
@@ -155,7 +155,7 @@ public abstract class Pertsona {
 
     /**
      * Helbidea lortzen du.
-     * 
+     *
      * @return Helbidea.
      */
     public String getHelbidea() {
@@ -164,7 +164,7 @@ public abstract class Pertsona {
 
     /**
      * Helbidea ezartzen du.
-     * 
+     *
      * @param helbidea Helbide berria.
      */
     public void setHelbidea(String helbidea) {
@@ -173,7 +173,7 @@ public abstract class Pertsona {
 
     /**
      * Herriaren IDa lortzen du.
-     * 
+     *
      * @return Herriaren IDa.
      */
     public int getHerriaId() {
@@ -182,7 +182,7 @@ public abstract class Pertsona {
 
     /**
      * Herriaren IDa ezartzen du.
-     * 
+     *
      * @param herriaId Herriaren ID berria.
      */
     public void setHerriaId(int herriaId) {
@@ -191,7 +191,7 @@ public abstract class Pertsona {
 
     /**
      * Posta kodea lortzen du.
-     * 
+     *
      * @return Posta kodea.
      */
     public String getPostaKodea() {
@@ -200,7 +200,7 @@ public abstract class Pertsona {
 
     /**
      * Posta kodea ezartzen du.
-     * 
+     *
      * @param postaKodea Posta kode berria.
      */
     public void setPostaKodea(String postaKodea) {
@@ -209,7 +209,7 @@ public abstract class Pertsona {
 
     /**
      * Telefonoa lortzen du.
-     * 
+     *
      * @return Telefonoa.
      */
     public String getTelefonoa() {
@@ -218,7 +218,7 @@ public abstract class Pertsona {
 
     /**
      * Telefonoa ezartzen du.
-     * 
+     *
      * @param telefonoa Telefono berria.
      */
     public void setTelefonoa(String telefonoa) {
@@ -227,7 +227,7 @@ public abstract class Pertsona {
 
     /**
      * Emaila lortzen du.
-     * 
+     *
      * @return Emaila.
      */
     public String getEmaila() {
@@ -236,7 +236,7 @@ public abstract class Pertsona {
 
     /**
      * Emaila ezartzen du.
-     * 
+     *
      * @param emaila Email berria.
      */
     public void setEmaila(String emaila) {
@@ -245,7 +245,7 @@ public abstract class Pertsona {
 
     /**
      * Hizkuntza lortzen du.
-     * 
+     *
      * @return Hizkuntza.
      */
     public String getHizkuntza() {
@@ -254,7 +254,7 @@ public abstract class Pertsona {
 
     /**
      * Hizkuntza ezartzen du.
-     * 
+     *
      * @param hizkuntza Hizkuntza berria.
      */
     public void setHizkuntza(String hizkuntza) {
@@ -263,7 +263,7 @@ public abstract class Pertsona {
 
     /**
      * Pasahitza lortzen du.
-     * 
+     *
      * @return Pasahitza.
      */
     public String getPasahitza() {
@@ -272,7 +272,7 @@ public abstract class Pertsona {
 
     /**
      * Pasahitza ezartzen du.
-     * 
+     *
      * @param pasahitza Pasahitz berria.
      */
     public void setPasahitza(String pasahitza) {
@@ -281,7 +281,7 @@ public abstract class Pertsona {
 
     /**
      * Aktibo dagoen lortzen du.
-     * 
+     *
      * @return True aktibo badago, false bestela.
      */
     public boolean isAktibo() {
@@ -290,7 +290,7 @@ public abstract class Pertsona {
 
     /**
      * Aktibo egoera ezartzen du.
-     * 
+     *
      * @param aktibo Aktibo egoera berria.
      */
     public void setAktibo(boolean aktibo) {
@@ -299,7 +299,7 @@ public abstract class Pertsona {
 
     /**
      * Alta data lortzen du.
-     * 
+     *
      * @return Alta data.
      */
     public Timestamp getAltaData() {
@@ -308,7 +308,7 @@ public abstract class Pertsona {
 
     /**
      * Alta data ezartzen du.
-     * 
+     *
      * @param altaData Alta data berria.
      */
     public void setAltaData(Timestamp altaData) {
@@ -317,7 +317,7 @@ public abstract class Pertsona {
 
     /**
      * Eguneratze data lortzen du.
-     * 
+     *
      * @return Eguneratze data.
      */
     public Timestamp getEguneratzeData() {
@@ -326,7 +326,7 @@ public abstract class Pertsona {
 
     /**
      * Eguneratze data ezartzen du.
-     * 
+     *
      * @param eguneratzeData Eguneratze data berria.
      */
     public void setEguneratzeData(Timestamp eguneratzeData) {
