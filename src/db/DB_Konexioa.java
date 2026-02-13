@@ -12,18 +12,18 @@ public class DB_Konexioa {
 
     // Konfigurazio datuak
 
-    /*kode exektagarria etxean badago*/
-
+    /*kode exekutagarria lokalean badago*/
+    /*
     private static final String URLEA = "jdbc:mysql://localhost:3306/birtek_db";
     private static final String ERABILTZAILEA = "root";
     private static final String PASAHITZA = "1MG32025";
+    */
+    /* kode exekutagarria ikastetxean badago */
 
-    /* kode exektagarria ikastetxean badago */
-    /*
     private static final String URLEA = "jdbc:mysql://192.168.115.155:3306/birtek_db";
     private static final String ERABILTZAILEA = "admin";
     private static final String PASAHITZA = "1234";
-     */
+
 
     /**
      * Connection instantzia estatikoa (Singleton).
