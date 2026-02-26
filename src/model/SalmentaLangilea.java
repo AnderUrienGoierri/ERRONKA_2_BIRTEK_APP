@@ -704,7 +704,7 @@ public class SalmentaLangilea extends Langilea {
                     Object langileaIdObj = rs.getObject("langilea_id");
                     Integer langileaId = (langileaIdObj != null) ? ((Number) langileaIdObj).intValue() : null;
 
-                    eskaerak.add(new Eskaera(
+                    Eskaera eskaera = new Eskaera(
                             rs.getInt("id_eskaera"),
                             rs.getInt("bezeroa_id"),
                             langileaId,
@@ -713,7 +713,9 @@ public class SalmentaLangilea extends Langilea {
                             rs.getBigDecimal("guztira_prezioa"),
                             rs.getString("faktura_zenbakia"),
                             rs.getString("faktura_url"),
-                            rs.getString("eskaera_egoera")));
+                            rs.getString("eskaera_egoera"));
+                    eskaera.setEskaeraLerroak(EskaeraLerroa.eskaeraLerroaIkusi(eskaera.getIdEskaera()));
+                    eskaerak.add(eskaera);
                 }
             }
         }
@@ -749,6 +751,7 @@ public class SalmentaLangilea extends Langilea {
                             rs.getString("faktura_zenbakia"),
                             rs.getString("faktura_url"),
                             rs.getString("eskaera_egoera"));
+                    eskaera.setEskaeraLerroak(EskaeraLerroa.eskaeraLerroaIkusi(idEskaera));
                 }
             }
         }
@@ -832,8 +835,8 @@ public class SalmentaLangilea extends Langilea {
             konexioa.setAutoCommit(false);
 
             // 1. Eskaera eguneratu
-            String sqlUpdate =  "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() "
-                                +"WHERE id_eskaera = ?";
+            String sqlUpdate = "UPDATE eskaerak SET bezeroa_id = ?, guztira_prezioa = ?, eskaera_egoera = ?, eguneratze_data = NOW() "
+                    + "WHERE id_eskaera = ?";
             try (PreparedStatement pst = konexioa.prepareStatement(sqlUpdate)) {
                 pst.setInt(1, e.getBezeroaId());
                 pst.setBigDecimal(2, e.getGuztiraPrezioa());
@@ -851,7 +854,7 @@ public class SalmentaLangilea extends Langilea {
 
             // 3. Lerro berriak sartu
             String sqlInsertLerroa = "INSERT INTO eskaera_lerroak (eskaera_id, produktua_id, kantitatea, unitate_prezioa, eskaera_lerro_egoera) "
-                                    +"VALUES (?, ?, ?, ?, ?)";
+                    + "VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstLerroa = konexioa.prepareStatement(sqlInsertLerroa)) {
                 for (EskaeraLerroa l : lerroak) {
                     pstLerroa.setInt(1, e.getIdEskaera());

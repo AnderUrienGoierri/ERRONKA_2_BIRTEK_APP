@@ -1,6 +1,8 @@
 package model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sarrera klasea.
@@ -14,6 +16,7 @@ public class Sarrera {
     private int hornitzaileaId;
     private int langileaId;
     private String sarreraEgoera;
+    private List<SarreraLerroa> sarreraLerroak;
 
     /**
      * Sarrera eraikitzailea.
@@ -33,6 +36,7 @@ public class Sarrera {
         this.hornitzaileaId = hornitzaileaId;
         this.langileaId = langileaId;
         this.sarreraEgoera = sarreraEgoera;
+        this.sarreraLerroak = new ArrayList<>();
     }
 
     /**
@@ -111,5 +115,27 @@ public class Sarrera {
 
     public void setSarreraEgoera(String sarreraEgoera) {
         this.sarreraEgoera = sarreraEgoera;
+    }
+
+    /**
+     * Sarreraren lerroen zerrenda lortzen du.
+     *
+     * @return SarreraLerroa objektuen zerrenda.
+     */
+    public List<SarreraLerroa> getSarreraLerroak() {
+        return sarreraLerroak;
+    }
+
+    public void setSarreraLerroak(List<SarreraLerroa> sarreraLerroak) {
+        this.sarreraLerroak = sarreraLerroak;
+    }
+
+    /**
+     * Lerro berri bat gehitzen dio sarrerari.
+     *
+     * @param lerroa Gehituko den sarrera lerroa.
+     */
+    public void addSarreraLerroa(SarreraLerroa lerroa) {
+        this.sarreraLerroak.add(lerroa);
     }
 }

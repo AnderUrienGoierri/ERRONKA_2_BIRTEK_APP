@@ -214,6 +214,7 @@ public class AdministrariLangilea extends Langilea {
                             rs.getString("faktura_zenbakia"),
                             rs.getString("faktura_url"),
                             rs.getString("eskaera_egoera"));
+                    eskaera.setEskaeraLerroak(EskaeraLerroa.eskaeraLerroaIkusi(idEskaera));
                 }
             }
         }
@@ -479,8 +480,8 @@ public class AdministrariLangilea extends Langilea {
             throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "UPDATE hornitzaileak "
-                        +"SET izena_soziala = ?, nan_ifz = ?, kontaktu_pertsona = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, emaila = ?, hizkuntza = ?, eguneratze_data = NOW() "
-                        +"WHERE id_hornitzailea = ?";
+                    + "SET izena_soziala = ?, nan_ifz = ?, kontaktu_pertsona = ?, helbidea = ?, herria_id = ?, posta_kodea = ?, telefonoa = ?, emaila = ?, hizkuntza = ?, eguneratze_data = NOW() "
+                    + "WHERE id_hornitzailea = ?";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izenaSoziala);
             pst.setString(2, nan);
@@ -531,7 +532,7 @@ public class AdministrariLangilea extends Langilea {
     public void herriBerriaSortu(String izena, String lurraldea, String nazioa) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "INSERT INTO herriak (izena, lurraldea, nazioa) "
-                        +"VALUES (?, ?, ?)";
+                    + "VALUES (?, ?, ?)";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, lurraldea);
@@ -567,7 +568,7 @@ public class AdministrariLangilea extends Langilea {
     public void herriaEditatu(int idHerria, String izena, String lurraldea, String nazioa) throws SQLException {
         try (Connection kon = DB_Konexioa.konektatu()) {
             String sql = "UPDATE herriak "
-                        +"SET izena = ?, lurraldea = ?, nazioa = ? WHERE id_herria = ?";
+                    + "SET izena = ?, lurraldea = ?, nazioa = ? WHERE id_herria = ?";
             PreparedStatement pst = kon.prepareStatement(sql);
             pst.setString(1, izena);
             pst.setString(2, lurraldea);
@@ -585,8 +586,8 @@ public class AdministrariLangilea extends Langilea {
      */
     public void kurrikulumaIkusi(int idLangilea) throws Exception {
         String sql = "SELECT kurrikuluma "
-                    +"FROM langileak "
-                    +"WHERE id_langilea = ?";
+                + "FROM langileak "
+                + "WHERE id_langilea = ?";
         try (Connection kon = DB_Konexioa.konektatu();
                 PreparedStatement pst = kon.prepareStatement(sql)) {
             pst.setInt(1, idLangilea);

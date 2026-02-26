@@ -110,4 +110,32 @@ public class SarreraLerroa {
     public void setProduktuBerriaDatuak(String produktuBerriaDatuak) {
         this.produktuBerriaDatuak = produktuBerriaDatuak;
     }
+
+    /**
+     * Sarrera baten lerroak ikusteko metodo estatikoa.
+     *
+     * @param sarreraId Sarreraren IDa.
+     * @return SarreraLerroa objektuen zerrenda.
+     * @throws java.sql.SQLException Datu-basean errorea gertatzen bada.
+     */
+    public static java.util.List<SarreraLerroa> sarreraLerroaIkusi(int sarreraId) throws java.sql.SQLException {
+        java.util.List<SarreraLerroa> lerroak = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM sarrera_lerroak WHERE sarrera_id = ?";
+        try (java.sql.Connection kon = db.DB_Konexioa.konektatu();
+                java.sql.PreparedStatement pst = kon.prepareStatement(sql)) {
+            pst.setInt(1, sarreraId);
+            try (java.sql.ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    lerroak.add(new SarreraLerroa(
+                            rs.getInt("id_sarrera_lerroa"),
+                            rs.getInt("sarrera_id"),
+                            (Integer) rs.getObject("produktua_id"),
+                            rs.getInt("kantitatea"),
+                            rs.getString("sarrera_lerro_egoera"),
+                            rs.getString("produktu_berria_datuak")));
+                }
+            }
+        }
+        return lerroak;
+    }
 }

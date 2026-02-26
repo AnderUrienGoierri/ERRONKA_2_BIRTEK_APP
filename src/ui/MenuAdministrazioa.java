@@ -154,7 +154,7 @@ public class MenuAdministrazioa extends JFrame {
 
         // --- LANGILEAK TAB ---
         JPanel langilePanela = new JPanel(new BorderLayout());
-        pestainaPanela.addTab("Langileak", null, langilePanela, null);
+        pestainaPanela.addTab("Langileak_Sailak", null, langilePanela, null);
         langileTaula = new JTable();
         langilePanela.add(new JScrollPane(langileTaula), BorderLayout.CENTER);
 
@@ -331,11 +331,10 @@ public class MenuAdministrazioa extends JFrame {
      */
     private void datuakKargatuOsoa() {
         try (Connection konexioa = DB_Konexioa.konektatu()) {
+
             // Langileak
             try {
-                PreparedStatement pstL = konexioa.prepareStatement(
-                        "SELECT id_langilea, izena, abizena, nan, jaiotza_data, herria_id, helbidea, posta_kodea, telefonoa, emaila "
-                        +"FROM langileak");
+                PreparedStatement pstL = konexioa.prepareStatement("SELECT * FROM langileak_sailak");
                 DefaultTableModel mL = TaulaModelatzailea.ereduaEraiki(pstL.executeQuery());
                 langileTaula.setModel(mL);
                 langileOrdenatzailea = new TableRowSorter<>(mL);
@@ -361,8 +360,8 @@ public class MenuAdministrazioa extends JFrame {
             try {
                 PreparedStatement pstF = konexioa.prepareStatement(
                         "SELECT f.id_fitxaketa, CONCAT(l.izena, ' ', l.abizena) AS langilea, f.data, CAST(f.ordua AS CHAR) AS ordua, f.mota "
-                        +"FROM fitxaketak f JOIN langileak l ON f.langilea_id = l.id_langilea "
-                        +"ORDER BY f.id_fitxaketa DESC");
+                                + "FROM fitxaketak f JOIN langileak l ON f.langilea_id = l.id_langilea "
+                                + "ORDER BY f.id_fitxaketa DESC");
                 DefaultTableModel mF = TaulaModelatzailea.ereduaEraiki(pstF.executeQuery());
                 fitxaketaTaula.setModel(mF);
                 fitxaketaOrdenatzailea = new TableRowSorter<>(mF);
@@ -376,12 +375,12 @@ public class MenuAdministrazioa extends JFrame {
             try {
                 // Bezeroaren izena erakutsi eskaera ID hutsaren ordez (JOIN eginez)
                 String sqlFakturak = "SELECT e.id_eskaera AS id_faktura, e.faktura_zenbakia, " +
-                                    "CONCAT(e.id_eskaera, ' - ', b.izena_edo_soziala) AS eskaera, " +
-                                    "e.data, e.faktura_url AS fitxategia_url " +
-                                    "FROM eskaerak e " +
-                                    "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa " +
-                                    "WHERE e.faktura_zenbakia IS NOT NULL AND e.faktura_zenbakia != '' " +
-                                    "ORDER BY e.id_eskaera DESC";
+                        "CONCAT(e.id_eskaera, ' - ', b.izena_edo_soziala) AS eskaera, " +
+                        "e.data, e.faktura_url AS fitxategia_url " +
+                        "FROM eskaerak e " +
+                        "JOIN bezeroak b ON e.bezeroa_id = b.id_bezeroa " +
+                        "WHERE e.faktura_zenbakia IS NOT NULL AND e.faktura_zenbakia != '' " +
+                        "ORDER BY e.id_eskaera DESC";
                 PreparedStatement pstFa = konexioa.prepareStatement(sqlFakturak);
                 DefaultTableModel mFa = TaulaModelatzailea.ereduaEraiki(pstFa.executeQuery());
                 fakturaTaula.setModel(mFa);

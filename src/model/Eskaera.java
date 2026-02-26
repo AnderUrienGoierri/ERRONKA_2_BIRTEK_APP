@@ -2,6 +2,8 @@ package model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Eskaera klasea.
@@ -18,6 +20,7 @@ public class Eskaera {
     private String fakturaZenbakia;
     private String fakturaUrl;
     private String eskaeraEgoera;
+    private List<EskaeraLerroa> eskaeraLerroak;
 
     /**
      * Eskaera eraikitzailea.
@@ -43,6 +46,7 @@ public class Eskaera {
         this.fakturaZenbakia = fakturaZenbakia;
         this.fakturaUrl = fakturaUrl;
         this.eskaeraEgoera = eskaeraEgoera;
+        this.eskaeraLerroak = new ArrayList<>();
     }
 
     public int getIdEskaera() {
@@ -117,4 +121,25 @@ public class Eskaera {
         this.eskaeraEgoera = eskaeraEgoera;
     }
 
+    /**
+     * Eskaeraren lerroen zerrenda lortzen du.
+     *
+     * @return EskaeraLerroa objektuen zerrenda.
+     */
+    public List<EskaeraLerroa> getEskaeraLerroak() {
+        return eskaeraLerroak;
+    }
+
+    public void setEskaeraLerroak(List<EskaeraLerroa> eskaeraLerroak) {
+        this.eskaeraLerroak = eskaeraLerroak;
+    }
+
+    /**
+     * Lerro berri bat gehitzen dio eskaerari.
+     *
+     * @param lerroa Gehituko den eskaera lerroa.
+     */
+    public void addEskaeraLerroa(EskaeraLerroa lerroa) {
+        this.eskaeraLerroak.add(lerroa);
+    }
 }
